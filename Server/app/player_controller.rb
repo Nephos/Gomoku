@@ -23,7 +23,7 @@ class PlayerController < Nephos::Controller
   end
 
   def connect2
-    connect :whate
+    connect :black
   end
 
   private
