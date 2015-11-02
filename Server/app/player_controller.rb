@@ -2,7 +2,17 @@ require_relative 'models/player'
 
 class PlayerController < Nephos::Controller
 
-  @@p = {white: Player.new(:white), black: Player.new(:black)}
+  @@p = {
+    white: Player.new(:white),
+    black: Player.new(:black),
+  }
+  def self.all
+    @@p
+  end
+  def self.disconnect!
+    @@p[:white].finish!
+    @@p[:black].finish!
+  end
 
   def index
     return {json: {data: {p1: @@p[:white].to_hash, p2: @@p[:black].to_hash} }}
