@@ -1,22 +1,21 @@
 #include <sstream>
 #include "Player.hpp"
 
-Player::Player(std::string const &colour, std::string const &host, std::string const &port) : _network(host, port) {
-  _colour = colour;
+Player::Player(std::string const &host, std::string const &port) : _network(host, port) {
   _myTurn = false;
   _host = host + ":" + port;
 }
 
 Player *Player::p = NULL;
-Player *Player::getInstance(std::string const &colour, std::string const &host, std::string const &port) {
+Player *Player::getInstance(std::string const &host, std::string const &port) {
   if (p == NULL)
-    p = new Player(colour, host, port);
+    p = new Player(host, port);
   return p;
 }
 
 void Player::connect() {
   std::string header = " HTTP/1.0\r\nHost: " + _host + "\r\nAccept: */*\r\n";
-  std::string *str = new std::string("GET /players/connect/" + _colour + header + "\r\n");
+  std::string *str = new std::string("GET /players/connect" + header + "\r\n");
   _network.sendQuery(str);
 }
 
@@ -24,11 +23,12 @@ void Player::play() {
   connect();
   std::string ans;
   std::string header = " HTTP/1.0\r\nHost: " + _host + "\r\nAccept: */*\r\n";
-  for (int i = 0; i < 1000; i++) { // Game loop
+  for (int i = 0; i < 2; i++) { // Game loop
     ans = _network.getAnswer();
     parseAnswer(ans);
     if (!_myTurn) {
-      std::string *req = new std::string("GET /game" + header + _cookieColor + _cookieCode + "\r\n");
+      std::string *req = new std::string("GET /game" + header + _cookie + "\r\n\r\n");
+      std::cout << *req << std::endl;
       _network.sendQuery(req);
     }
   }
@@ -45,11 +45,17 @@ bool Player::parseAnswer(const std::string &str) {
   }
   std::istringstream ss(str);
   std::string tmp;
+  bool setCookie = false;
   while (std::getline(ss, tmp)) {
-    if (tmp.find("Set-Cookie: color=") != std::string::npos)
-      _cookieColor = tmp + "\r\n";
-    else if (tmp.find("Set-Cookie: code=") != std::string::npos)
-      _cookieCode = tmp + "\r\n";
+    if (tmp.find("Set-Cookie:") != std::string::npos) {
+      if (!setCookie) {
+        setCookie = true;
+        _cookie = "Cookie: ";
+      }
+      int n = tmp.find(";path=/");
+      tmp = tmp.substr(12, n - 12);
+      _cookie += tmp + "; ";
+    }
   }
   return true;
 }
