@@ -17,4 +17,5 @@ void Player::play() {
   std::string *req = new std::string("GET /players/connect/" + _colour);
   *req += " HTTP/1.0\r\nHost: " + _host + "\r\nAccept: */*\r\n\r\n";
   _network.sendQuery(req);
+  _network.update();
 }

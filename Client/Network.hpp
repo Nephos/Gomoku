@@ -20,8 +20,7 @@ class Network
     void sendQuery(const std::string *);
     bool isConnected();
 
-    void handleResolve(const boost::system::error_code&, boost::asio::ip::tcp::resolver::iterator);
-    void handleConnect(const boost::system::error_code&, boost::asio::ip::tcp::resolver::iterator);
+    void handleConnect(const boost::system::error_code&);
     void handleWrite(const boost::system::error_code&);
     void handleRead(const boost::system::error_code&);
     void timerHandle(const boost::system::error_code &);
