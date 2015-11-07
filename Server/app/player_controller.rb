@@ -41,6 +41,7 @@ class PlayerController < Nephos::Controller
     @@p[color].reset!
     cookies[:color] = color
     cookies[:code] = @@p[color].code
+    GameController.start_new_game! if @@p.count{|c, p| p.busy?} == 2
     return {json: {message: "connected"}, status: 200}
   end
 

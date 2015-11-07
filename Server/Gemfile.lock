@@ -7,10 +7,9 @@ GEM
     nephos (1.0.4)
       nephos-server (~> 0)
       nomorebeer (~> 1.1)
-    nephos-server (0.7.0)
+    nephos-server (0.7.1)
       colorize (~> 0.7)
       nomorebeer (~> 1.1)
-      puma (~> 2.13)
       rack (~> 1.6)
     nomorebeer (1.1)
     pry (0.10.3)
@@ -27,7 +26,7 @@ PLATFORMS
 DEPENDENCIES
   nephos
   pry
-  rack
+  puma
 
 BUNDLED WITH
    1.10.6
