@@ -2,13 +2,13 @@ class GameController < Nephos::Controller
 
   @@map = nil
   @@round = nil
-  # each game played add :black or :white in @@win
+  # each game played add "black" or "white" in @@win
   @@win = []
   @@last = nil
 
   def self.start_new_game!
     @@map = Map.new
-    @@round = :white
+    @@round = "white"
   end
 
   def request_round
@@ -33,7 +33,8 @@ class GameController < Nephos::Controller
   end
 
   def status
-    return {json: {win: @@win, current: !game_terminated?}}
+    return auth_err unless auth?
+    return {json: {win: @@win, current: !game_terminated?, you: cookies.to_h}}
   end
 
   private
@@ -47,7 +48,7 @@ class GameController < Nephos::Controller
   end
 
   def next_round!
-    @@round = (@@round == :white) ? :black : :white
+    @@round = (@@round == "white") ? "black" : "white"
   end
   @@player_mutex = {white: Mutex.new, black: Mutex.new}
   def wait_round color
@@ -83,7 +84,7 @@ class GameController < Nephos::Controller
     PlayerController.disconnect!
   end
   def game_terminated?
-    return @@last == @win.size
+    return @@last == @@win.size
   end
 
 end

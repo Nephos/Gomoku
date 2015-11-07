@@ -5,7 +5,7 @@ class Player
   attr_reader :color, :code
 
   def initialize color
-    raise ArgumentError unless [:white, :black].include? color
+    raise ArgumentError unless ["white", "black"].include? color
     @color = color
     @code = nil
   end
@@ -20,7 +20,7 @@ class Player
 
   CODES = (0..2**63)
   def reset!
-    @code = Digest::SHA256.digest(rand(CODES).to_s)
+    @code = Digest::SHA256.hexdigest(rand(CODES).to_s)
   end
 
   def to_hash
