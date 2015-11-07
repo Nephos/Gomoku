@@ -1,27 +1,57 @@
+require 'digest'
+
 class GameController < Nephos::Controller
 
-  @@map = nil
-  @@round = nil
-  # each game played add "black" or "white" in @@win
-  @@win = []
-  @@last = nil
+  @@games = {}
+  #before_action :set_game
+  def set_game
+    @game = @@games[cookies[:game]]
+    return false if @game.nil?
+    @map = @game[:map]
+    @code = cookies[:code]
+    @color = cookies[:color]
+    @round = @game[:round]
+    return true
+  end
 
-  def self.start_new_game!
-    @@map = Map.new
-    @@round = "white"
+  @@free_game = nil
+  # If no free game, start new one
+  # add player to free game
+  # If free game complete, add it to games and reset
+  @@connect_mutex = Mutex.new
+  def self.connect! color, code
+    @@connect_mutex.lock
+    if @@free_game == nil
+      @game_id = Player.new_code
+      @@free_game = {id: @game_id,
+                     map: Map.new,
+                     round: "white",
+                     # player codes
+                     players: {},
+                     # lock the game while there is no 2 players connected
+                     players_mutex: {"white" => Mutex.new, "black" => Mutex.new},
+      }
+    end
+    @@free_game[:players][color] = code # add the player
+    if @@free_game[:players].size == 2
+      @game_id = @@free_game[:id]
+      @@games[@game_id] = @@free_game
+      @@free_game = nil
+    end
+    @@connect_mutex.unlock
+    return @game_id
   end
 
   def request_round
     return auth_err unless auth?
-    return wait_err unless wait_round(cookies[:color])
-    return {json: {message: win_message(cookies[:color])}} if game_terminated?
-    return {json: {message: "It's your turn", map: @@map.to_a}}
+    return wait_err unless wait_round
+    return {json: {message: "Game end. You failed."}} if game_terminated?
+    return {json: {message: "It's your turn", map: @map.to_a}}
   end
 
-  @@round_mutex = Mutex.new
   def play_round
-    @@round_mutex.lock
-    @@round_mutex.unlock
+    return auth_err unless auth?
+    return {json: {message: "Not your turn. It's #{@round}."}, status: 401} if @round != @color
     next_round!
     raise "Not implemented"
     # Here try to play
@@ -33,36 +63,27 @@ class GameController < Nephos::Controller
     #return {json: {message: "Well played. Next turn...", map: @@map.to_a}}
   end
 
-  def status
-    return auth_err unless auth?
-    return {json: {win: @@win, current: !game_terminated?, you: cookies.to_h}}
-  end
-
   private
   def auth?
-    p = PlayerController.all[cookies[:color]]
-    #puts "Try to auth: #{cookies[:code]} => #{PlayerController.all}"
-    return false unless p
-    return p.code == cookies[:code]
+    return false if set_game == false
+    p = @game[:players][cookies[:color]]
+    # check if the client code is the player code
+    return p == cookies[:code]
   end
   def auth_err
-    return {json: "Forbidden. Not connected", status: 403}
+    return {json: {message: "Forbidden. Not connected", status: 403}}
   end
 
   def next_round!
-    @@round = (@@round == "white") ? "black" : "white"
+    @game[:round] = (@game[:round] == "white") ? "black" : "white"
   end
-  @@player_mutex = {"white" =>  Mutex.new, "black" => Mutex.new}
-  def wait_round color
-    unless @@player_mutex[color].try_lock
-      #puts "Already waiting for #{color}"
-      return false
-    end
+  def wait_round
+    # Already waiting for #{color}
+    return false unless @game[:players_mutex][@color].try_lock
     loop do
-      #puts "Wait your turn #{color} (#{@@round})"
-      if @@round == color
-        @@player_mutex[color].unlock
-        #puts "Time to play for #{color}"
+      # wait untile the color is right
+      if @game[:round] == @color
+        @game[:players_mutex][color].unlock
         return true
       end
       sleep 0.1
@@ -72,27 +93,11 @@ class GameController < Nephos::Controller
     return {json: {status: 401, message: "Error, you cannot join the round"}}
   end
 
-  def win! color
-    @@win << color
-    @@last += 1
-    game_terminated!
-  end
-  def win
-    return nil if @@round
-    return @@win.last
-  end
-  def win_message color
-    return nil unless win?
-    return "You failed" if color != win
-    return "You win"
-  end
-
   def game_terminated!
-    PlayerController.disconnect!
-    @@round = nil
+    @game[:players] = {}
   end
   def game_terminated?
-    return @@last == @@win.size
+    @game[:players].empty?
   end
 
 end

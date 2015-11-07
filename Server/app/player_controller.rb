@@ -2,47 +2,22 @@ require_relative 'models/player'
 
 class PlayerController < Nephos::Controller
 
-  @@p = {
-    "white" => Player.new("white"),
-    "black" => Player.new("black"),
-  }
-  def self.all
-    @@p
-  end
-  def self.disconnect!
-    @@p["white"].finish!
-    @@p["black"].finish!
-  end
-
-  def index
-    return {json: {data: {p1: @@p["white"].to_hash, p2: @@p["black"].to_hash} }}
-  end
-
-  def connect1
-    connect "white"
-  end
-
-  def connect2
-    connect "black"
-  end
-
-  private
-  def connect color
-    #require 'pry' ; binding.pry
-    return connect_err if @@p[color].busy?
-    return connect_new color
-  end
-
+  @@color = 0
   def connect_err
     return {json: {message: "failure"}, status: 401}
   end
 
-  def connect_new color
-    @@p[color].reset!
+  @@connect_mutex = Mutex.new
+  def connect
+    @@connect_mutex.lock # do not allows multiple connections to dispatch the games
+    color = (@@color % 2 == 0 ? "white" : "black")
+    @@color += 1
     cookies[:color] = color
-    cookies[:code] = @@p[color].code
-    GameController.start_new_game! if @@p.count{|c, p| p.busy?} == 2
-    return {json: {message: "connected"}, status: 200}
+    cookies[:code] = Player.new_code
+    id = GameController.connect! cookies[:color], cookies[:code]
+    @@connect_mutex.unlock # allows new connections
+    cookies[:game] = id
+    return {json: {message: "connected to #{id} as #{color}", id: id, color: color}, status: 200}
   end
 
 end
