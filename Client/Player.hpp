@@ -10,19 +10,18 @@ class Player
     void play();
     void connect();
 
-    static Player *getInstance(std::string const &colour = "", std::string const &host = "127.0.0.1", std::string const &port = "8080");
+    static Player *getInstance(std::string const &host = "127.0.0.1", std::string const &port = "8080");
 
     bool parseAnswer(std::string const &);
 
   private:
-    Player(std::string const &, std::string const &, std::string const &);
+    Player(std::string const &, std::string const &);
     ~Player() {};
     static Player *p;
 
-    std::string _colour;
+    std::string _color;
     std::string _host;
-    std::string _cookieColor;
-    std::string _cookieCode;
+    std::string _cookie;
     bool _myTurn;
     Network _network;
 };

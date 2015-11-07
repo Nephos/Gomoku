@@ -1,3 +1,4 @@
+#include <cstring>
 #include "Exceptions.hpp"
 #include "Network.hpp"
 
@@ -12,7 +13,6 @@ void Network::connect() {
 void Network::handleConnect(const boost::system::error_code &err) {
   if (err)
     throw Gomoku::NetworkException(err.message());
-  std::cout << "Connected" << std::endl;
 }
 
 void Network::sendQuery(const std::string *req) {
@@ -27,8 +27,12 @@ void Network::sendQuery(const std::string *req) {
   size_t read = boost::asio::read(_sock, boost::asio::buffer(_buff, max_length), err);
   if (err && err.value() != 2)
     throw Gomoku::NetworkException(err.message());
-  if (read > 0)
+  if (read > 0) {
     std::cout << _buff << std::endl;
+    std::string tmp(_buff);
+    _answers.push_back(tmp);
+  }
+  memset(_buff, '\0', 256);
 }
 
 std::string Network::getAnswer() {
