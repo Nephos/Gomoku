@@ -52,15 +52,19 @@ class GameController < Nephos::Controller
   def play_round
     return auth_err unless auth?
     return {json: {message: "Not your turn. It's #{@round}."}, status: 401} if @round != @color
+    x, y = Integer(params[:x]), Integer(params[:y])
+    return {json: {message: "Invalid position (x)", map: @game[:map].to_a, status: 401}} if x < 0 or x > 18
+    return {json: {message: "Invalid position (y)", map: @game[:map].to_a, status: 401}} if y < 0 or y > 18
+    return {json: {message: "Invalid position (occupied)", map: @game[:map].to_a, status: 401}} if @game[:map][x][y]
+    color = @color == "white" ? 0 : 1
+    @game[:map][x][y] = color
+    @game[:map].take_around!(x, y, color)
+    if @game.win?(x, y, color)
+      game_terminated!
+      return {json: {message: "You win.", map: @game[:map].to_a}}
+    end
     next_round!
-    raise "Not implemented"
-    # Here try to play
-    #...
-    # Then returns success or error
-    #return {json: {message: win_message(cookies[:color])}} if game_terminated?
-    #return {json: {message: "Not authorized", code: 401, map: @@map.to_a}}
-    #next_round!
-    #return {json: {message: "Well played. Next turn...", map: @@map.to_a}}
+    return {json: {message: "Well played. Next turn...", map: @game[:map].to_a}}
   end
 
   private
