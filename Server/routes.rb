@@ -4,12 +4,8 @@ resource "/players" do
   get "/connect/black", to: "PlayerController#connect2"
 end
 
-resource "/map" do
-  get "/", to: "MapControler#index"
-end
-
 resource "/game" do
-  get "/", to: "GameController#get_round"
+  get "/", to: "GameController#request_round"
   get "/status", to: "GameController#status"
   post "/play/:x/:y", to: "GameController#play_round"
 end

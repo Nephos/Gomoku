@@ -13,16 +13,19 @@ class GameController < Nephos::Controller
 
   def request_round
     return auth_err unless auth?
-    wait_round(cookies[:color])
+    return wait_err unless wait_round(cookies[:color])
     return {json: {message: win_message(cookies[:color])}} if game_terminated?
     return {json: {message: "It's your turn", map: @@map.to_a}}
   end
 
+  @@round_mutex = Mutex.new
   def play_round
+    @@round_mutex.lock
     raise "Not implemented"
     # Here try to play
     #...
     # Then returns success or error
+    @@round_mutex.unlock
     #return {json: {message: win_message(cookies[:color])}} if game_terminated?
     #return {json: {message: "Not authorized", code: 401, map: @@map.to_a}}
     #next_round!
@@ -46,13 +49,19 @@ class GameController < Nephos::Controller
   def next_round!
     @@round = (@@round == :white) ? :black : :white
   end
-  # ach ach ach
-  # TODO: protect against DOS on flood of threads whith a color
+  @@player_mutex = {white: Mutex.new, black: Mutex.new}
   def wait_round color
+    return false unless @@player_mutex[color].try_lock
     loop do
-      return true if @@round == color
+      if @@round == color
+        @@player_mutex[color].unlock
+        return true
+      end
       sleep 0.1
     end
+  end
+  def wait_err
+    return {json: {status: 401, message: "Error, you cannot join the round"}}
   end
 
   def win! color
