@@ -1,5 +1,6 @@
 SRC	=	Player.cpp \
 		Network.cpp \
+		HttpRequest.cpp \
 		main.cpp
 
 OBJ	=	$(SRC:.cpp=.o)
