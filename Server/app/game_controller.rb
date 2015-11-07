@@ -83,7 +83,7 @@ class GameController < Nephos::Controller
     loop do
       # wait untile the color is right
       if @game[:round] == @color
-        @game[:players_mutex][color].unlock
+        @game[:players_mutex][@color].unlock
         return true
       end
       sleep 0.1
