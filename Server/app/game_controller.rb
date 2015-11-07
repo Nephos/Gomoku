@@ -50,7 +50,7 @@ class GameController < Nephos::Controller
   def next_round!
     @@round = (@@round == "white") ? "black" : "white"
   end
-  @@player_mutex = {white: Mutex.new, black: Mutex.new}
+  @@player_mutex = {"white" =>  Mutex.new, black: Mutex.new}
   def wait_round color
     return false unless @@player_mutex[color].try_lock
     loop do
