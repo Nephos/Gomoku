@@ -55,11 +55,13 @@ class GameController < Nephos::Controller
     x, y = Integer(params[:x]), Integer(params[:y])
     return {json: {message: "Invalid position (x)", map: @game[:map].to_a, status: 401}} if x < 0 or x > 18
     return {json: {message: "Invalid position (y)", map: @game[:map].to_a, status: 401}} if y < 0 or y > 18
-    return {json: {message: "Invalid position (occupied)", map: @game[:map].to_a, status: 401}} if @game[:map][x][y]
+    return {json: {message: "Invalid position (occupied)", map: @game[:map].to_a, status: 401}} if @game[:map][y][x]
     color = @color == "white" ? 0 : 1
     @game[:map][x][y] = color
-    @game[:map].take_around!(x, y, color)
-    if @game.win?(x, y, color)
+    @game[:map].take_around!(y, x, color)
+    win = @game.win? color
+    @game[:map].took! color
+    if win
       game_terminated!
       return {json: {message: "You win.", map: @game[:map].to_a}}
     end
