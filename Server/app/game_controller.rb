@@ -71,7 +71,11 @@ class GameController < Nephos::Controller
     return p == cookies[:code]
   end
   def auth_err
-    return {json: {message: "Forbidden. Not connected", status: 403}}
+    g = @@games[cookies[:map]]
+    unless g && g[:players][cookies[:color]] && @@free_game.nil?
+      return {json: {message: "Forbidden. Game not validated.", status: 401}}
+    end
+    return {json: {message: "Forbidden. Not connected.", status: 403}}
   end
 
   def next_round!
