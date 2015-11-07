@@ -1,0 +1,29 @@
+SRC	=	Player.cpp \
+		Network.cpp \
+		main.cpp
+
+OBJ	=	$(SRC:.cpp=.o)
+
+NAME=	client
+
+CXXFLAGS += -Werror -Wextra -Wall
+
+LDXXFLAGS =	-lboost_system -lboost_filesystem -lboost_thread
+
+all: $(NAME)
+
+$(NAME): $(OBJ)
+	g++ -o $(NAME) $(LDXXFLAGS) $(OBJ)
+
+debug:
+	g++ $(SRC) $(LDXXFLAGS) $(CXXFLAGS) -g -o $(NAME)
+
+clean:
+	$(RM) $(OBJ)
+
+fclean: clean
+	$(RM) $(NAME)
+
+re: fclean all
+
+.PHONY: all clean fclean re debug
