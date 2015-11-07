@@ -1,2 +1,0 @@
-# Start
-``bundle install && nserver``

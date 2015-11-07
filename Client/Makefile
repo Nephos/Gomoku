@@ -6,7 +6,7 @@ OBJ	=	$(SRC:.cpp=.o)
 
 NAME=	client
 
-CXXFLAGS += -Werror -Wextra -Wall
+CXXFLAGS += -Werror -Wextra -Wall -std=c++11
 
 LDXXFLAGS =	-lboost_system -lboost_filesystem -lboost_thread
 
