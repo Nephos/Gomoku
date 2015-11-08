@@ -7,7 +7,7 @@
 #include <boost/bind.hpp>
 #include <boost/array.hpp>
 
-#define max_length 2048
+#define max_length 4096
 
 class Network
 {

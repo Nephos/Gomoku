@@ -85,18 +85,20 @@ bool Player::parseAnswer(const std::string &str) {
       }
     }
   }
-  std::istringstream ss(str);
-  std::string tmp;
-  bool setCookie = false;
-  while (std::getline(ss, tmp)) {
-    if (tmp.find("Set-Cookie:") != std::string::npos) {
-      if (!setCookie) {
-        setCookie = true;
-        _cookie = "Cookie: ";
+  if (_cookie == "") {
+    bool setCookie = false;
+    std::istringstream ss(str);
+    std::string tmp;
+    while (std::getline(ss, tmp)) {
+      if (tmp.find("Set-Cookie:") != std::string::npos) {
+        if (!setCookie) {
+          setCookie = true;
+          _cookie = "Cookie: ";
+        }
+        int n = tmp.find(";path=/");
+        tmp = tmp.substr(12, n - 12);
+        _cookie += tmp + "; ";
       }
-      int n = tmp.find(";path=/");
-      tmp = tmp.substr(12, n - 12);
-      _cookie += tmp + "; ";
     }
   }
   return true;
