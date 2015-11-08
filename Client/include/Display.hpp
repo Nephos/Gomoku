@@ -30,7 +30,9 @@ enum textures {
   GREEN,
   BLUE,
   PURPLE,
-  PINK
+  PINK,
+  BLACK,
+  WHITE
 };
 
 class GomokuDisplay {
@@ -41,7 +43,7 @@ class GomokuDisplay {
     std::pair<int, int> drawGame(const std::map<std::pair<int, int>, char> &); // Displays the game board, iterates on it & calls drawToken() then drawUI()
     void drawBoard(const std::map<std::pair<int, int>, char> &);
     void drawTile(int, int, bool);
-    void drawToken(); // Draws a token
+    void drawToken(float, float, bool); // Draws a token
     void drawUI(); // Draws the UI : scores + message
     void newToken(); // Displays a token spawn
     std::pair<int, int> handleInputs(); // Handles user inputs

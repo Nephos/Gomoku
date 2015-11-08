@@ -39,6 +39,8 @@ GomokuDisplay::GomokuDisplay() {
   _textures.push_back(loadTexture("./assets/blue.raw"));
   _textures.push_back(loadTexture("./assets/purple.raw"));
   _textures.push_back(loadTexture("./assets/pink.raw"));
+  _textures.push_back(loadTexture("./assets/black.raw"));
+  _textures.push_back(loadTexture("./assets/white.raw"));
 }
 
 GLuint GomokuDisplay::loadTexture(const std::string &filename)
@@ -110,9 +112,9 @@ void GomokuDisplay::drawTile(int x, int y, bool generic) {
   glBegin(GL_QUADS);
 
   glTexCoord2f(0, 0);
-  glVertex3f(x +  0.5f,  0.5f, y + 0.5f);
+  glVertex3f(x +  0.5f, 0.5f, y + 0.5f);
   glTexCoord2f(1, 0);
-  glVertex3f(x + -0.5f,  0.5f, y + 0.5f);
+  glVertex3f(x + -0.5f, 0.5f, y + 0.5f);
   glTexCoord2f(1, 1);
   glVertex3f(x + -0.5f, -0.5f, y + 0.5f);
   glTexCoord2f(0, 1);
@@ -123,27 +125,94 @@ void GomokuDisplay::drawTile(int x, int y, bool generic) {
   glTexCoord2f(1, 0);
   glVertex3f(x + -0.5f, -0.5f, y + -0.5f);
   glTexCoord2f(1, 1);
-  glVertex3f(x + -0.5f,  0.5f, y + -0.5f);
+  glVertex3f(x + -0.5f, 0.5f, y + -0.5f);
   glTexCoord2f(0, 1);
-  glVertex3f(x +  0.5f,  0.5f, y + -0.5f);
+  glVertex3f(x +  0.5f, 0.5f, y + -0.5f);
 
   glTexCoord2f(0, 0);
-  glVertex3f(x + -0.5f,  0.5f, y +  0.5f);
+  glVertex3f(x + -0.5f, 0.5f, y +  0.5f);
   glTexCoord2f(1, 0);
-  glVertex3f(x + -0.5f,  0.5f, y + -0.5f);
+  glVertex3f(x + -0.5f, 0.5f, y + -0.5f);
   glTexCoord2f(1, 1);
   glVertex3f(x + -0.5f, -0.5f, y + -0.5f);
   glTexCoord2f(0, 1);
   glVertex3f(x + -0.5f, -0.5f, y +  0.5f);
 
   glTexCoord2f(0, 0);
-  glVertex3f(x + 0.5f,  0.5f,  y + -0.5f);
+  glVertex3f(x + 0.5f, 0.5f,  y + -0.5f);
   glTexCoord2f(1, 0);
-  glVertex3f(x + 0.5f,  0.5f,  y +  0.5f);
+  glVertex3f(x + 0.5f, 0.5f,  y +  0.5f);
   glTexCoord2f(1, 1);
   glVertex3f(x + 0.5f, -0.5f,  y +  0.5f);
   glTexCoord2f(0, 1);
   glVertex3f(x + 0.5f, -0.5f,  y + -0.5f);
+
+  glEnd();
+}
+
+void GomokuDisplay::drawToken(float x, float y, bool generic) {
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  glEnable(GL_TEXTURE_2D);
+  glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+  if (generic)
+    glBindTexture(GL_TEXTURE_2D, _textures[WHITE]);
+  else
+    glBindTexture(GL_TEXTURE_2D, _textures[BLACK]);
+  glBegin(GL_QUADS);
+
+  glTexCoord2f(0, 0);
+  glVertex3f(x +  0.5f, 1.0f,  y +-0.5f);
+  glTexCoord2f(1, 0);
+  glVertex3f(x + -0.5f, 1.0f,  y +-0.5f);
+  glTexCoord2f(1, 1);
+  glVertex3f(x + -0.5f, 1.0f,  y + 0.5f);
+  glTexCoord2f(0, 1);
+  glVertex3f(x +  0.5f, 1.0f,  y + 0.5f);
+
+  glTexCoord2f(0, 0);
+  glVertex3f(x +  0.5f, -1.0f, y +  0.5f);
+  glTexCoord2f(1, 0);
+  glVertex3f(x + -0.5f, -1.0f, y +  0.5f);
+  glTexCoord2f(1, 1);
+  glVertex3f(x + -0.5f, -1.0f, y + -0.5f);
+  glTexCoord2f(0, 1);
+  glVertex3f(x +  0.5f, -1.0f, y + -0.5f);
+
+  glTexCoord2f(0, 0);
+  glVertex3f(x +  0.5f, 1.0f, y + 0.5f);
+  glTexCoord2f(1, 0);
+  glVertex3f(x + -0.5f, 1.0f, y + 0.5f);
+  glTexCoord2f(1, 1);
+  glVertex3f(x + -0.5f, -1.0f, y + 0.5f);
+  glTexCoord2f(0, 1);
+  glVertex3f(x +  0.5f, -1.0f, y + 0.5f);
+
+  glTexCoord2f(0, 0);
+  glVertex3f(x +  0.5f, -1.0f, y + -0.5f);
+  glTexCoord2f(1, 0);
+  glVertex3f(x + -0.5f, -1.0f, y + -0.5f);
+  glTexCoord2f(1, 1);
+  glVertex3f(x + -0.5f, 1.0f, y + -0.5f);
+  glTexCoord2f(0, 1);
+  glVertex3f(x +  0.5f, 1.0f, y + -0.5f);
+
+  glTexCoord2f(0, 0);
+  glVertex3f(x + -0.5f, 1.0f, y +  0.5f);
+  glTexCoord2f(1, 0);
+  glVertex3f(x + -0.5f, 1.0f, y + -0.5f);
+  glTexCoord2f(1, 1);
+  glVertex3f(x + -0.5f, -1.0f, y + -0.5f);
+  glTexCoord2f(0, 1);
+  glVertex3f(x + -0.5f, -1.0f, y +  0.5f);
+
+  glTexCoord2f(0, 0);
+  glVertex3f(x + 0.5f, 1.0f,  y + -0.5f);
+  glTexCoord2f(1, 0);
+  glVertex3f(x + 0.5f, 1.0f,  y +  0.5f);
+  glTexCoord2f(1, 1);
+  glVertex3f(x + 0.5f, -1.0f,  y +  0.5f);
+  glTexCoord2f(0, 1);
+  glVertex3f(x + 0.5f, -1.0f,  y + -0.5f);
 
   glEnd();
 }
@@ -159,10 +228,11 @@ void GomokuDisplay::drawBoard(const std::map<std::pair<int, int>, char> &map) {
       /* Then, if there is a token on it, we draw the token */
       std::pair<int, int> p(x, y);
       if (x != 19 && y != 19 && map.at(p) == '0') {
-      /* Don't forget to put the on the intersections */
+      /* Don't forget to put the token on the intersections */
+        drawToken(x - 8.5, y - 8.5, false);
       }
       else if (x != 19 && y != 19 && map.at(p) == '1') {
-
+        drawToken(x - 8.5, y - 8.5, true);
       }
     }
   }
@@ -189,7 +259,9 @@ std::pair<int, int> GomokuDisplay::drawGame(const std::map<std::pair<int, int>, 
   drawBoard(map);
 
   glXSwapBuffers(dpy, win);
-  return handleInputs();
+  std::pair<int, int> p = handleInputs();
+  // Faire des vecteurs et du cast et convertir le x et le y pour renvoyer la case correspondant
+  return p;
 }
 
 std::pair<int, int> GomokuDisplay::handleInputs() {
