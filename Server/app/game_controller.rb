@@ -42,31 +42,55 @@ class GameController < Nephos::Controller
     return @game_id
   end
 
+  private
+  def get_map_render
+    @map_render = @map.to_a
+    @map_render = @map_render.map{|e| e.map{|x| x||"x"}.join(" ")}.join("\n") if plain?
+  end
+  public
+
   def request_round
     return auth_err unless auth?
     return wait_err unless wait_round
-    return {json: {message: "Game end. You failed."}} if game_terminated?
-    return {json: {message: "It's your turn", map: @map.to_a}}
+    get_map_render
+    return {plain: "failed.\n" + @map_render} if game_terminated? and plain?
+    return {json: {message: "Game end. You failed.", map: @map_render}} if game_terminated?
+    return {plain: "continue.\n" + @map_render} if plain?
+    return {json: {message: "It's your turn", map: @map_render}}
   end
 
   def play_round
     return auth_err unless auth?
-    return {json: {message: "Not your turn. It's #{@round}."}, status: 401} if @round != @color
+    get_map_render
+    if @round != @color
+      return {plain: "failed. not your turn\n" + @map_render, status: 401} if plain?
+      return {json: {message: "Not your turn. It's #{@round}."}, status: 401}
+    end
     x, y = Integer(params[:x]), Integer(params[:y])
-    return {json: {message: "Invalid position (x)", map: @game[:map].to_a, status: 401}} if x < 0 or x > 18
-    return {json: {message: "Invalid position (y)", map: @game[:map].to_a, status: 401}} if y < 0 or y > 18
-    return {json: {message: "Invalid position (occupied)", map: @game[:map].to_a, status: 401}} if @game[:map][y][x]
+    if x < 0 or x > 18
+      return {plain: "failed. invalid x\n" + @map_render, status: 401} if plain?
+      return {json: {message: "Invalid position (x)", map: @map_render}, status: 401}
+    elsif y < 0 or y > 18
+      return {plain: "failed. invalid y\n" + @map_render, status: 401} if plain?
+      return {json: {message: "Invalid position (y)", map: @map_render}, status: 401}
+    elsif @map[y][x]
+      return {plain: "failed. occupied\n" + @map_render, status: 401} if plain?
+      return {json: {message: "Invalid position (occupied)", map: @map_render}, status: 401}
+    end
     color = @color == "white" ? 0 : 1
     @game[:map][x][y] = color
     @game[:map].take_around!(y, x, color)
     win = @game.win? color
     @game[:map].took! color
+    get_map_render
     if win
       game_terminated!
-      return {json: {message: "You win.", map: @game[:map].to_a}}
+      return {plain: "win\n" + @map_render} if plain?
+      return {json: {message: "You win.", map: @map_render}}
     end
     next_round!
-    return {json: {message: "Well played. Next turn...", map: @game[:map].to_a}}
+    return {plain: "continue\n" + @map_render} if plain?
+    return {json: {message: "Well played. Next turn...", map: @map_render}}
   end
 
   private
@@ -79,9 +103,11 @@ class GameController < Nephos::Controller
   def auth_err
     g = @@games[cookies[:map]]
     unless g && g[:players][cookies[:color]] && @@free_game.nil?
-      return {json: {message: "Forbidden. Game not validated.", status: 401}}
+      return {plain: "failed. not ready\n", status: 401} if plain?
+      return {json: {message: "Forbidden. Game not validated."}, status: 401}
     end
-    return {json: {message: "Forbidden. Not connected.", status: 403}}
+    return {plain: "failed. not connected\n", status: 403} if plain?
+    return {json: {message: "Forbidden. Not connected."}, status: 403}
   end
 
   def next_round!
@@ -100,7 +126,8 @@ class GameController < Nephos::Controller
     end
   end
   def wait_err
-    return {json: {status: 401, message: "Error, you cannot join the round"}}
+    return {plain: "failed. connect join", status: 401} if plain?
+    return {json: {message: "Error, you cannot join the round"}, status: 401}
   end
 
   def game_terminated!
