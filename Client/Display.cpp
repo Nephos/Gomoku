@@ -169,27 +169,27 @@ void GomokuDisplay::drawToken(float x, float y, bool white) {
   glVertex3f(x +  0.5f, 1.0f,  y + 0.5f);
 
   glTexCoord2f(0, 0);
-  glVertex3f(x +  0.5f, -1.0f, y +  0.5f);
+  glVertex3f(x +  0.5f, 0.0f, y +  0.5f);
   glTexCoord2f(1, 0);
-  glVertex3f(x + -0.5f, -1.0f, y +  0.5f);
+  glVertex3f(x + -0.5f, 0.0f, y +  0.5f);
   glTexCoord2f(1, 1);
-  glVertex3f(x + -0.5f, -1.0f, y + -0.5f);
+  glVertex3f(x + -0.5f, 0.0f, y + -0.5f);
   glTexCoord2f(0, 1);
-  glVertex3f(x +  0.5f, -1.0f, y + -0.5f);
+  glVertex3f(x +  0.5f, 0.0f, y + -0.5f);
 
   glTexCoord2f(0, 0);
   glVertex3f(x +  0.5f, 1.0f, y + 0.5f);
   glTexCoord2f(1, 0);
   glVertex3f(x + -0.5f, 1.0f, y + 0.5f);
   glTexCoord2f(1, 1);
-  glVertex3f(x + -0.5f, -1.0f, y + 0.5f);
+  glVertex3f(x + -0.5f, 0.0f, y + 0.5f);
   glTexCoord2f(0, 1);
-  glVertex3f(x +  0.5f, -1.0f, y + 0.5f);
+  glVertex3f(x +  0.5f, 0.0f, y + 0.5f);
 
   glTexCoord2f(0, 0);
-  glVertex3f(x +  0.5f, -1.0f, y + -0.5f);
+  glVertex3f(x +  0.5f, 0.0f, y + -0.5f);
   glTexCoord2f(1, 0);
-  glVertex3f(x + -0.5f, -1.0f, y + -0.5f);
+  glVertex3f(x + -0.5f, 0.0f, y + -0.5f);
   glTexCoord2f(1, 1);
   glVertex3f(x + -0.5f, 1.0f, y + -0.5f);
   glTexCoord2f(0, 1);
@@ -200,18 +200,18 @@ void GomokuDisplay::drawToken(float x, float y, bool white) {
   glTexCoord2f(1, 0);
   glVertex3f(x + -0.5f, 1.0f, y + -0.5f);
   glTexCoord2f(1, 1);
-  glVertex3f(x + -0.5f, -1.0f, y + -0.5f);
+  glVertex3f(x + -0.5f, 0.0f, y + -0.5f);
   glTexCoord2f(0, 1);
-  glVertex3f(x + -0.5f, -1.0f, y +  0.5f);
+  glVertex3f(x + -0.5f, 0.0f, y +  0.5f);
 
   glTexCoord2f(0, 0);
   glVertex3f(x + 0.5f, 1.0f,  y + -0.5f);
   glTexCoord2f(1, 0);
   glVertex3f(x + 0.5f, 1.0f,  y +  0.5f);
   glTexCoord2f(1, 1);
-  glVertex3f(x + 0.5f, -1.0f,  y +  0.5f);
+  glVertex3f(x + 0.5f, 0.0f,  y +  0.5f);
   glTexCoord2f(0, 1);
-  glVertex3f(x + 0.5f, -1.0f,  y + -0.5f);
+  glVertex3f(x + 0.5f, 0.0f,  y + -0.5f);
 
   glEnd();
 }
@@ -282,12 +282,26 @@ std::pair<int, int> GomokuDisplay::drawGame(const std::map<std::pair<int, int>, 
   glRotatef(pitch, 0., 1., 0.);
 
   drawBoard(map);
+  drawUI();
 
   glXSwapBuffers(dpy, win);
   std::pair<float, float> p = handleInputs();
   if (p.first >= 0)
     return transformInputs(p);
   return p;
+}
+
+void GomokuDisplay::drawUI() {
+  XGCValues val;
+  XFontStruct *font_info = XLoadQueryFont(dpy, "fixed");
+  val.font = font_info->fid;
+  GC gc = XCreateGC(dpy, win, 0, &val);
+
+  char str[256];
+  sprintf(str, "Nyuuuuuuuuuuuuuuu%s", message.c_str());
+  int width = XTextWidth(font_info, str, message.length() + 10);
+  int font_height = font_info->ascent + font_info->descent;
+  XDrawString(dpy, win, gc, (1000 - width) / 2, font_height, str, message.length() + 10);
 }
 
 std::pair<float, float> GomokuDisplay::handleInputs() {

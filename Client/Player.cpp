@@ -50,6 +50,10 @@ void Player::play() {
         ss << "POST /game/play/" << click.first << "/" << click.second << header << _cookie << "\r\n\r\n";
         std::string req = ss.str();
         _network.sendQuery(req);
+        _network._io_service.run();
+        _network._io_service.reset();
+        req = "GET /game/map.txt" + header + _cookie + "\r\n\r\n";
+        _network.sendQuery(req);
         _myTurn = false;
       }
     }
@@ -71,17 +75,20 @@ bool Player::parseAnswer(const std::string &str) {
     std::istringstream ss(str);
     std::string tmp;
     while (std::getline(ss, tmp)) {
-      if (tmp.find("failed.") != std::string::npos) {
+      if (tmp.find("failed.") == 0) {
         _gameOver = true;
         _display.setMessage("Game over, you lose. Press ESC to quit or SPACE to play again.");
       }
-      if (tmp.find("win.") != std::string::npos) {
+      if (tmp.find("win.") == 0) {
         _gameOver = true;
         _display.setMessage("Game over, you win. Press ESC to quit or SPACE to play again.");
       }
-      if (tmp.find("continue.") != std::string::npos) {
-        _display.setMessage("It's your turn !");
-        _myTurn = true;
+      if (tmp.find("continue.") == 0 ||
+        tmp.find("ok.") == 0) {
+        if (tmp.find("continue") == 0) {
+          _display.setMessage("It's your turn !");
+          _myTurn = true;
+        }
         /* We get the map */
         _map.clear();
         int i = 0;

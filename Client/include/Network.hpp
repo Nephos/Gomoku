@@ -26,8 +26,9 @@ class Network
     void handleRead(const boost::system::error_code &, size_t);
     void handleWrite(const boost::system::error_code &);
 
-  private:
     boost::asio::io_service _io_service;
+
+  private:
     boost::asio::ip::tcp::resolver _resolver;
     boost::asio::ip::tcp::socket _sock;
     boost::asio::ip::tcp::resolver::iterator _it;
