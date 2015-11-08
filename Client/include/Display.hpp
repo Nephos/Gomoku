@@ -7,8 +7,9 @@
 #include <GL/glx.h>
 #include <GL/glu.h>
 #include <map>
+#include <vector>
 
-#define CAMERA_SPEED 10
+#define CAMERA_SPEED 5
 
 enum keyCodes {
   KEY_ESCAPE = 9,
@@ -19,6 +20,13 @@ enum keyCodes {
   KEY_UP = 111
 };
 
+enum textures {
+  BOARDEDGE,
+  BOARDTOP,
+  BOARDSIDE,
+  BOARDBOT
+};
+
 class GomokuDisplay {
   public:
     GomokuDisplay();
@@ -26,11 +34,13 @@ class GomokuDisplay {
 
     std::pair<int, int> drawGame(const std::map<std::pair<int, int>, char> &); // Displays the game board, iterates on it & calls drawToken() then drawUI()
     void drawBoard(const std::map<std::pair<int, int>, char> &);
+    void drawTile(int, int, bool);
     void drawToken(); // Draws a token
     void drawUI(); // Draws the UI : scores + message
     void newToken(); // Displays a token spawn
     std::pair<int, int> handleInputs(); // Handles user inputs
     void setMessage(std::string const &);
+    GLuint loadTexture(std::string const &);
 
   private:
     Display *dpy;
@@ -38,4 +48,5 @@ class GomokuDisplay {
     GLXContext glc;
     float yaw, pitch;
     std::string message;
+    std::vector<GLuint> _textures;
 };
