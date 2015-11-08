@@ -49,6 +49,10 @@ class GameController < Nephos::Controller
   end
   public
 
+  # The method waits for the turn of the player before returning
+  #
+  # returns the map every times
+  # also add in first place "failed/continue. ...\n" for plain
   def request_round
     return auth_err unless auth?
     return wait_err unless wait_round
@@ -59,6 +63,11 @@ class GameController < Nephos::Controller
     return {json: {message: "It's your turn", map: @map_render}}
   end
 
+  # The route /game/play/x/y will try to put a item with color at y:x
+  # It will check if the move is valid, and then apply the rules
+  #
+  # returns the map every times
+  # also add in first place "failed/continue/win. ...\n" for plain
   def play_round
     return auth_err unless auth?
     get_map_render

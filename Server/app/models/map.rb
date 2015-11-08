@@ -67,12 +67,17 @@ class Map
   # test with every lines, based on T and (y, x)
   # if there is a 5 aligned "color" or "2"
   def win? color
+    # for each line and each cell
     @data.each_with_index do |line, y|
       line.each_with_index do |e, x|
+        # do not computes if not 2 (took this round) or same color
         next if e != 2 and e != color
+        # for each direction name tuple
         T.each do |tuple|
+          # calculate position of the next element
           y2, x2 = y + tuple[0], x + tuple[1]
           c = @data[y2][x2]
+          # check if the direction and win if one direction is true
          return true if c == color and win_direction? tuple, y2, x2, color
         end
       end
@@ -83,9 +88,11 @@ class Map
   private
   # test a line
   def win_direction? tuple, y, x, color, distance=0
+    # if we found 4 items + the base (from "win?") it's finished
     return true if distance == 4
     case @data[y][x]
-    when color
+    when color, 2
+      # check the next case with the direction if the color is right
       return win_direction?(tuple, y + tuple[0], x + tuple[1], color, distance + 1)
     else
       return false
