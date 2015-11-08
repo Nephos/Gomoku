@@ -300,6 +300,10 @@ std::pair<float, float> GomokuDisplay::handleInputs() {
           p.first = -2;
           p.second = -2;
           break;
+        case KEY_SPACE:
+          p.first = -3;
+          p.second = -3;
+          break;
         case KEY_LEFT:
           pitch -= CAMERA_SPEED;
           break;

@@ -32,10 +32,13 @@ void Player::play() {
   std::string header = " HTTP/1.0\r\nHost: " + _host + "\r\nAccept: */*\r\n";
   std::pair<int, int> click(-1, -1);
   int loop = 0;
+  _gameOver = false;
   while (click.first != -2) { // Game loop
     ans = _network.getAnswer();
     parseAnswer(ans);
     click = _display.drawGame(_map);
+    if (_gameOver && click.first == -3) // resetting cookies to play a new game
+      _cookie = "";
     if (!_myTurn && loop >= 10) {
       loop = 0;
       std::string req = "GET /game.txt" + header + _cookie + "\r\n\r\n";
@@ -68,6 +71,14 @@ bool Player::parseAnswer(const std::string &str) {
     std::istringstream ss(str);
     std::string tmp;
     while (std::getline(ss, tmp)) {
+      if (tmp.find("failed.") != std::string::npos) {
+        _gameOver = true;
+        _display.setMessage("Game over, you lose. Press ESC to quit or SPACE to play again.");
+      }
+      if (tmp.find("win.") != std::string::npos) {
+        _gameOver = true;
+        _display.setMessage("Game over, you win. Press ESC to quit or SPACE to play again.");
+      }
       if (tmp.find("continue.") != std::string::npos) {
         _display.setMessage("It's your turn !");
         _myTurn = true;

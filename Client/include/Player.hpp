@@ -25,6 +25,7 @@ class Player
     std::string _host;
     std::string _cookie;
     bool _myTurn;
+    bool _gameOver;
     Network _network;
     GomokuDisplay _display;
     std::map<std::pair<int, int>, char> _map;
