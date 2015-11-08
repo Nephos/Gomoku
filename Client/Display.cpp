@@ -43,8 +43,7 @@ GomokuDisplay::GomokuDisplay() {
   _textures.push_back(loadTexture("./assets/white.raw"));
 }
 
-GLuint GomokuDisplay::loadTexture(const std::string &filename)
-{
+GLuint GomokuDisplay::loadTexture(const std::string &filename) {
   GLuint texture;
   unsigned char data[64 * 64 * 3];
   FILE *fd;
@@ -150,11 +149,11 @@ void GomokuDisplay::drawTile(int x, int y, bool generic) {
   glEnd();
 }
 
-void GomokuDisplay::drawToken(float x, float y, bool generic) {
+void GomokuDisplay::drawToken(float x, float y, bool white) {
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
   glEnable(GL_TEXTURE_2D);
   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-  if (generic)
+  if (white == false) // bools hate me
     glBindTexture(GL_TEXTURE_2D, _textures[WHITE]);
   else
     glBindTexture(GL_TEXTURE_2D, _textures[BLACK]);
@@ -226,7 +225,7 @@ void GomokuDisplay::drawBoard(const std::map<std::pair<int, int>, char> &map) {
       else
         drawTile(x - 9, y - 9, false);
       /* Then, if there is a token on it, we draw the token */
-      std::pair<int, int> p(x, y);
+      std::pair<int, int> p(y, x);
       if (x != 19 && y != 19 && map.at(p) == '0') {
       /* Don't forget to put the token on the intersections */
         drawToken(x - 8.5, y - 8.5, false);
@@ -236,6 +235,28 @@ void GomokuDisplay::drawBoard(const std::map<std::pair<int, int>, char> &map) {
       }
     }
   }
+}
+
+std::pair<int, int> GomokuDisplay::transformInputs(std::pair<float, float> &click) {
+  GLint viewport[4];
+  glGetIntegerv(GL_VIEWPORT, viewport);
+  GLdouble modelview[16];
+  GLdouble projection[16];
+  GLfloat winX, winY, winZ;
+  GLdouble posX, posY, posZ;
+
+  glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+  glGetDoublev(GL_PROJECTION_MATRIX, projection);
+  glGetIntegerv(GL_VIEWPORT, viewport);
+
+  winX = click.first;
+  winY = (float)viewport[3] - click.second;
+  glReadPixels(click.first, int(winY), 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
+
+  gluUnProject(winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
+
+  std::pair<int, int> ret((int)(posX + 9), (int)(posZ + 9));
+  return ret;
 }
 
 std::pair<int, int> GomokuDisplay::drawGame(const std::map<std::pair<int, int>, char> &map) {
@@ -259,14 +280,15 @@ std::pair<int, int> GomokuDisplay::drawGame(const std::map<std::pair<int, int>, 
   drawBoard(map);
 
   glXSwapBuffers(dpy, win);
-  std::pair<int, int> p = handleInputs();
-  // Faire des vecteurs et du cast et convertir le x et le y pour renvoyer la case correspondant
+  std::pair<float, float> p = handleInputs();
+  if (p.first >= 0)
+    return transformInputs(p);
   return p;
 }
 
-std::pair<int, int> GomokuDisplay::handleInputs() {
+std::pair<float, float> GomokuDisplay::handleInputs() {
   XEvent xev;
-  std::pair<int, int> p(-1, -1);
+  std::pair<float, float> p(-1.0, -1.0);
 
   XSelectInput(dpy, win, ButtonPressMask|ButtonReleaseMask|KeyPressMask);
   if (XPending(dpy) > 0)

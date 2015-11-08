@@ -36,7 +36,10 @@ void Network::sendQuery(const std::string req) {
   const char *str = new char[req.length()];
   str = req.c_str();
   boost::asio::async_write(_sock, boost::asio::buffer(str, req.length()), boost::bind(&Network::handleWrite, this, boost::asio::placeholders::error));
-  boost::asio::async_read(_sock, boost::asio::buffer(_buff, max_length), boost::bind(&Network::handleRead, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
+  if (req.find("POST") == 0)
+    _answered = true;
+  else
+    boost::asio::async_read(_sock, boost::asio::buffer(_buff, max_length), boost::bind(&Network::handleRead, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred));
 }
 
 std::string Network::getAnswer() {

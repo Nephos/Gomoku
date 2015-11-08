@@ -31,23 +31,26 @@ void Player::play() {
   std::string ans;
   std::string header = " HTTP/1.0\r\nHost: " + _host + "\r\nAccept: */*\r\n";
   std::pair<int, int> click(-1, -1);
+  int loop = 0;
   while (click.first != -2) { // Game loop
     ans = _network.getAnswer();
     parseAnswer(ans);
     click = _display.drawGame(_map);
-    if (!_myTurn) {
+    if (!_myTurn && loop >= 10) {
+      loop = 0;
       std::string req = "GET /game.txt" + header + _cookie + "\r\n\r\n";
       _network.sendQuery(req);
     }
     else {
-      if (click.first != -1 && click.second != -1) {
+      if (click.first >= 0 && click.second >= 0) {
         std::stringstream ss;
         ss << "POST /game/play/" << click.first << "/" << click.second << header << _cookie << "\r\n\r\n";
-        std::string req;
-        ss >> req;
+        std::string req = ss.str();
         _network.sendQuery(req);
+        _myTurn = false;
       }
     }
+    loop++;
   }
 }
 
@@ -81,7 +84,6 @@ bool Player::parseAnswer(const std::string &str) {
         }
       }
     }
-    // Message = continue, fail ou win puis map
   }
   std::istringstream ss(str);
   std::string tmp;

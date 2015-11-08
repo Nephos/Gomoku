@@ -41,12 +41,13 @@ class GomokuDisplay {
     ~GomokuDisplay();
 
     std::pair<int, int> drawGame(const std::map<std::pair<int, int>, char> &); // Displays the game board, iterates on it & calls drawToken() then drawUI()
+    std::pair<int, int> transformInputs(std::pair<float, float> &);
     void drawBoard(const std::map<std::pair<int, int>, char> &);
     void drawTile(int, int, bool);
     void drawToken(float, float, bool); // Draws a token
     void drawUI(); // Draws the UI : scores + message
     void newToken(); // Displays a token spawn
-    std::pair<int, int> handleInputs(); // Handles user inputs
+    std::pair<float, float> handleInputs(); // Handles user inputs
     void setMessage(std::string const &);
     GLuint loadTexture(std::string const &);
 
