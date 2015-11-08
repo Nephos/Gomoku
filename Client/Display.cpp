@@ -8,6 +8,9 @@ GomokuDisplay::GomokuDisplay() {
   Colormap cmap;
   XSetWindowAttributes swa;
 
+  yaw = 100.0;
+  pitch = 0.0;
+
   dpy = XOpenDisplay(NULL);
   if (dpy == NULL)
     throw Gomoku::DisplayException("Cannot connect to X server");
@@ -33,12 +36,29 @@ GomokuDisplay::~GomokuDisplay() {
   XCloseDisplay(dpy);
 }
 
-std::pair<int, int> GomokuDisplay::drawMap() {
+void GomokuDisplay::drawBoard(const std::map<std::pair<int, int>, char> &) {
+
+}
+
+std::pair<int, int> GomokuDisplay::drawGame(const std::map<std::pair<int, int>, char> &map) {
   XWindowAttributes gwa;
 
   XGetWindowAttributes(dpy, win, &gwa);
   glViewport(0, 0, gwa.width, gwa.height);
-  // Draw the board
+
+  /* Getting ready to draw */
+  glClearColor(1.0, 1.0, 1.0, 1.0);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  /* Camera positionning */
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  gluPerspective(60, 1, 0.01, 1000);
+  glTranslatef(0, 0, -4);
+  glRotatef(yaw, 1., 0., 0.);
+  glRotatef(pitch, 0., 1., 0.);
+
+  drawBoard(map);
   // Iterate & call drawToken() function
   glXSwapBuffers(dpy, win);
   return handleInputs();
@@ -48,18 +68,39 @@ std::pair<int, int> GomokuDisplay::handleInputs() {
   XEvent xev;
   std::pair<int, int> p(-1, -1);
 
-  XSelectInput(dpy, win, ButtonPressMask|ButtonReleaseMask);
+  XSelectInput(dpy, win, ButtonPressMask|ButtonReleaseMask|KeyPressMask);
   if (XPending(dpy) > 0)
   {
     XNextEvent(dpy, &xev);
-    if (xev.type == Expose)
-      drawMap();
-    else if (xev.type == KeyPress)
-      std::cout << "yay, keyboard input !" << std::endl;
+    if (xev.type == KeyPress) {
+      std::cout << xev.xkey.keycode << std::endl;
+      switch (xev.xkey.keycode) {
+        case KEY_ESCAPE:
+          p.first = -2;
+          p.second = -2;
+          break;
+        case KEY_LEFT:
+          pitch -= CAMERA_SPEED;
+          break;
+        case KEY_RIGHT:
+          pitch += CAMERA_SPEED;
+          break;
+        case KEY_UP:
+          yaw += CAMERA_SPEED;
+          break;
+        case KEY_DOWN:
+          yaw -= CAMERA_SPEED;
+          break;
+      }
+    }
     else if (xev.type == ButtonRelease) {
       p.first = xev.xbutton.x;
       p.second = xev.xbutton.y;
     }
   }
   return p;
+}
+
+void GomokuDisplay::setMessage(const std::string &msg) {
+  message = msg;
 }

@@ -4,6 +4,13 @@
 Player::Player(std::string const &host, std::string const &port) : _network(host, port), _display() {
   _myTurn = false;
   _host = host + ":" + port;
+  for (int i = 0; i < 19; i++) {
+    for (int j = 0; j < 19; j++) {
+      std::pair<int, int> p(i, j);
+      std::pair<std::pair<int, int>, char> e(p, 'x');
+      _map.insert(e);
+    }
+  }
 }
 
 Player *Player::p = NULL;
@@ -23,10 +30,11 @@ void Player::play() {
   connect();
   std::string ans;
   std::string header = " HTTP/1.0\r\nHost: " + _host + "\r\nAccept: */*\r\n";
-  for (int i = 0; i < 1000; i++) { // Game loop
+  std::pair<int, int> click(-1, -1);
+  while (click.first != -2) { // Game loop
     ans = _network.getAnswer();
     parseAnswer(ans);
-    std::pair<int, int> click = _display.drawMap();
+    click = _display.drawGame(_map);
     if (!_myTurn) {
       std::string req = "GET /game.txt" + header + _cookie + "\r\n\r\n";
       _network.sendQuery(req);
@@ -37,7 +45,6 @@ void Player::play() {
         ss << "POST /game/play/" << click.first << "/" << click.second << header << _cookie << "\r\n\r\n";
         std::string req;
         ss >> req;
-        std::cout << req << std::endl;
         _network.sendQuery(req);
       }
     }
@@ -47,6 +54,7 @@ void Player::play() {
 /* If returns false, then ask for another user input */
 /* Else, wait for the other client */
 bool Player::parseAnswer(const std::string &str) {
+  _myTurn = false;
   if (str.find("401 Unauthorized") != std::string::npos)
     return false;
   else if (str.find("403 Forbidden") != std::string::npos) {
@@ -54,7 +62,25 @@ bool Player::parseAnswer(const std::string &str) {
     return false;
   }
   else {
-    std::cout << str << std::endl;
+    std::istringstream ss(str);
+    std::string tmp;
+    while (std::getline(ss, tmp)) {
+      if (tmp.find("continue.") != std::string::npos) {
+        _display.setMessage("It's your turn !");
+        _myTurn = true;
+        /* We get the map */
+        _map.clear();
+        int i = 0;
+        while (std::getline(ss, tmp)) {
+          for (int j = 0; j < 19; j++) {
+            std::pair<int, int> c(i, j); // Coordinates
+            std::pair<std::pair<int, int>, char> e(c, tmp.at(j * 2));
+            _map.insert(e);
+          }
+          ++i;
+        }
+      }
+    }
     // Message = continue, fail ou win puis map
   }
   std::istringstream ss(str);

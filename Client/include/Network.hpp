@@ -23,7 +23,8 @@ class Network
 
     std::string getAnswer();
 
-    void handleConnect(const boost::system::error_code&);
+    void handleRead(const boost::system::error_code &, size_t);
+    void handleWrite(const boost::system::error_code &);
 
   private:
     boost::asio::io_service _io_service;
@@ -34,4 +35,5 @@ class Network
     std::vector<std::string> _answers;
     std::string const &_host;
     std::string const &_port;
+    bool _answered;
 };

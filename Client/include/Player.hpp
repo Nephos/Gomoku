@@ -2,7 +2,7 @@
 
 #include <string>
 #include <utility>
-#include <vector>
+#include <map>
 #include "Display.hpp"
 #include "Network.hpp"
 
@@ -27,4 +27,5 @@ class Player
     bool _myTurn;
     Network _network;
     GomokuDisplay _display;
+    std::map<std::pair<int, int>, char> _map;
 };
