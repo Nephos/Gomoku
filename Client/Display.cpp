@@ -256,6 +256,10 @@ std::pair<int, int> GomokuDisplay::transformInputs(std::pair<float, float> &clic
   gluUnProject(winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
 
   std::pair<int, int> ret((int)(posX + 9), (int)(posZ + 9));
+  if (ret.first < 0 || ret.first > 18 || ret.second < 0 || ret.second > 18) {
+    ret.first = -1;
+    ret.second = -1;
+  }
   return ret;
 }
 
