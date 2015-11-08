@@ -22,9 +22,15 @@ enum keyCodes {
 
 enum textures {
   BOARDEDGE,
-  BOARDTOP,
   BOARDSIDE,
-  BOARDBOT
+  BOARDBOT,
+  RED,
+  ORANGE,
+  YELLOW,
+  GREEN,
+  BLUE,
+  PURPLE,
+  PINK
 };
 
 class GomokuDisplay {

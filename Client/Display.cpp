@@ -29,10 +29,16 @@ GomokuDisplay::GomokuDisplay() {
   glEnable(GL_DEPTH_TEST);
 
   /* Loading textures */
-  _textures.push_back(loadTexture("./assets/board_side.raw"));
-  _textures.push_back(loadTexture("./assets/board_top.raw"));
   _textures.push_back(loadTexture("./assets/board_edge.raw"));
+  _textures.push_back(loadTexture("./assets/board_bot.raw")); // To change maybe
   _textures.push_back(loadTexture("./assets/board_bot.raw"));
+  _textures.push_back(loadTexture("./assets/red.raw"));
+  _textures.push_back(loadTexture("./assets/orange.raw"));
+  _textures.push_back(loadTexture("./assets/yellow.raw"));
+  _textures.push_back(loadTexture("./assets/green.raw"));
+  _textures.push_back(loadTexture("./assets/blue.raw"));
+  _textures.push_back(loadTexture("./assets/purple.raw"));
+  _textures.push_back(loadTexture("./assets/pink.raw"));
 }
 
 GLuint GomokuDisplay::loadTexture(const std::string &filename)
@@ -72,7 +78,7 @@ void GomokuDisplay::drawTile(int x, int y, bool generic) {
   glEnable(GL_TEXTURE_2D);
   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
   if (generic)
-    glBindTexture(GL_TEXTURE_2D, _textures[BOARDTOP]);
+    glBindTexture(GL_TEXTURE_2D, _textures[((x + 9) + (y + 9)) % 7 + 3]);
   else
     glBindTexture(GL_TEXTURE_2D, _textures[BOARDEDGE]);
   glBegin(GL_QUADS);
@@ -143,19 +149,19 @@ void GomokuDisplay::drawTile(int x, int y, bool generic) {
 }
 
 void GomokuDisplay::drawBoard(const std::map<std::pair<int, int>, char> &map) {
-  for (int y = -1; y < 19; y++) {
-    for (int x = -1; x < 19; x++) {
+  for (int y = 0; y < 20; y++) {
+    for (int x = 0; x < 20; x++) {
       /* First we draw the board tile */
-      if (x != 18 && y != 18 && x != -1 && y != -1)
+      if (x != 19 && y != 19 && x != 0 && y != 0)
         drawTile(x - 9, y - 9, true);
       else
         drawTile(x - 9, y - 9, false);
       /* Then, if there is a token on it, we draw the token */
       std::pair<int, int> p(x, y);
-      if (x != -1 && y != -1 && map.at(p) == '0') {
+      if (x != 19 && y != 19 && map.at(p) == '0') {
       /* Don't forget to put the on the intersections */
       }
-      else if (x != -1 && y != -1 && map.at(p) == '1') {
+      else if (x != 19 && y != 19 && map.at(p) == '1') {
 
       }
     }
@@ -176,7 +182,7 @@ std::pair<int, int> GomokuDisplay::drawGame(const std::map<std::pair<int, int>, 
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   gluPerspective(60, 1, 0.01, 1000);
-  glTranslatef(0.5, -0.5, -20);
+  glTranslatef(-0.5, 0.5, -20);
   glRotatef(yaw, 1., 0., 0.);
   glRotatef(pitch, 0., 1., 0.);
 
