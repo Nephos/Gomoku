@@ -4,4 +4,5 @@ require 'uri'
 require 'http'
 require 'json'
 
-require_relative 'test_game'
+require_relative 'game'
+require_relative 'game_real'
