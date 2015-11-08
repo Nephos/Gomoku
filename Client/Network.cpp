@@ -15,20 +15,18 @@ void Network::handleConnect(const boost::system::error_code &err) {
     throw Gomoku::NetworkException(err.message());
 }
 
-void Network::sendQuery(const std::string *req) {
+void Network::sendQuery(const std::string req) {
   connect();
-  const char *str = new char[req->length()];
-  str = req->c_str();
+  const char *str = new char[req.length()];
+  str = req.c_str();
   boost::system::error_code err;
-  boost::asio::write(_sock, boost::asio::buffer(str, req->length()), err);
+  boost::asio::write(_sock, boost::asio::buffer(str, req.length()), err);
   if (err)
     throw Gomoku::NetworkException(err.message());
-  std::cout << str << std::endl;
   size_t read = boost::asio::read(_sock, boost::asio::buffer(_buff, max_length), err);
   if (err && err.value() != 2)
     throw Gomoku::NetworkException(err.message());
   if (read > 0) {
-    std::cout << _buff << std::endl;
     std::string tmp(_buff);
     _answers.push_back(tmp);
   }

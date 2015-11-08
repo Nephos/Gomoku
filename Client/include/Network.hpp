@@ -7,7 +7,7 @@
 #include <boost/bind.hpp>
 #include <boost/array.hpp>
 
-#define max_length 1024
+#define max_length 2048
 
 class Network
 {
@@ -18,7 +18,7 @@ class Network
     void init();
     void connect();
     void update();
-    void sendQuery(const std::string *);
+    void sendQuery(const std::string);
     bool isConnected();
 
     std::string getAnswer();

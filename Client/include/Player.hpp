@@ -2,6 +2,8 @@
 
 #include <string>
 #include <utility>
+#include <vector>
+#include "Display.hpp"
 #include "Network.hpp"
 
 class Player
@@ -24,4 +26,5 @@ class Player
     std::string _cookie;
     bool _myTurn;
     Network _network;
+    GomokuDisplay _display;
 };

@@ -25,4 +25,9 @@ namespace Gomoku {
   public:
     NetworkException(std::string const &str) : GomokuException(str, "Network error: ") {};
   };
+
+  class DisplayException : public GomokuException {
+  public:
+    DisplayException(std::string const &str) : GomokuException(str, "Display error: ") {};
+  };
 }
