@@ -46,7 +46,7 @@ class GameController < Nephos::Controller
     return auth_err unless auth?
     get_map_render
     return {plain: "ok.\n" + @map_render} if plain?
-    return {json: {message: "It's your turn", map: @map_render}}
+    return {json: {message: "Ok", map: @map_render}}
   end
 
   # The method waits for the turn of the player before returning
