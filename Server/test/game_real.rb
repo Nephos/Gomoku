@@ -35,9 +35,9 @@ class TestGameReal < Test::Unit::TestCase
     play(1, 0, 1, 200, 200)
     play(2, 2, 0, 200, 200)
     play(1, 0, 2, 200, 200)
-    play(2, 2, 0, 200, 200)
+    play(2, 3, 0, 200, 200)
     play(1, 0, 3, 200, 200)
-    play(2, 2, 0, 200, 200)
+    play(2, 4, 0, 200, 200)
     play(1, 0, 4, 200, 200, {end_msg: "You win."})
   end
 
@@ -47,11 +47,11 @@ class TestGameReal < Test::Unit::TestCase
     r = c.get(WAIT, {:headers => co})
     puts r
     assert_equal status_wait, r.status if status_wait
-    r = c.post(PLAY.gsub('X', '0').gsub('Y', '0'), {headers: co})
-    puts r
+    r = c.post(PLAY.gsub('X', x.to_s).gsub('Y', y.to_s), {headers: co})
+    #puts r
     assert_equal status_end, r.status if status_end
     if opt[:end_msg]
-      assert_eql JSON.parse(r.body.to_s)["message"], opt[:end_msg]
+      assert_equal JSON.parse(r.body.to_s)["message"], opt[:end_msg]
     end
     r
   end

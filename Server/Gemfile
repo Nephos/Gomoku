@@ -6,3 +6,4 @@ gem 'puma'
 
 gem 'pry'
 gem 'colorize'
+gem 'http'

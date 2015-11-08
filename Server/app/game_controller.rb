@@ -42,13 +42,6 @@ class GameController < Nephos::Controller
     return @game_id
   end
 
-  private
-  def get_map_render
-    @map_render = @map.to_a
-    @map_render = @map_render.map{|e| e.map{|x| x||"x"}.join(" ")}.join("\n") if plain?
-  end
-  public
-
   # The method waits for the turn of the player before returning
   #
   # returns the map every times
@@ -117,6 +110,11 @@ class GameController < Nephos::Controller
     end
     return {plain: "failed. not connected\n", status: 403} if plain?
     return {json: {message: "Forbidden. Not connected."}, status: 403}
+  end
+
+  def get_map_render
+    @map_render = @map.to_a
+    @map_render = @map_render.map{|e| e.map{|x| x||"x"}.join(" ")}.join("\n") if plain?
   end
 
   def next_round!

@@ -3,6 +3,9 @@ GEM
   specs:
     coderay (1.1.0)
     colorize (0.7.7)
+    http (0.6.4)
+      http_parser.rb (~> 0.6.0)
+    http_parser.rb (0.6.0)
     method_source (0.8.2)
     nephos (1.0.4)
       nephos-server (~> 0)
@@ -25,6 +28,7 @@ PLATFORMS
 
 DEPENDENCIES
   colorize
+  http
   nephos
   pry
   puma
