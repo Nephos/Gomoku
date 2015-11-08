@@ -5,7 +5,6 @@
 #include <vector>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
-#include <boost/array.hpp>
 
 #define max_length 4096
 
