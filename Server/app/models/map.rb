@@ -3,8 +3,8 @@ class Map
   attr_reader :size, :data
 
   def initialize size=19
-    @size = 19
-    @data = Array.new(19){Array.new(19) {nil}}
+    @size = size
+    @data = Array.new(size){Array.new(size) {nil}}
   end
 
   # we can use map like an array
