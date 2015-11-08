@@ -1,0 +1,18 @@
+#encoding: utf-8
+
+require 'colorize'
+
+task :default => [:test]
+
+task :test do
+  ruby "test/test.rb"
+end
+
+namespace :test do
+
+  desc "Unitary tests. Fasts and on the sources."
+  task :test do
+    ruby "test/test.rb"
+  end
+
+end
