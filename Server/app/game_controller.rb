@@ -78,18 +78,18 @@ class GameController < Nephos::Controller
       return {json: {message: "Invalid position (occupied)", map: @map_render}, status: 401}
     end
     color = @color == "white" ? 0 : 1
-    @game[:map][x][y] = color
+    @game[:map][y][x] = color
     @game[:map].take_around!(y, x, color)
-    win = @game.win? color
+    win = @game[:map].win? color
     @game[:map].took! color
     get_map_render
     if win
       game_terminated!
-      return {plain: "win\n" + @map_render} if plain?
+      return {plain: "win.\n" + @map_render} if plain?
       return {json: {message: "You win.", map: @map_render}}
     end
     next_round!
-    return {plain: "continue\n" + @map_render} if plain?
+    return {plain: "continue.\n" + @map_render} if plain?
     return {json: {message: "Well played. Next turn...", map: @map_render}}
   end
 
