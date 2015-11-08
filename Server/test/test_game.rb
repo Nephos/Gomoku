@@ -1,5 +1,6 @@
-puts "Please be sure you started the server on 8080"
 require 'pry'
+require 'colorize'
+puts "Please be sure you started the server on 8080".yellow
 
 module HTTP
   class Response
@@ -59,6 +60,7 @@ class TestGame < Test::Unit::TestCase
                     [nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil],
                     [nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil],
                     [nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil]]}
+
   INIT_WAIT_REP3 = {"message"=>"It's your turn",
                    "map"=>
                    [[0, nil, 1, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil],
