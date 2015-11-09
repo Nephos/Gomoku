@@ -11,6 +11,8 @@ GomokuDisplay::GomokuDisplay() {
   yaw = 90.0;
   pitch = 0.0;
 
+  color = "white";
+
   dpy = XOpenDisplay(NULL);
   if (dpy == NULL)
     throw Gomoku::DisplayException("Cannot connect to X server");
@@ -270,7 +272,10 @@ std::pair<int, int> GomokuDisplay::drawGame(const std::map<std::pair<int, int>, 
   glViewport(0, 0, gwa.width, gwa.height);
 
   /* Getting ready to draw */
-  glClearColor(0.0, 0.0, 0.0, 0.0);
+  if (color.compare("black") == 0)
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+  else
+    glClearColor(1.0, 1.0, 1.0, 1.0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   /* Camera positionning */
@@ -289,6 +294,10 @@ std::pair<int, int> GomokuDisplay::drawGame(const std::map<std::pair<int, int>, 
   if (p.first >= 0)
     return transformInputs(p);
   return p;
+}
+
+void GomokuDisplay::setColor(const std::string &c) {
+  color = c;
 }
 
 void GomokuDisplay::drawUI() {
