@@ -10,7 +10,7 @@ NAME=	client
 
 CXXFLAGS += -Werror -Wextra -Wall -std=c++11 -I./include
 
-LDXXFLAGS =	-lboost_system -lGL -lGLU -lX11
+LDXXFLAGS =	-lboost_system -lGL -lGLU -lX11 -lpthread
 
 all: $(NAME)
 
