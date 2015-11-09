@@ -53,7 +53,7 @@ void Player::play() {
     ans = _network.getAnswer();
     parseAnswer(ans);
     click = _display.drawGame(_map);
-    if (_gameOver && click.first == -3)
+    if (click.first == -3)
       resetGame();
     else if (!_myTurn && !_gameOver) {
       std::string req = "GET /game.txt" + header + _cookie + "\r\n\r\n";
@@ -100,6 +100,7 @@ bool Player::parseAnswer(const std::string &str) {
       else if (tmp.find("win.") == 0) {
         _gameOver = true;
         _display.setMessage("Game over, you win. Press ESC to quit or SPACE to play again.");
+        updateMap(ss);
       }
       else if (tmp.find("continue.") == 0 ||
         tmp.find("ok.") == 0) {
