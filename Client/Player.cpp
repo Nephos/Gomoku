@@ -53,7 +53,7 @@ void Player::play() {
     ans = _network.getAnswer();
     parseAnswer(ans);
     click = _display.drawGame(_map);
-    if (_gameOver && click.first == -3)
+    if (click.first == -3)
       resetGame();
     else if (!_myTurn && !_gameOver) {
       std::string req = "GET /game.txt" + header + _cookie + "\r\n\r\n";
@@ -95,20 +95,12 @@ bool Player::parseAnswer(const std::string &str) {
       if (tmp.find("failed.") == 0) {
         _gameOver = true;
         _display.setMessage("Game over, you lose. Press ESC to quit or SPACE to play again.");
-        _map.clear();
-        int i = 0;
-        while (std::getline(ss, tmp)) {
-          for (int j = 0; j < 19; j++) {
-            std::pair<int, int> c(i, j); // Coordinates
-            std::pair<std::pair<int, int>, char> e(c, tmp.at(j * 2));
-            _map.insert(e);
-          }
-          ++i;
-        }
+        updateMap(ss);
       }
       else if (tmp.find("win.") == 0) {
         _gameOver = true;
         _display.setMessage("Game over, you win. Press ESC to quit or SPACE to play again.");
+        updateMap(ss);
       }
       else if (tmp.find("continue.") == 0 ||
         tmp.find("ok.") == 0) {
@@ -122,22 +114,26 @@ bool Player::parseAnswer(const std::string &str) {
             _myTurn = false;
           }
         }
-        /* We get the map */
-        _map.clear();
-        int i = 0;
-        while (std::getline(ss, tmp)) {
-          for (int j = 0; j < 19; j++) {
-            std::pair<int, int> c(i, j); // Coordinates
-            std::pair<std::pair<int, int>, char> e(c, tmp.at(j * 2));
-            _map.insert(e);
-          }
-          ++i;
-        }
+        updateMap(ss);
       }
     }
   }
   setCookie(str);
   return true;
+}
+
+void Player::updateMap(std::istringstream &ss) {
+  std::string tmp;
+  _map.clear();
+  int i = 0;
+  while (std::getline(ss, tmp)) {
+    for (int j = 0; j < 19; j++) {
+      std::pair<int, int> c(i, j); // Coordinates
+      std::pair<std::pair<int, int>, char> e(c, tmp.at(j * 2));
+      _map.insert(e);
+    }
+    ++i;
+  }
 }
 
 void Player::setCookie(const std::string &str) {

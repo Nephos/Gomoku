@@ -27,7 +27,10 @@ void Network::handleWrite(const boost::system::error_code &err) {
 }
 
 void Network::reset() {
+  _io_service.poll();
+  _io_service.reset();
   _answers.clear();
+  _answered = true;
 }
 
 void Network::sendQuery(const std::string req) {
