@@ -2,12 +2,6 @@ require 'digest'
 
 class GameController < Nephos::Controller
 
-  def debug
-    require 'pry'
-    binding.pry
-    return {}
-  end
-
   @@games = {}
   #before_action :set_game
   def set_game
