@@ -73,6 +73,8 @@ class Map
         T.each do |tuple|
           # calculate position of the next element
           y2, x2 = y + tuple[0], x + tuple[1]
+          # if at border, end
+          next if y2 < 0 or y2 > 19
           c = @data[y2][x2]
           # check if the direction and win if one direction is true
          return true if c == color and win_direction? tuple, y2, x2, color
