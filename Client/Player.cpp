@@ -153,11 +153,11 @@ void Player::setCookie(const std::string &str) {
         }
         int n = tmp.find(";path=/");
         tmp = tmp.substr(12, n - 12);
+        _cookie += tmp + "; ";
         if (tmp.find("color") == 0) {
           tmp = tmp.substr(6);
           _display.setColor(tmp);
         }
-        _cookie += tmp + "; ";
       }
     }
   }
