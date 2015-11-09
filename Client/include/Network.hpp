@@ -19,6 +19,7 @@ class Network
     void update();
     void sendQuery(const std::string);
     bool isConnected();
+    void reset();
 
     std::string getAnswer();
 
