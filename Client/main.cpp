@@ -7,7 +7,7 @@ int main(int ac, char **av) {
     if (ac >= 1) {
       std::string host, port;
       if (ac == 2) {
-        host.assign(av[2]);
+        host.assign(av[1]);
         unsigned int sep = host.find(":");
         if (host.find(":") == std::string::npos || sep + 1 == host.length())
           throw Gomoku::UsageException();

@@ -11,6 +11,8 @@ GomokuDisplay::GomokuDisplay() {
   yaw = 90.0;
   pitch = 0.0;
 
+  color = "white";
+
   dpy = XOpenDisplay(NULL);
   if (dpy == NULL)
     throw Gomoku::DisplayException("Cannot connect to X server");
@@ -270,7 +272,10 @@ std::pair<int, int> GomokuDisplay::drawGame(const std::map<std::pair<int, int>, 
   glViewport(0, 0, gwa.width, gwa.height);
 
   /* Getting ready to draw */
-  glClearColor(0.0, 0.0, 0.0, 0.0);
+  if (color.compare("black") == 0)
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+  else
+    glClearColor(1.0, 1.0, 1.0, 1.0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   /* Camera positionning */
@@ -291,6 +296,10 @@ std::pair<int, int> GomokuDisplay::drawGame(const std::map<std::pair<int, int>, 
   return p;
 }
 
+void GomokuDisplay::setColor(const std::string &c) {
+  color = c;
+}
+
 void GomokuDisplay::drawUI() {
   XGCValues val;
   XFontStruct *font_info = XLoadQueryFont(dpy, "fixed");
@@ -298,6 +307,10 @@ void GomokuDisplay::drawUI() {
   GC gc = XCreateGC(dpy, win, 0, &val);
 
   char str[256];
+  if (color.compare("black") == 0)
+    XSetForeground(dpy, gc, 0xFFFFFF);
+  else
+    XSetForeground(dpy, gc, 0x000000);
   sprintf(str, "%s", message.c_str());
   int width = XTextWidth(font_info, str, message.length());
   int font_height = font_info->ascent + font_info->descent;
