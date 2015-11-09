@@ -79,9 +79,10 @@ class TestGameReal < Test::Unit::TestCase
     map[0][4] = 1
     assert_equal map.to_a, get_map
 
-    play(1, 0, 4, 200, 200)
+    body = play(1, 0, 4, 200, 200).body.to_s
     map[4][0] = 0
-    assert_equal nil, get_map # end of the game, no map avaliable
+    assert_equal map.to_a, get_map
+    assert_equal "You win.", JSON.parse(body)["message"]
   end
 
   def test_simple_take
@@ -93,6 +94,21 @@ class TestGameReal < Test::Unit::TestCase
     assert_equal map.to_a, get_map
   end
 
+  def test_double_take
+    new_game
+    map = Map.new
+    play_map(map, 1, 3, 1) # 1
+    play_map(map, 2, 3, 0)
+    play_map(map, 1, 2, 1) # 2
+    play_map(map, 2, 4, 1)
+    play_map(map, 1, 3, 2) # 3
+    play_map(map, 2, 0, 1)
+    play_map(map, 1, 1, 1) # 4
+    #play_map(map, 2, 3, 3)
+    #assert_equal 0, get_map.count(0)
+    #TODO
+  end
+
   def play(color, x, y, status_wait=nil, status_end=nil, opt={})
     c = (color == 1 ? @c1 : @c2)
     co = (color == 1 ? @co1 : @co2)
@@ -102,6 +118,14 @@ class TestGameReal < Test::Unit::TestCase
     assert_equal status_end, r.status if status_end
     if opt[:end_msg]
       assert_equal JSON.parse(r.body.to_s)["message"], opt[:end_msg]
+    end
+    r
+  end
+
+  def play_map(map, color, x, y, status_wait=nil, status_end=nil, opt={})
+    r = play(color, x, y, status_wait, status_end, opt)
+    if r.status == 200
+      map[y][x] = color - 1
     end
     r
   end

@@ -11,6 +11,7 @@ class GameController < Nephos::Controller
     @code = cookies[:code]
     @color = cookies[:color]
     @round = @game[:round]
+    @win = @game[:win]
     return true
   end
 
@@ -57,11 +58,21 @@ class GameController < Nephos::Controller
     return auth_err unless auth?
     return wait_err unless wait_round
     get_map_render
-    return {plain: "failed.\n" + @map_render} if game_terminated? and plain?
-    return {json: {message: "Game end. You failed.", map: @map_render}} if game_terminated?
+    return game_terminate_msg if game_terminated?
     return {plain: "continue.\n" + @map_render} if plain?
     return {json: {message: "It's your turn", map: @map_render}}
   end
+  private
+  def game_terminated_msg
+    if @win == @color
+      return {plain: "win.\n" + @map_render} if plain?
+      return {json: {message: "failed", map: @map_render}}
+    else
+      return {plain: "failed.\n" + @map_render} if plain?
+      return {json: {message: "failed", map: @map_render}}
+    end
+  end
+  public
 
   # The route /game/play/x/y will try to put a item with color at y:x
   # It will check if the move is valid, and then apply the rules
@@ -145,10 +156,11 @@ class GameController < Nephos::Controller
   end
 
   def game_terminated!
-    @game[:players] = {}
+    @game[:round] = nil
+    @game[:win] = @color
   end
   def game_terminated?
-    @game[:players].empty?
+    @game[:round].nil?
   end
 
 end
