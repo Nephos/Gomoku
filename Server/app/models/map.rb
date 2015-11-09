@@ -24,34 +24,36 @@ class Map
   ]
 
   public
-  # try to take every lines around (y, x)
-  # use the directions T
-  def take_around! y, x, color
-    T.each do |tuple|
-      y2, x2 = y + tuple[0], x + tuple[1]
-      c = @data[y2][x2]
-      #puts "Try #{c} at #{y2}:#{x2}"
-      if c && c != color
-        #puts "Direction found: #{tuple}"
-        take_direction! tuple, y2, x2, color
-      end
-    end
-  end
-
   # change elements "2" to "color"
   def took! color
     @data.map!{|line| line.map{|e| e == 2 ? color : e}}
   end
 
+  # try to take every lines around (y, x)
+  # use the directions T
+  def take_around! y, x, color
+    puts "take around #{x} #{y} (#{color})"
+    # check every directions
+    T.each do |tuple|
+      y2, x2 = y + tuple[0], x + tuple[1]
+      c = @data[y2][x2]
+      if c && c != color
+        take_direction! tuple, y2, x2, color
+      end
+    end
+  end
+
   private
   # try to take the line with the direction "tuple"
   # from (y, x)
+  # if a point is captured, then it will try to take every point around itself
   def take_direction! tuple, y, x, color
+    puts "take direction #{x} #{y} (#{color})"
     #puts "Check at #{y}:#{x}: #{@data[y][x].class}"
     case @data[y][x]
     when nil
       return false
-    when color
+    when color, 2
       #puts "Direction validated (#{tuple}) at #{y}:#{x}"
       return true
     end

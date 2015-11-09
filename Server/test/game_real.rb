@@ -104,9 +104,9 @@ class TestGameReal < Test::Unit::TestCase
     play_map(map, 1, 3, 2) # 3
     play_map(map, 2, 0, 1)
     play_map(map, 1, 1, 1) # 4
-    #play_map(map, 2, 3, 3)
-    #assert_equal 0, get_map.count(0)
-    #TODO
+    body = play_map(map, 2, 3, 3).body.to_s
+    assert_equal 0, get_map.count(0)
+    assert_equal "You win.", JSON.parse(body)["message"]
   end
 
   def play(color, x, y, status_wait=nil, status_end=nil, opt={})
