@@ -14,7 +14,11 @@ class Player
 
     static Player *getInstance(std::string const &host = "127.0.0.1", std::string const &port = "8080");
 
+    void initMap();
     bool parseAnswer(std::string const &);
+    void setCookie(std::string const &);
+    void resetGame();
+    void sendClick(std::pair<int, int>, std::string const &);
 
   private:
     Player(std::string const &, std::string const &);

@@ -298,10 +298,10 @@ void GomokuDisplay::drawUI() {
   GC gc = XCreateGC(dpy, win, 0, &val);
 
   char str[256];
-  sprintf(str, "Nyuuuuuuuuuuuuuuu%s", message.c_str());
-  int width = XTextWidth(font_info, str, message.length() + 10);
+  sprintf(str, "%s", message.c_str());
+  int width = XTextWidth(font_info, str, message.length());
   int font_height = font_info->ascent + font_info->descent;
-  XDrawString(dpy, win, gc, (1000 - width) / 2, font_height, str, message.length() + 10);
+  XDrawString(dpy, win, gc, (1000 - width) / 2, font_height, str, message.length());
 }
 
 std::pair<float, float> GomokuDisplay::handleInputs() {
