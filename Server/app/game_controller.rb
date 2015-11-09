@@ -62,6 +62,7 @@ class GameController < Nephos::Controller
   # also add in first place "failed/continue. ...\n" for plain
   def request_round
     return auth_err unless auth?
+    log "#{@color} requested a round"
     return wait_err unless wait_round
     get_map_render
     return game_terminate_msg if game_terminated?
@@ -145,6 +146,7 @@ class GameController < Nephos::Controller
   end
   def wait_round
     # Already waiting for #{color}
+    return false if @game[:round].nil?
     return false unless @game[:players_mutex][@color].try_lock
     loop do
       # wait untile the color is right
