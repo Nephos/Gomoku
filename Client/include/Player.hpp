@@ -18,6 +18,7 @@ class Player
     bool parseAnswer(std::string const &);
     void setCookie(std::string const &);
     void resetGame();
+    void updateMap(std::istringstream &);
     void sendClick(std::pair<int, int>, std::string const &);
 
   private:

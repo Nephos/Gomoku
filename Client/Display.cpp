@@ -307,6 +307,10 @@ void GomokuDisplay::drawUI() {
   GC gc = XCreateGC(dpy, win, 0, &val);
 
   char str[256];
+  if (color.compare("black") == 0)
+    XSetForeground(dpy, gc, 0xFFFFFF);
+  else
+    XSetForeground(dpy, gc, 0x000000);
   sprintf(str, "%s", message.c_str());
   int width = XTextWidth(font_info, str, message.length());
   int font_height = font_info->ascent + font_info->descent;
