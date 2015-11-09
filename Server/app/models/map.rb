@@ -31,6 +31,7 @@ class Map
     # check every directions
     T.each do |tuple|
       y2, x2 = y + tuple[0], x + tuple[1]
+      next unless valid_xy? x2, y2
       c = @data[y2][x2]
       if c && c != color
         take_direction! tuple, y2, x2, color
@@ -39,6 +40,10 @@ class Map
   end
 
   private
+  def valid_xy? x, y
+    return false if y < 0 or y >= 19 or x < 0 or x >= 19
+    return true
+  end
   # try to take the line with the direction "tuple"
   # from (y, x)
   # if a point is captured, then it will try to take every point around itself
@@ -52,7 +57,9 @@ class Map
       #puts "Direction validated (#{tuple}) at #{y}:#{x}"
       return true
     end
-    if take_direction! tuple, y + tuple[0], x + tuple[1], color
+    y2, x2 = y + tuple[0], x + tuple[1]
+    return false unless valid_xy? x2, y2
+    if take_direction! tuple, y2, x2, color
       @data[y][x] = color
       take_around! y, x, color
       return true
@@ -74,7 +81,7 @@ class Map
           # calculate position of the next element
           y2, x2 = y + tuple[0], x + tuple[1]
           # if at border, end
-          next if y2 < 0 or y2 > 19 or x2 < 0 or x2 > 19
+          next unless valid_xy? x2, y2
           c = @data[y2][x2]
           # check if the direction and win if one direction is true
          return true if c == color and win_direction? tuple, y2, x2, color
@@ -92,7 +99,9 @@ class Map
     case @data[y][x]
     when color
       # check the next case with the direction if the color is right
-      return win_direction?(tuple, y + tuple[0], x + tuple[1], color, distance + 1)
+      y2, x2 = y + tuple[0], x + tuple[1]
+      return false unless valid_xy? x2, y2
+      return win_direction?(tuple, y2, x2, color, distance + 1)
     else
       return false
     end
