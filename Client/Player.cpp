@@ -31,16 +31,16 @@ void Player::play() {
   std::string ans;
   std::string header = " HTTP/1.0\r\nHost: " + _host + "\r\nAccept: */*\r\n";
   std::pair<int, int> click(-1, -1);
-  int loop = 0;
   _gameOver = false;
   while (click.first != -2) { // Game loop
     ans = _network.getAnswer();
     parseAnswer(ans);
     click = _display.drawGame(_map);
-    if (_gameOver && click.first == -3) // resetting cookies to play a new game
-      _cookie = "";
-    if (!_myTurn && loop >= 10) {
-      loop = 0;
+    if (_gameOver && click.first == -3) {
+      _cookie = ""; // resetting cookies to play a new game
+      connect();
+    }
+    if (!_myTurn && !_gameOver) {
       std::string req = "GET /game.txt" + header + _cookie + "\r\n\r\n";
       _network.sendQuery(req);
     }
@@ -52,19 +52,18 @@ void Player::play() {
         _network.sendQuery(req);
         _network._io_service.run();
         _network._io_service.reset();
+        ans = _network.getAnswer();
+        parseAnswer(ans);
         req = "GET /game/map.txt" + header + _cookie + "\r\n\r\n";
         _network.sendQuery(req);
-        _myTurn = false;
       }
     }
-    loop++;
   }
 }
 
 /* If returns false, then ask for another user input */
 /* Else, wait for the other client */
 bool Player::parseAnswer(const std::string &str) {
-  _myTurn = false;
   if (str.find("401 Unauthorized") != std::string::npos)
     return false;
   else if (str.find("403 Forbidden") != std::string::npos) {
@@ -79,15 +78,18 @@ bool Player::parseAnswer(const std::string &str) {
         _gameOver = true;
         _display.setMessage("Game over, you lose. Press ESC to quit or SPACE to play again.");
       }
-      if (tmp.find("win.") == 0) {
+      else if (tmp.find("win.") == 0) {
         _gameOver = true;
         _display.setMessage("Game over, you win. Press ESC to quit or SPACE to play again.");
       }
-      if (tmp.find("continue.") == 0 ||
+      else if (tmp.find("continue.") == 0 ||
         tmp.find("ok.") == 0) {
         if (tmp.find("continue") == 0) {
           _display.setMessage("It's your turn !");
-          _myTurn = true;
+          if (!_myTurn)
+            _myTurn = true;
+          else
+            _myTurn = false;
         }
         /* We get the map */
         _map.clear();

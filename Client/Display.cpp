@@ -149,11 +149,11 @@ void GomokuDisplay::drawTile(int x, int y, bool generic) {
   glEnd();
 }
 
-void GomokuDisplay::drawToken(float x, float y, bool white) {
+void GomokuDisplay::drawToken(float x, float y, bool black) {
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
   glEnable(GL_TEXTURE_2D);
   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-  if (white == false) // bools hate me
+  if (!black)
     glBindTexture(GL_TEXTURE_2D, _textures[WHITE]);
   else
     glBindTexture(GL_TEXTURE_2D, _textures[BLACK]);
