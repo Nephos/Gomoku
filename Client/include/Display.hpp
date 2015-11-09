@@ -47,6 +47,7 @@ class GomokuDisplay {
     void drawToken(float, float, bool); // Draws a token
     void drawUI(); // Draws the UI : scores + message
     void newToken(); // Displays a token spawn
+    void setColor(const std::string &);
     std::pair<float, float> handleInputs(); // Handles user inputs
     void setMessage(std::string const &);
     GLuint loadTexture(std::string const &);
@@ -58,4 +59,5 @@ class GomokuDisplay {
     float yaw, pitch;
     std::string message;
     std::vector<GLuint> _textures;
+    std::string color;
 };

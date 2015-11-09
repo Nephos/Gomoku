@@ -15,8 +15,7 @@ Player *Player::getInstance(std::string const &host, std::string const &port) {
 }
 
 void Player::connect() {
-  std::string header = " HTTP/1.0\r\nHost: " + _host + "\r\nAccept: */*\r\n";
-  std::string str = "GET /players/connect/" + header + "\r\n";
+  std::string str = "GET /players/connect/ HTTP/1.0\r\nHost: " + _host + "\r\nAccept: */*\r\n\r\n";
   _network.sendQuery(str);
 }
 
@@ -32,20 +31,25 @@ void Player::initMap() {
 }
 
 void Player::resetGame() {
-  _cookie = ""; // resetting cookies to play a new game
+  _cookie.clear();
   _gameOver = false;
   _myTurn = false;
   initMap();
+  _network.reset();
   connect();
+  _display.setMessage("Waiting for other players...");
 }
 
 void Player::play() {
   connect();
+  _display.setMessage("Waiting for other players...");
   std::string ans;
   std::string header = " HTTP/1.0\r\nHost: " + _host + "\r\nAccept: */*\r\n";
   std::pair<int, int> click(-1, -1);
   _gameOver = false;
   while (click.first != -2) { // Game loop
+    click.first = -1;
+    click.second = -1;
     ans = _network.getAnswer();
     parseAnswer(ans);
     click = _display.drawGame(_map);
@@ -76,6 +80,8 @@ void Player::sendClick(std::pair<int, int> click, std::string const &header) {
 /* If returns false, then ask for another user input */
 /* Else, wait for the other client */
 bool Player::parseAnswer(const std::string &str) {
+  if (str.empty())
+    return true;
   if (str.find("401 Unauthorized") != std::string::npos)
     return false;
   else if (str.find("403 Forbidden") != std::string::npos) {
@@ -148,6 +154,10 @@ void Player::setCookie(const std::string &str) {
         int n = tmp.find(";path=/");
         tmp = tmp.substr(12, n - 12);
         _cookie += tmp + "; ";
+        if (tmp.find("color") == 0) {
+          tmp = tmp.substr(6);
+          _display.setColor(tmp);
+        }
       }
     }
   }
