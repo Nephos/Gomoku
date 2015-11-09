@@ -2,6 +2,12 @@ require 'digest'
 
 class GameController < Nephos::Controller
 
+  def debug
+    require 'pry'
+    binding.pry
+    return {}
+  end
+
   @@games = {}
   #before_action :set_game
   def set_game
@@ -11,6 +17,7 @@ class GameController < Nephos::Controller
     @code = cookies[:code]
     @color = cookies[:color]
     @round = @game[:round]
+    @win = @game[:win]
     return true
   end
 
@@ -42,23 +49,42 @@ class GameController < Nephos::Controller
     return @game_id
   end
 
-  private
-  def get_map_render
-    @map_render = @map.to_a
-    @map_render = @map_render.map{|e| e.map{|x| x||"x"}.join(" ")}.join("\n") if plain?
+  def request_map
+    return auth_err unless auth?
+    get_map_render
+    return {plain: "ok.\n" + @map_render} if plain?
+    return {json: {message: "Ok", map: @map_render}}
   end
-  public
 
+  # The method waits for the turn of the player before returning
+  #
+  # returns the map every times
+  # also add in first place "failed/continue. ...\n" for plain
   def request_round
     return auth_err unless auth?
     return wait_err unless wait_round
     get_map_render
-    return {plain: "failed.\n" + @map_render} if game_terminated? and plain?
-    return {json: {message: "Game end. You failed.", map: @map_render}} if game_terminated?
+    return game_terminate_msg if game_terminated?
     return {plain: "continue.\n" + @map_render} if plain?
     return {json: {message: "It's your turn", map: @map_render}}
   end
+  private
+  def game_terminated_msg
+    if @win == @color
+      return {plain: "win.\n" + @map_render} if plain?
+      return {json: {message: "failed", map: @map_render}}
+    else
+      return {plain: "failed.\n" + @map_render} if plain?
+      return {json: {message: "failed", map: @map_render}}
+    end
+  end
+  public
 
+  # The route /game/play/x/y will try to put a item with color at y:x
+  # It will check if the move is valid, and then apply the rules
+  #
+  # returns the map every times
+  # also add in first place "failed/continue/win. ...\n" for plain
   def play_round
     return auth_err unless auth?
     get_map_render
@@ -81,7 +107,6 @@ class GameController < Nephos::Controller
     @game[:map][y][x] = color
     @game[:map].take_around!(y, x, color)
     win = @game[:map].win? color
-    @game[:map].took! color
     get_map_render
     if win
       game_terminated!
@@ -110,6 +135,11 @@ class GameController < Nephos::Controller
     return {json: {message: "Forbidden. Not connected."}, status: 403}
   end
 
+  def get_map_render
+    @map_render = @map.to_a
+    @map_render = @map_render.map{|e| e.map{|x| x||"x"}.join(" ")}.join("\n") if plain?
+  end
+
   def next_round!
     @game[:round] = (@game[:round] == "white") ? "black" : "white"
   end
@@ -131,10 +161,11 @@ class GameController < Nephos::Controller
   end
 
   def game_terminated!
-    @game[:players] = {}
+    @game[:round] = nil
+    @game[:win] = @color
   end
   def game_terminated?
-    @game[:players].empty?
+    @game[:round].nil?
   end
 
 end

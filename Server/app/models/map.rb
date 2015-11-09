@@ -3,8 +3,8 @@ class Map
   attr_reader :size, :data
 
   def initialize size=19
-    @size = 19
-    @data = Array.new(19){Array.new(19) {nil}}
+    @size = size
+    @data = Array.new(size){Array.new(size) {nil}}
   end
 
   # we can use map like an array
@@ -27,26 +27,23 @@ class Map
   # try to take every lines around (y, x)
   # use the directions T
   def take_around! y, x, color
+    puts "take around #{x} #{y} (#{color})"
+    # check every directions
     T.each do |tuple|
       y2, x2 = y + tuple[0], x + tuple[1]
       c = @data[y2][x2]
-      #puts "Try #{c} at #{y2}:#{x2}"
       if c && c != color
-        #puts "Direction found: #{tuple}"
         take_direction! tuple, y2, x2, color
       end
     end
   end
 
-  # change elements "2" to "color"
-  def took! color
-    @data.map!{|line| line.map{|e| e == 2 ? color : e}}
-  end
-
   private
   # try to take the line with the direction "tuple"
   # from (y, x)
+  # if a point is captured, then it will try to take every point around itself
   def take_direction! tuple, y, x, color
+    puts "take direction #{x} #{y} (#{color})"
     #puts "Check at #{y}:#{x}: #{@data[y][x].class}"
     case @data[y][x]
     when nil
@@ -56,7 +53,7 @@ class Map
       return true
     end
     if take_direction! tuple, y + tuple[0], x + tuple[1], color
-      @data[y][x] = 2
+      @data[y][x] = color
       take_around! y, x, color
       return true
     end
@@ -67,12 +64,17 @@ class Map
   # test with every lines, based on T and (y, x)
   # if there is a 5 aligned "color" or "2"
   def win? color
+    # for each line and each cell
     @data.each_with_index do |line, y|
       line.each_with_index do |e, x|
-        next if e != 2 and e != color
+        # do not computes if not 2 (took this round) or same color
+        next if e != color
+        # for each direction name tuple
         T.each do |tuple|
+          # calculate position of the next element
           y2, x2 = y + tuple[0], x + tuple[1]
           c = @data[y2][x2]
+          # check if the direction and win if one direction is true
          return true if c == color and win_direction? tuple, y2, x2, color
         end
       end
@@ -83,9 +85,11 @@ class Map
   private
   # test a line
   def win_direction? tuple, y, x, color, distance=0
+    # if we found 4 items + the base (from "win?") it's finished
     return true if distance == 4
     case @data[y][x]
     when color
+      # check the next case with the direction if the color is right
       return win_direction?(tuple, y + tuple[0], x + tuple[1], color, distance + 1)
     else
       return false

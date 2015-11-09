@@ -5,3 +5,5 @@ gem 'nephos'
 gem 'puma'
 
 gem 'pry'
+gem 'colorize'
+gem 'http'
