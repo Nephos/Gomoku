@@ -107,10 +107,7 @@ class GameController < Nephos::Controller
     @game[:map][y][x] = color
     @game[:map].take_around!(y, x, color)
     win = @game[:map].win? color
-    @game[:map].took! color
-    win = @game[:map].win? color
     get_map_render
-    #require 'pry'; binding.pry
     if win
       game_terminated!
       return {plain: "win.\n" + @map_render} if plain?

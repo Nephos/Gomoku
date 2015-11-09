@@ -24,11 +24,6 @@ class Map
   ]
 
   public
-  # change elements "2" to "color"
-  def took! color
-    @data.map!{|line| line.map{|e| e == 2 ? color : e}}
-  end
-
   # try to take every lines around (y, x)
   # use the directions T
   def take_around! y, x, color
@@ -53,12 +48,12 @@ class Map
     case @data[y][x]
     when nil
       return false
-    when color, 2
+    when color
       #puts "Direction validated (#{tuple}) at #{y}:#{x}"
       return true
     end
     if take_direction! tuple, y + tuple[0], x + tuple[1], color
-      @data[y][x] = 2
+      @data[y][x] = color
       take_around! y, x, color
       return true
     end
@@ -73,7 +68,7 @@ class Map
     @data.each_with_index do |line, y|
       line.each_with_index do |e, x|
         # do not computes if not 2 (took this round) or same color
-        next if e != 2 and e != color
+        next if e != color
         # for each direction name tuple
         T.each do |tuple|
           # calculate position of the next element
@@ -93,7 +88,7 @@ class Map
     # if we found 4 items + the base (from "win?") it's finished
     return true if distance == 4
     case @data[y][x]
-    when color, 2
+    when color
       # check the next case with the direction if the color is right
       return win_direction?(tuple, y + tuple[0], x + tuple[1], color, distance + 1)
     else
