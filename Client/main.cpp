@@ -23,6 +23,9 @@ int main(int ac, char **av) {
       throw Gomoku::UsageException();
   }
   catch (const Gomoku::GomokuException &e) {
-    std::cout << e.what() << std::endl;
+    std::cout << "Game Error ! " << e.what() << std::endl;
+  }
+  catch (const std::exception &e) {
+    std::cout << "Runtime Error ! " << e.what() << std::endl;
   }
 }
