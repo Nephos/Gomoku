@@ -32,7 +32,9 @@ GomokuDisplay::GomokuDisplay() {
 
   /* Loading textures */
   _textures.push_back(loadTexture("./assets/board_edge.raw"));
-  _textures.push_back(loadTexture("./assets/board_bot.raw")); // To change maybe
+  _textures.push_back(loadTexture("./assets/board_edge_white.raw"));
+  _textures.push_back(loadTexture("./assets/board_edge_black.raw"));
+  _textures.push_back(loadTexture("./assets/board_bot.raw")); // To change
   _textures.push_back(loadTexture("./assets/board_bot.raw"));
   _textures.push_back(loadTexture("./assets/red.raw"));
   _textures.push_back(loadTexture("./assets/orange.raw"));
@@ -76,15 +78,21 @@ GomokuDisplay::~GomokuDisplay() {
   XCloseDisplay(dpy);
 }
 
-void GomokuDisplay::drawTile(int x, int y, bool generic) {
+void GomokuDisplay::drawTile(int x, int y, bool generic, int score) {
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
   glEnable(GL_TEXTURE_2D);
   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-  int c = ((x + 9) + (y + 9) + (loop / 10)) % 7 + 3;
+  int c = ((x + 9) + (y + 9) + (loop / 10)) % 7 + 5;
   if (generic)
     glBindTexture(GL_TEXTURE_2D, _textures[c]);
-  else
-    glBindTexture(GL_TEXTURE_2D, _textures[BOARDEDGE]);
+  else {
+    if (score == 1)
+      glBindTexture(GL_TEXTURE_2D, _textures[BOARDWHITE]);
+    else if (score == 2)
+      glBindTexture(GL_TEXTURE_2D, _textures[BOARDBLACK]);
+    else
+      glBindTexture(GL_TEXTURE_2D, _textures[BOARDEDGE]);
+  }
   glBegin(GL_QUADS);
 
   glTexCoord2f(0, 0);
@@ -97,7 +105,7 @@ void GomokuDisplay::drawTile(int x, int y, bool generic) {
   glVertex3f(x +  0.5f, 0.5f,  y + 0.5f);
 
   glEnd();
-  glBindTexture(GL_TEXTURE_2D, _textures[BOARDBOT]);
+  glBindTexture(GL_TEXTURE_2D, _textures[BOARDSIDE]);
   glBegin(GL_QUADS);
 
   glTexCoord2f(0, 0);
@@ -110,7 +118,7 @@ void GomokuDisplay::drawTile(int x, int y, bool generic) {
   glVertex3f(x +  0.5f, -0.5f, y + -0.5f);
 
   glEnd();
-  glBindTexture(GL_TEXTURE_2D, _textures[BOARDSIDE]);
+  glBindTexture(GL_TEXTURE_2D, _textures[BOARDBOT]);
   glBegin(GL_QUADS);
 
   glTexCoord2f(0, 0);
@@ -220,13 +228,25 @@ void GomokuDisplay::drawToken(float x, float y, bool black) {
 }
 
 void GomokuDisplay::drawBoard(const std::map<std::pair<int, int>, char> &map) {
+  int tmpBlack = blackScore;
+  int tmpWhite = whiteScore;
   for (int y = 0; y < 20; y++) {
     for (int x = 0; x < 20; x++) {
       /* First we draw the board tile */
       if (x != 19 && y != 19 && x != 0 && y != 0)
-        drawTile(x - 9, y - 9, true);
-      else
-        drawTile(x - 9, y - 9, false);
+        drawTile(x - 9, y - 9, true, false);
+      else {
+        if (y == 0 && tmpWhite) {
+          drawTile(x - 9, y - 9, false, 1);
+          tmpWhite--;
+        }
+        else if (y == 19 && tmpBlack) {
+          drawTile(x - 9, y - 9, false, 2);
+          tmpBlack--;
+        }
+        else
+          drawTile(x - 9, y - 9, false, 0);
+      }
       /* Then, if there is a token on it, we draw the token */
       std::pair<int, int> p(y, x);
       if (x != 19 && y != 19 && map.at(p) == '0') {
@@ -301,6 +321,14 @@ std::pair<int, int> GomokuDisplay::drawGame(const std::map<std::pair<int, int>, 
 
 void GomokuDisplay::setColor(const std::string &c) {
   color = c;
+}
+
+void GomokuDisplay::setBlackScore(int a) {
+  blackScore = a;
+}
+
+void GomokuDisplay::setWhiteScore(int a) {
+  whiteScore = a;
 }
 
 void GomokuDisplay::drawUI() {

@@ -14,7 +14,7 @@
 
 enum keyCodes {
   KEY_ESCAPE = 9,
-  KEY_SPACE = 65, // Not used (for now)
+  KEY_SPACE = 65,
   KEY_LEFT = 113,
   KEY_RIGHT = 114,
   KEY_DOWN = 116,
@@ -23,6 +23,8 @@ enum keyCodes {
 
 enum textures {
   BOARDEDGE,
+  BOARDWHITE,
+  BOARDBLACK,
   BOARDSIDE,
   BOARDBOT,
   RED,
@@ -44,15 +46,18 @@ class GomokuDisplay {
     std::pair<int, int> drawGame(const std::map<std::pair<int, int>, char> &); // Displays the game board, iterates on it & calls drawToken() then drawUI()
     std::pair<int, int> transformInputs(std::pair<float, float> &);
     void drawBoard(const std::map<std::pair<int, int>, char> &);
-    void drawTile(int, int, bool);
+    void drawTile(int, int, bool, int);
     void drawToken(float, float, bool); // Draws a token
     void drawUI(); // Draws the UI : scores + message
     void newToken(); // Displays a token spawn
-    void setColor(const std::string &);
     std::pair<float, float> handleInputs(); // Handles user inputs
-    void setMessage(std::string const &);
     GLuint loadTexture(std::string const &);
     void loadOBJ(std::string const &);
+
+    void setColor(const std::string &);
+    void setMessage(std::string const &);
+    void setBlackScore(int);
+    void setWhiteScore(int);
 
   private:
     Display *dpy;
@@ -63,5 +68,7 @@ class GomokuDisplay {
     std::vector<GLuint> _textures;
     std::string color;
     int loop;
+    int whiteScore;
+    int blackScore;
 //    std::vector<Obj> objs;
 };
