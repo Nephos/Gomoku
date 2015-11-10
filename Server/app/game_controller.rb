@@ -31,6 +31,7 @@ class GameController < Nephos::Controller
                      players: {},
                      # lock the game while there is no 2 players connected
                      players_mutex: {"white" => Mutex.new, "black" => Mutex.new},
+                     players_took: {"white" => 0, "black" => 0},
       }
     end
     @@free_game[:players][color] = code # add the player
