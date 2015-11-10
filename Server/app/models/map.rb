@@ -1,11 +1,15 @@
 class Map
 
-  attr_reader :size, :data
+  attr_reader :size, :data, :took
 
   def initialize size=19
     @size = size
     @data = Array.new(size){Array.new(size) {nil}}
     @took = [0, 0]
+  end
+
+  def took_hash
+    {"white" => @took[0], "black" => @took[1]}
   end
 
   # we can use map like an array
@@ -49,7 +53,7 @@ class Map
   # from (y, x)
   # if a point is captured, then it will try to take every point around itself
   def take_direction! tuple, y, x, color, n=1
-    puts "take direction #{x} #{y} (#{color})"
+    #puts "take direction #{x} #{y} (#{color})"
     #puts "Check at #{y}:#{x}: #{@data[y][x].class}"
     case @data[y][x]
     when nil
