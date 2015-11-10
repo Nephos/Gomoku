@@ -90,23 +90,28 @@ class TestGameReal < Test::Unit::TestCase
     map = Map.new
     play(1, 0, 0, 200, 200); map[0][0] = 0
     play(2, 0, 1, 200, 200); map[1][0] = 1
-    play(1, 0, 2, 200, 200); map[2][0] = 0 ; map[1][0] = 0
+    play(1, 0, 9, 200, 200); map[9][0] = 0
+    play(2, 0, 2, 200, 200); map[2][0] = 1
+    play(1, 0, 3, 200, 200); map[3][0] = 0
+    map[1][0] = nil
+    map[2][0] = nil
     assert_equal map.to_a, get_map
   end
 
   def test_double_take
     new_game
     map = Map.new
-    play_map(map, 1, 3, 1) # 1
-    play_map(map, 2, 3, 0)
-    play_map(map, 1, 2, 1) # 2
-    play_map(map, 2, 4, 1)
-    play_map(map, 1, 3, 2) # 3
-    play_map(map, 2, 0, 1)
-    play_map(map, 1, 1, 1) # 4
-    body = play_map(map, 2, 3, 3).body.to_s
-    assert_equal 0, get_map.count(0)
-    assert_equal "You win.", JSON.parse(body)["message"]
+    play_map(map, 1, 0, 1) # 1
+    play_map(map, 2, 1, 1)
+    play_map(map, 1, 1, 0) # 2
+    play_map(map, 2, 2, 1)
+    play_map(map, 1, 0, 0) # 3
+    play_map(map, 2, 3, 1)
+    play_map(map, 1, 4, 1) # 4
+    play_map(map, 2, 1, 2)
+    body = play_map(map, 1, 1, 3).body.to_s # 5
+    assert_equal 0, get_map.count(1)
+    # continue
   end
 
   def play(color, x, y, status_wait=nil, status_end=nil, opt={})
