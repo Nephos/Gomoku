@@ -8,6 +8,7 @@
 #include <GL/glu.h>
 #include <map>
 #include <vector>
+#include "Obj.hpp"
 
 #define CAMERA_SPEED 5
 
@@ -51,6 +52,7 @@ class GomokuDisplay {
     std::pair<float, float> handleInputs(); // Handles user inputs
     void setMessage(std::string const &);
     GLuint loadTexture(std::string const &);
+    void loadOBJ(std::string const &);
 
   private:
     Display *dpy;
@@ -60,4 +62,5 @@ class GomokuDisplay {
     std::string message;
     std::vector<GLuint> _textures;
     std::string color;
+    std::vector<Obj> objs;
 };
