@@ -34,6 +34,8 @@ void Player::resetGame() {
   _cookie.clear();
   _gameOver = false;
   _myTurn = false;
+  _display.setWhiteScore(0);
+  _display.setBlackScore(0);
   initMap();
   _network.reset();
   connect();
@@ -126,7 +128,7 @@ void Player::updateMap(std::istringstream &ss) {
   std::string tmp;
   _map.clear();
   int i = 0;
-  while (std::getline(ss, tmp)) {
+  while (i < 19 && std::getline(ss, tmp)) {
     for (int j = 0; j < 19; j++) {
       std::pair<int, int> c(i, j); // Coordinates
       std::pair<std::pair<int, int>, char> e(c, tmp.at(j * 2));
@@ -134,6 +136,11 @@ void Player::updateMap(std::istringstream &ss) {
     }
     ++i;
   }
+  int w, b;
+  ss >> w;
+  ss >> b;
+  _display.setWhiteScore(w);
+  _display.setBlackScore(b);
 }
 
 void Player::setCookie(const std::string &str) {
