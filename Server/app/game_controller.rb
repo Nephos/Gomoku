@@ -2,12 +2,6 @@ require 'digest'
 
 class GameController < Nephos::Controller
 
-  def debug
-    require 'pry'
-    binding.pry
-    return {}
-  end
-
   @@games = {}
   #before_action :set_game
   def set_game
@@ -37,6 +31,7 @@ class GameController < Nephos::Controller
                      players: {},
                      # lock the game while there is no 2 players connected
                      players_mutex: {"white" => Mutex.new, "black" => Mutex.new},
+                     players_took: {"white" => 0, "black" => 0},
       }
     end
     @@free_game[:players][color] = code # add the player
@@ -53,7 +48,7 @@ class GameController < Nephos::Controller
     return auth_err unless auth?
     get_map_render
     return {plain: "ok.\n" + @map_render} if plain?
-    return {json: {message: "Ok", map: @map_render}}
+    return {json: {message: "Ok", map: @map_render, points: @map.took_hash}}
   end
 
   # The method waits for the turn of the player before returning
@@ -67,16 +62,16 @@ class GameController < Nephos::Controller
     get_map_render
     return game_terminated_msg if game_terminated?
     return {plain: "continue.\n" + @map_render} if plain?
-    return {json: {message: "It's your turn", map: @map_render}}
+    return {json: {message: "It's your turn", map: @map_render, points: @map.took_hash}}
   end
   private
   def game_terminated_msg
     if @win == @color
       return {plain: "win.\n" + @map_render} if plain?
-      return {json: {message: "failed", map: @map_render}}
+      return {json: {message: "failed", map: @map_render, points: @map.took_hash}}
     else
       return {plain: "failed.\n" + @map_render} if plain?
-      return {json: {message: "failed", map: @map_render}}
+      return {json: {message: "failed", map: @map_render, points: @map.took_hash}}
     end
   end
   public
@@ -91,18 +86,18 @@ class GameController < Nephos::Controller
     get_map_render
     if @round != @color
       return {plain: "failed. not your turn\n" + @map_render, status: 401} if plain?
-      return {json: {message: "Not your turn. It's #{@round}."}, status: 401}
+      return {json: {message: "Not your turn. It's #{@round}.", points: @map.took_hash}, status: 401}
     end
     x, y = Integer(params[:x]), Integer(params[:y])
     if x < 0 or x > 18
       return {plain: "failed. invalid x\n" + @map_render, status: 401} if plain?
-      return {json: {message: "Invalid position (x)", map: @map_render}, status: 401}
+      return {json: {message: "Invalid position (x)", map: @map_render, points: @map.took_hash}, status: 401}
     elsif y < 0 or y > 18
       return {plain: "failed. invalid y\n" + @map_render, status: 401} if plain?
-      return {json: {message: "Invalid position (y)", map: @map_render}, status: 401}
+      return {json: {message: "Invalid position (y)", map: @map_render, points: @map.took_hash}, status: 401}
     elsif @map[y][x]
       return {plain: "failed. occupied\n" + @map_render, status: 401} if plain?
-      return {json: {message: "Invalid position (occupied)", map: @map_render}, status: 401}
+      return {json: {message: "Invalid position (occupied)", map: @map_render, points: @map.took_hash}, status: 401}
     end
     color = @color == "white" ? 0 : 1
     @game[:map][y][x] = color
@@ -112,11 +107,11 @@ class GameController < Nephos::Controller
     if win
       game_terminated!
       return {plain: "win.\n" + @map_render} if plain?
-      return {json: {message: "You win.", map: @map_render}}
+      return {json: {message: "You win.", map: @map_render, points: @map.took_hash}}
     end
     next_round!
     return {plain: "continue.\n" + @map_render} if plain?
-    return {json: {message: "Well played. Next turn...", map: @map_render}}
+    return {json: {message: "Well played. Next turn...", map: @map_render, points: @map.took_hash}}
   end
 
   private
@@ -137,8 +132,12 @@ class GameController < Nephos::Controller
   end
 
   def get_map_render
-    @map_render = @map.to_a
-    @map_render = @map_render.map{|e| e.map{|x| x||"x"}.join(" ")}.join("\n") if plain?
+    if plain?
+      @map_render = @map.to_a.map{|e| e.map{|x| x||"x"}.join(" ")}.join("\n")
+      @map_render += "\n" + @map.took.join(" ")
+    else
+      @map_render = @map.to_a
+    end
   end
 
   def next_round!
