@@ -1,6 +1,11 @@
 #pragma once
 
+#include <string>
 #include <vector>
+#include <fstream>
+#include <GL/gl.h>
+
+#define MAX 10000
 
 class Obj
 {
@@ -8,15 +13,16 @@ class Obj
     Obj(std::string const &);
     ~Obj() {};
 
-    std::vector<glm::vec3> getVertices() const;
-    std::vector<glm::vec3> getNormals() const;
-    std::vector<glm::vec2> getUvs() const;
+    void draw(float, float, GLuint);
+    void storeVertices();
 
   private:
-    std::vector<unsigned int> vertexIndices;
-    std::vector<unsigned int> uvIndices;
-    std::vector<unsigned int> normalIndices;
-    std::vector<glm::vec3> vertices;
-    std::vector<glm::vec2> uvs;
-    std::vector<glm::vec3> normals;
+    std::string filename;
+    float _x[MAX];
+    float _y[MAX];
+    float _z[MAX];
+    std::vector<int> _one;
+    std::vector<int> _two;
+    std::vector<int> _three;
+    std::vector<int> _four;
 };

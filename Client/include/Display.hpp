@@ -8,7 +8,7 @@
 #include <GL/glu.h>
 #include <map>
 #include <vector>
-//#include "Obj.hpp"
+#include "Obj.hpp"
 
 #define CAMERA_SPEED 5
 
@@ -48,6 +48,7 @@ class GomokuDisplay {
     void drawBoard(const std::map<std::pair<int, int>, char> &);
     void drawTile(int, int, bool, int);
     void drawToken(float, float, bool); // Draws a token
+    void drawPony(float, float, bool);
     void drawUI(); // Draws the UI : scores + message
     void newToken(); // Displays a token spawn
     std::pair<float, float> handleInputs(); // Handles user inputs
@@ -70,5 +71,8 @@ class GomokuDisplay {
     int loop;
     int whiteScore;
     int blackScore;
-//    std::vector<Obj> objs;
+    std::vector<GLuint> _texturesP1;
+    std::vector<GLuint> _texturesP2;
+    std::vector<Obj> _modelsP1;
+    std::vector<Obj> _modelsP2;
 };

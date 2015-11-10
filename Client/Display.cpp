@@ -30,12 +30,16 @@ GomokuDisplay::GomokuDisplay() {
   glXMakeCurrent(dpy, win, glc);
   glEnable(GL_DEPTH_TEST);
 
+  std::cout << "Loading textures..." << std::endl;
+
   /* Loading textures */
   _textures.push_back(loadTexture("./assets/board_edge.raw"));
   _textures.push_back(loadTexture("./assets/board_edge_white.raw"));
   _textures.push_back(loadTexture("./assets/board_edge_black.raw"));
   _textures.push_back(loadTexture("./assets/board_bot.raw")); // To change
   _textures.push_back(loadTexture("./assets/board_bot.raw"));
+
+  /* Upper tiles */
   _textures.push_back(loadTexture("./assets/red.raw"));
   _textures.push_back(loadTexture("./assets/orange.raw"));
   _textures.push_back(loadTexture("./assets/yellow.raw"));
@@ -45,6 +49,29 @@ GomokuDisplay::GomokuDisplay() {
   _textures.push_back(loadTexture("./assets/pink.raw"));
   _textures.push_back(loadTexture("./assets/black.raw"));
   _textures.push_back(loadTexture("./assets/white.raw"));
+
+  /* Pony textures */
+  _texturesP1.push_back(loadTexture("./assets/rainbow_dash/rainbow_dash_body.raw"));
+  _texturesP1.push_back(loadTexture("./assets/rainbow_dash/rainbow_dash_eyes.raw"));
+  _texturesP1.push_back(loadTexture("./assets/rainbow_dash/rainbow_dash_hair_back.raw"));
+  _texturesP1.push_back(loadTexture("./assets/rainbow_dash/rainbow_dash_hair_front.raw"));
+  _texturesP1.push_back(loadTexture("./assets/rainbow_dash/rainbow_dash_wings.raw"));
+
+  std::cout << "Textures loaded!" << std::endl;
+  std::cout << "Loading models..." << std::endl;
+
+  /* Pony models */
+  Obj tmp("./assets/rainbow_dash/pony_body.obj");
+  _modelsP1.push_back(tmp);
+  tmp = Obj("./assets/rainbow_dash/pony_eyes.OBJ");
+  _modelsP1.push_back(tmp);
+  tmp = Obj("./assets/rainbow_dash/rainbow_dash_hair_back.OBJ");
+  _modelsP1.push_back(tmp);
+  tmp = Obj("./assets/rainbow_dash/rainbow_dash_hair_front.OBJ");
+  _modelsP1.push_back(tmp);
+  tmp = Obj("./assets/rainbow_dash/pony_wing_open.obj");
+  _modelsP1.push_back(tmp);
+  std::cout << "Models loaded!" << std::endl;
 }
 
 GLuint GomokuDisplay::loadTexture(const std::string &filename) {
@@ -227,7 +254,21 @@ void GomokuDisplay::drawToken(float x, float y, bool black) {
   glEnd();
 }
 
+void GomokuDisplay::drawPony(float x, float y, bool black) {
+  if (black) {
+    std::vector<Obj>::iterator itm;
+    std::vector<GLuint>::iterator itt = _texturesP1.begin();
+    for (itm = _modelsP1.begin(); itm != _modelsP1.end(); itm++) {
+      (*itm).draw(x, y, *itt);
+      itt++;
+    }
+  }
+  else
+    _modelsP1[0].draw(x, y, _textures[0]);
+}
+
 void GomokuDisplay::drawBoard(const std::map<std::pair<int, int>, char> &map) {
+  drawPony(0, 0, true);
   int tmpBlack = blackScore;
   int tmpWhite = whiteScore;
   for (int y = 0; y < 20; y++) {
