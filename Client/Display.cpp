@@ -80,8 +80,9 @@ void GomokuDisplay::drawTile(int x, int y, bool generic) {
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
   glEnable(GL_TEXTURE_2D);
   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+  int c = ((x + 9) + (y + 9) + (loop / 10)) % 7 + 3;
   if (generic)
-    glBindTexture(GL_TEXTURE_2D, _textures[((x + 9) + (y + 9)) % 7 + 3]);
+    glBindTexture(GL_TEXTURE_2D, _textures[c]);
   else
     glBindTexture(GL_TEXTURE_2D, _textures[BOARDEDGE]);
   glBegin(GL_QUADS);
@@ -270,6 +271,8 @@ std::pair<int, int> GomokuDisplay::drawGame(const std::map<std::pair<int, int>, 
 
   XGetWindowAttributes(dpy, win, &gwa);
   glViewport(0, 0, gwa.width, gwa.height);
+
+  loop++;
 
   /* Getting ready to draw */
   if (color.compare("black") == 0)

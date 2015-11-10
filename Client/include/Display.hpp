@@ -8,7 +8,7 @@
 #include <GL/glu.h>
 #include <map>
 #include <vector>
-#include "Obj.hpp"
+//#include "Obj.hpp"
 
 #define CAMERA_SPEED 5
 
@@ -62,5 +62,6 @@ class GomokuDisplay {
     std::string message;
     std::vector<GLuint> _textures;
     std::string color;
-    std::vector<Obj> objs;
+    int loop;
+//    std::vector<Obj> objs;
 };
