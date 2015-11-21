@@ -12,7 +12,7 @@ class Player
     void play();
     void connect();
 
-    static Player *getInstance(std::string const &host = "127.0.0.1", std::string const &port = "8080");
+    static Player *getInstance(bool, std::string const &host = "127.0.0.1", std::string const &port = "8080");
 
     void initMap();
     bool parseAnswer(std::string const &);
@@ -22,7 +22,7 @@ class Player
     void sendClick(std::pair<int, int>, std::string const &);
 
   private:
-    Player(std::string const &, std::string const &);
+    Player(std::string const &, std::string const &, bool);
     ~Player() {};
     static Player *p;
 

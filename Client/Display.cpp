@@ -1,7 +1,9 @@
 #include "Display.hpp"
 #include "Exceptions.hpp"
 
-GomokuDisplay::GomokuDisplay() {
+GomokuDisplay::GomokuDisplay(bool r) {
+  rainbow = r;
+
   Window root;
   GLint att[] = { GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None };
   XVisualInfo *vi;
@@ -49,6 +51,7 @@ GomokuDisplay::GomokuDisplay() {
   _textures.push_back(loadTexture("./assets/pink.raw"));
   _textures.push_back(loadTexture("./assets/black.raw"));
   _textures.push_back(loadTexture("./assets/white.raw"));
+  _textures.push_back(loadTexture("./assets/tile.raw"));
 
   /* Pony textures */
   _texturesP1.push_back(loadTexture("./assets/pinkie_pie/pinkie_body.raw"));
@@ -131,7 +134,11 @@ void GomokuDisplay::drawTile(int x, int y, bool generic, int score) {
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
   glEnable(GL_TEXTURE_2D);
   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
-  int c = ((x + 9) + (y + 9) + (loop / 10)) % 7 + 5;
+  int c;
+  if (rainbow)
+    c = ((x + 9) + (y + 9) + (loop / 10)) % 7 + 5;
+  else
+    c = 14;
   if (generic)
     glBindTexture(GL_TEXTURE_2D, _textures[c]);
   else {
@@ -318,11 +325,16 @@ void GomokuDisplay::drawBoard(const std::map<std::pair<int, int>, char> &map) {
       /* Then, if there is a token on it, we draw the token */
       std::pair<int, int> p(y, x);
       if (x != 19 && y != 19 && map.at(p) == '0') {
-      /* Don't forget to put the token on the intersections */
-        drawPony(x - 8.5, y - 8.5, false);
+        if (rainbow)
+          drawPony(x - 8.5, y - 8.5, false);
+        else
+          drawToken(x - 8.5, y - 8.5, false);
       }
       else if (x != 19 && y != 19 && map.at(p) == '1') {
-        drawPony(x - 8.5, y - 8.5, true);
+        if (rainbow)
+          drawPony(x - 8.5, y - 8.5, true);
+        else
+          drawToken(x - 8.5, y - 8.5, true);
       }
     }
   }

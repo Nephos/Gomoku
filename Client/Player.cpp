@@ -1,16 +1,16 @@
 #include <sstream>
 #include "Player.hpp"
 
-Player::Player(std::string const &host, std::string const &port) : _network(host, port), _display() {
+Player::Player(std::string const &host, std::string const &port, bool r) : _network(host, port), _display(r) {
   _myTurn = false;
   _host = host + ":" + port;
   initMap();
 }
 
 Player *Player::p = NULL;
-Player *Player::getInstance(std::string const &host, std::string const &port) {
+Player *Player::getInstance(bool r, std::string const &host, std::string const &port) {
   if (p == NULL)
-    p = new Player(host, port);
+    p = new Player(host, port, r);
   return p;
 }
 
