@@ -6,6 +6,7 @@
 #include <GL/gl.h>
 
 #define MAX 10000
+#define OBJ_SIZE 7
 
 class Obj
 {

@@ -51,26 +51,42 @@ GomokuDisplay::GomokuDisplay() {
   _textures.push_back(loadTexture("./assets/white.raw"));
 
   /* Pony textures */
-  _texturesP1.push_back(loadTexture("./assets/rainbow_dash/rainbow_dash_body.raw"));
-  _texturesP1.push_back(loadTexture("./assets/rainbow_dash/rainbow_dash_eyes.raw"));
-  _texturesP1.push_back(loadTexture("./assets/rainbow_dash/rainbow_dash_hair_back.raw"));
-  _texturesP1.push_back(loadTexture("./assets/rainbow_dash/rainbow_dash_hair_front.raw"));
-  _texturesP1.push_back(loadTexture("./assets/rainbow_dash/rainbow_dash_wings.raw"));
+  _texturesP1.push_back(loadTexture("./assets/pinkie_pie/pinkie_body.raw"));
+  _texturesP1.push_back(loadTexture("./assets/pinkie_pie/pinkie_eyes.raw"));
+  _texturesP1.push_back(loadTexture("./assets/pinkie_pie/pinkie_hair.raw"));
+  _texturesP1.push_back(loadTexture("./assets/pinkie_pie/pinkie_tail.raw"));
+
+  _texturesP2.push_back(loadTexture("./assets/fluttershy/fluttershy_body.raw"));
+  _texturesP2.push_back(loadTexture("./assets/fluttershy/fluttershy_eyes.raw"));
+  _texturesP2.push_back(loadTexture("./assets/fluttershy/fluttershy_hair.raw"));
+  _texturesP2.push_back(loadTexture("./assets/fluttershy/fluttershy_hair.raw"));
+  _texturesP2.push_back(loadTexture("./assets/fluttershy/fluttershy_tail.raw"));
+  _texturesP2.push_back(loadTexture("./assets/fluttershy/fluttershy_wings.raw"));
 
   std::cout << "Textures loaded!" << std::endl;
   std::cout << "Loading models..." << std::endl;
 
   /* Pony models */
-  Obj tmp("./assets/rainbow_dash/pony_body.obj");
+  Obj tmp("./assets/pinkie_pie/pony_body.OBJ");
   _modelsP1.push_back(tmp);
-  tmp = Obj("./assets/rainbow_dash/pony_eyes.OBJ");
+  _modelsP2.push_back(tmp);
+  tmp = Obj("./assets/pinkie_pie/pony_eyes.OBJ");
   _modelsP1.push_back(tmp);
-  tmp = Obj("./assets/rainbow_dash/rainbow_dash_hair_back.OBJ");
+  _modelsP2.push_back(tmp);
+  tmp = Obj("./assets/pinkie_pie/pinkie_pie_hair.OBJ");
   _modelsP1.push_back(tmp);
-  tmp = Obj("./assets/rainbow_dash/rainbow_dash_hair_front.OBJ");
+  tmp = Obj("./assets/pinkie_pie/pinkie_pie_tail.OBJ");
   _modelsP1.push_back(tmp);
-  tmp = Obj("./assets/rainbow_dash/pony_wing_open.obj");
-  _modelsP1.push_back(tmp);
+
+  tmp = Obj("./assets/fluttershy/fluttershy_hair_back.OBJ");
+  _modelsP2.push_back(tmp);
+  tmp = Obj("./assets/fluttershy/fluttershy_hair_front.OBJ");
+  _modelsP2.push_back(tmp);
+  tmp = Obj("./assets/fluttershy/fluttershy_tail.OBJ");
+  _modelsP2.push_back(tmp);
+  tmp = Obj("./assets/fluttershy/pony_wing_open.obj");
+  _modelsP2.push_back(tmp);
+
   std::cout << "Models loaded!" << std::endl;
 }
 
@@ -263,12 +279,17 @@ void GomokuDisplay::drawPony(float x, float y, bool black) {
       itt++;
     }
   }
-  else
-    _modelsP1[0].draw(x, y, _textures[0]);
+  else {
+    std::vector<Obj>::iterator itm;
+    std::vector<GLuint>::iterator itt = _texturesP2.begin();
+    for (itm = _modelsP2.begin(); itm != _modelsP2.end(); itm++) {
+      (*itm).draw(x, y, *itt);
+      itt++;
+    }
+  }
 }
 
 void GomokuDisplay::drawBoard(const std::map<std::pair<int, int>, char> &map) {
-  drawPony(0, 0, true);
   int tmpBlack = blackScore;
   int tmpWhite = whiteScore;
   for (int y = 0; y < 20; y++) {
@@ -292,10 +313,10 @@ void GomokuDisplay::drawBoard(const std::map<std::pair<int, int>, char> &map) {
       std::pair<int, int> p(y, x);
       if (x != 19 && y != 19 && map.at(p) == '0') {
       /* Don't forget to put the token on the intersections */
-        drawToken(x - 8.5, y - 8.5, false);
+        drawPony(x - 8.5, y - 8.5, false);
       }
       else if (x != 19 && y != 19 && map.at(p) == '1') {
-        drawToken(x - 8.5, y - 8.5, true);
+        drawPony(x - 8.5, y - 8.5, true);
       }
     }
   }
