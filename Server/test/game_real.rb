@@ -109,7 +109,7 @@ class TestGameReal < Test::Unit::TestCase
     play_map(map, 2, 3, 1)
     play_map(map, 1, 4, 1) # 4
     play_map(map, 2, 1, 2)
-    body = play_map(map, 1, 1, 3).body.to_s # 5
+    _ = play_map(map, 1, 1, 3).body.to_s # 5
     assert_equal 0, get_map.count(1)
     # continue
   end

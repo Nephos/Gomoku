@@ -1,10 +1,26 @@
 class Map
 
-  attr_reader :size, :data, :took
+  # T is the list of the direction, an array of [y, x]
+  T = [
+    [-1, -1], [-1, 0], [-1, 1],
+    [0, -1], [0, 1],
+    [1, -1], [1, 0], [1, 1],
+  ]
+
+  T_CAPTURE = [
+    [[-1, -1], [1, 1]],
+    [[-1, 0], [1, 0]],
+    [[-1, 1], [1, -1]],
+    [[0, 1], [0, -1]],
+  ]
+
+  attr_reader :size, :data, :took, :capturable, :free3
 
   def initialize size=19
     @size = size
     @data = Array.new(size){Array.new(size) {nil}}
+    @capturable = Array.new(size){Array.new(size) {false}}
+    @free3 = Array.new(size){Array.new(size) {false}}
     @took = [0, 0]
   end
 
@@ -21,12 +37,9 @@ class Map
     @data
   end
 
-  # T is the list of the direction, an array of [y, x]
-  T = [
-    [-1, -1], [-1, 0], [-1, 1],
-    [0, -1], [0, 1],
-    [1, -1], [1, 0], [1, 1],
-  ]
+  def to_s
+    self.to_a.stringify_map
+  end
 
   public
   def valid_place_for? x, y, color
@@ -35,7 +48,47 @@ class Map
     return 3 if @data[y][x]
     return nil
   end
+  def valid_xy? x, y
+    return false if y < 0 or y >= 19 or x < 0 or x >= 19
+    return true
+  end
 
+  def update! y, x
+    color = @data[y][x]
+    update_capturable!(y, x, color)
+    #update_free3!(y, x, color)
+  end
+
+  private
+  def update_capturable! y, x, color
+    @capturable[y][x] = false
+    return false if @data[y][x].nil?
+    T_CAPTURE.each do |tuples|
+      #puts "TEST FOR #{tuples} at #{y}#{x}"
+      y2,x2 = y + tuples[0][0], x + tuples[0][1]
+      y3,x3 = y + tuples[1][0], x + tuples[1][1]
+      #puts "2: #{y2}#{x2}, 3:#{y3}#{x3}"
+      next if not valid_xy? x2, y2
+      next if not valid_xy? x3, y3
+      #puts :test
+      a = @data[y2][x2]
+      b = @data[y3][x3]
+      ra = a == color && b == nil
+      rb = b == color && a == nil
+      if ra or rb
+        @capturable[y][x] = true
+        @capturable[y2][x2] = true if ra
+        @capturable[y3][x3] = true if rb
+        #puts :ra if ra
+        #puts :rb if rb
+      #else
+        #puts :miss
+      end
+      ra||rb
+    end
+  end
+
+  public
   # try to take every lines around (y, x)
   # use the directions T
   def take_around! y, x, color
@@ -52,10 +105,6 @@ class Map
   end
 
   private
-  def valid_xy? x, y
-    return false if y < 0 or y >= 19 or x < 0 or x >= 19
-    return true
-  end
   # try to take the line with the direction "tuple"
   # from (y, x)
   # if a point is captured, then it will try to take every point around itself
@@ -73,6 +122,7 @@ class Map
     return false unless valid_xy? x2, y2
     if take_direction! tuple, y2, x2, color, n+1
       @data[y][x] = nil
+      update!(y, x)
       @took[color] += 1
       #take_around! y, x, color
       return true
@@ -85,7 +135,16 @@ class Map
   # if there is a 5 aligned "color" or "2"
   def win? color
     return true if @took[color] >= 10
+    fives = fives(color)
+    return false if fives.empty?
+    fives.each { |five| return false if is_breakable?(five) }
+    return true # TOOD: check if all fives are breakable
+  end
+
+  private
+  def fives color
     # for each line and each cell
+    fives = []
     @data.each_with_index do |line, y|
       line.each_with_index do |e, x|
         # do not computes if not 2 (took this round) or same color
@@ -98,14 +157,17 @@ class Map
           next unless valid_xy? x2, y2
           c = @data[y2][x2]
           # check if the direction and win if one direction is true
-         return true if c == color and win_direction? tuple, y2, x2, color
+          fives << [y, x, tuple] if c == color and win_direction? tuple, y2, x2, color
         end
       end
     end
+    return fives
+  end
+
+  def is_breakable? five
     return false
   end
 
-  private
   # test a line
   def win_direction? tuple, y, x, color, distance=0
     # if we found 4 items + the base (from "win?") it's finished
@@ -124,9 +186,31 @@ class Map
 end
 
 if __FILE__ == $0
-  map = Map.new
-  map[0][0] = 0
-  map[0][1] = 1
+
+  class Array
+    def stringify_map(null='x')
+      map{|e| e.map{|x| x||null}.join(" ")}.join("\n")
+    end
+  end
+
   require 'pry'
+  m = Map.new
+  m[0][0] = 0
+  m[0][1] = 0
+  m.update! 0, 0
+  m.update! 0, 1
+  m.update! 0, 2
+  puts m.data.stringify_map
+  puts m.capturable.stringify_map
+  #assert 2, m.capturable.select{|e| e == true}
+
+  m[0][2] = 1
+  m.update! 0, 0
+  m.update! 0, 1
+  m.update! 0, 2
+  puts m.data.stringify_map
+  puts m.capturable.stringify_map
+  #assert 0, m.capturable.select{|e| e == true}
+
   binding.pry
 end

@@ -110,6 +110,7 @@ class GameController < Nephos::Controller
       # WHAT ?!
     end
     @game[:map][y][x] = color
+    @game[:map].update!(y, x)
     @game[:map].take_around!(y, x, color)
     win = @game[:map].win? color
     get_map_render
