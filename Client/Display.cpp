@@ -227,58 +227,58 @@ void GomokuDisplay::drawToken(float x, float y, bool black) {
   glBegin(GL_QUADS);
 
   glTexCoord2f(0, 0);
-  glVertex3f(x +  0.5f, 1.0f,  y +-0.5f);
+  glVertex3f(x +  0.4f, 1.0f,  y +-0.4f);
   glTexCoord2f(1, 0);
-  glVertex3f(x + -0.5f, 1.0f,  y +-0.5f);
+  glVertex3f(x + -0.4f, 1.0f,  y +-0.4f);
   glTexCoord2f(1, 1);
-  glVertex3f(x + -0.5f, 1.0f,  y + 0.5f);
+  glVertex3f(x + -0.4f, 1.0f,  y + 0.4f);
   glTexCoord2f(0, 1);
-  glVertex3f(x +  0.5f, 1.0f,  y + 0.5f);
+  glVertex3f(x +  0.4f, 1.0f,  y + 0.4f);
 
   glTexCoord2f(0, 0);
-  glVertex3f(x +  0.5f, 0.0f, y +  0.5f);
+  glVertex3f(x +  0.4f, 0.0f, y +  0.4f);
   glTexCoord2f(1, 0);
-  glVertex3f(x + -0.5f, 0.0f, y +  0.5f);
+  glVertex3f(x + -0.4f, 0.0f, y +  0.4f);
   glTexCoord2f(1, 1);
-  glVertex3f(x + -0.5f, 0.0f, y + -0.5f);
+  glVertex3f(x + -0.4f, 0.0f, y + -0.4f);
   glTexCoord2f(0, 1);
-  glVertex3f(x +  0.5f, 0.0f, y + -0.5f);
+  glVertex3f(x +  0.4f, 0.0f, y + -0.4f);
 
   glTexCoord2f(0, 0);
-  glVertex3f(x +  0.5f, 1.0f, y + 0.5f);
+  glVertex3f(x +  0.4f, 1.0f, y + 0.4f);
   glTexCoord2f(1, 0);
-  glVertex3f(x + -0.5f, 1.0f, y + 0.5f);
+  glVertex3f(x + -0.4f, 1.0f, y + 0.4f);
   glTexCoord2f(1, 1);
-  glVertex3f(x + -0.5f, 0.0f, y + 0.5f);
+  glVertex3f(x + -0.4f, 0.0f, y + 0.4f);
   glTexCoord2f(0, 1);
-  glVertex3f(x +  0.5f, 0.0f, y + 0.5f);
+  glVertex3f(x +  0.4f, 0.0f, y + 0.4f);
 
   glTexCoord2f(0, 0);
-  glVertex3f(x +  0.5f, 0.0f, y + -0.5f);
+  glVertex3f(x +  0.4f, 0.0f, y + -0.4f);
   glTexCoord2f(1, 0);
-  glVertex3f(x + -0.5f, 0.0f, y + -0.5f);
+  glVertex3f(x + -0.4f, 0.0f, y + -0.4f);
   glTexCoord2f(1, 1);
-  glVertex3f(x + -0.5f, 1.0f, y + -0.5f);
+  glVertex3f(x + -0.4f, 1.0f, y + -0.4f);
   glTexCoord2f(0, 1);
-  glVertex3f(x +  0.5f, 1.0f, y + -0.5f);
+  glVertex3f(x +  0.4f, 1.0f, y + -0.4f);
 
   glTexCoord2f(0, 0);
-  glVertex3f(x + -0.5f, 1.0f, y +  0.5f);
+  glVertex3f(x + -0.4f, 1.0f, y +  0.4f);
   glTexCoord2f(1, 0);
-  glVertex3f(x + -0.5f, 1.0f, y + -0.5f);
+  glVertex3f(x + -0.4f, 1.0f, y + -0.4f);
   glTexCoord2f(1, 1);
-  glVertex3f(x + -0.5f, 0.0f, y + -0.5f);
+  glVertex3f(x + -0.4f, 0.0f, y + -0.4f);
   glTexCoord2f(0, 1);
-  glVertex3f(x + -0.5f, 0.0f, y +  0.5f);
+  glVertex3f(x + -0.4f, 0.0f, y +  0.4f);
 
   glTexCoord2f(0, 0);
-  glVertex3f(x + 0.5f, 1.0f,  y + -0.5f);
+  glVertex3f(x + 0.4f, 1.0f,  y + -0.4f);
   glTexCoord2f(1, 0);
-  glVertex3f(x + 0.5f, 1.0f,  y +  0.5f);
+  glVertex3f(x + 0.4f, 1.0f,  y +  0.4f);
   glTexCoord2f(1, 1);
-  glVertex3f(x + 0.5f, 0.0f,  y +  0.5f);
+  glVertex3f(x + 0.4f, 0.0f,  y +  0.4f);
   glTexCoord2f(0, 1);
-  glVertex3f(x + 0.5f, 0.0f,  y + -0.5f);
+  glVertex3f(x + 0.4f, 0.0f,  y + -0.4f);
 
   glEnd();
 }
