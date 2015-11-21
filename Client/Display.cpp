@@ -55,6 +55,7 @@ GomokuDisplay::GomokuDisplay() {
   _texturesP1.push_back(loadTexture("./assets/pinkie_pie/pinkie_eyes.raw"));
   _texturesP1.push_back(loadTexture("./assets/pinkie_pie/pinkie_hair.raw"));
   _texturesP1.push_back(loadTexture("./assets/pinkie_pie/pinkie_tail.raw"));
+  _texturesP1.push_back(loadTexture("./assets/pinkie_pie/socle.raw"));
 
   _texturesP2.push_back(loadTexture("./assets/fluttershy/fluttershy_body.raw"));
   _texturesP2.push_back(loadTexture("./assets/fluttershy/fluttershy_eyes.raw"));
@@ -62,6 +63,7 @@ GomokuDisplay::GomokuDisplay() {
   _texturesP2.push_back(loadTexture("./assets/fluttershy/fluttershy_hair.raw"));
   _texturesP2.push_back(loadTexture("./assets/fluttershy/fluttershy_tail.raw"));
   _texturesP2.push_back(loadTexture("./assets/fluttershy/fluttershy_wings.raw"));
+  _texturesP2.push_back(loadTexture("./assets/fluttershy/socle.raw"));
 
   std::cout << "Textures loaded!" << std::endl;
   std::cout << "Loading models..." << std::endl;
@@ -77,6 +79,8 @@ GomokuDisplay::GomokuDisplay() {
   _modelsP1.push_back(tmp);
   tmp = Obj("./assets/pinkie_pie/pinkie_pie_tail.OBJ");
   _modelsP1.push_back(tmp);
+  tmp = Obj("./assets/pinkie_pie/socle.obj");
+  _modelsP1.push_back(tmp);
 
   tmp = Obj("./assets/fluttershy/fluttershy_hair_back.OBJ");
   _modelsP2.push_back(tmp);
@@ -85,6 +89,8 @@ GomokuDisplay::GomokuDisplay() {
   tmp = Obj("./assets/fluttershy/fluttershy_tail.OBJ");
   _modelsP2.push_back(tmp);
   tmp = Obj("./assets/fluttershy/pony_wing_open.obj");
+  _modelsP2.push_back(tmp);
+  tmp = Obj("./assets/fluttershy/socle.obj");
   _modelsP2.push_back(tmp);
 
   std::cout << "Models loaded!" << std::endl;
@@ -271,7 +277,7 @@ void GomokuDisplay::drawToken(float x, float y, bool black) {
 }
 
 void GomokuDisplay::drawPony(float x, float y, bool black) {
-  if (black) {
+  if (!black) {
     std::vector<Obj>::iterator itm;
     std::vector<GLuint>::iterator itt = _texturesP1.begin();
     for (itm = _modelsP1.begin(); itm != _modelsP1.end(); itm++) {

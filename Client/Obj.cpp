@@ -186,13 +186,13 @@ void Obj::draw(float x, float y, GLuint texture) {
   it4 = _four.begin();
   for (it1 = _one.begin(); it1 != _one.end(); it1++) {
     glTexCoord2f(0, 0);
-    glVertex3d(_x[*it1] / OBJ_SIZE + x, _y[*it1] / OBJ_SIZE + 1, _z[*it1] / OBJ_SIZE + y);
+    glVertex3d(_x[*it1] / OBJ_SIZE + x, _y[*it1] / OBJ_SIZE + 1.2, _z[*it1] / OBJ_SIZE + y);
     glTexCoord2f(0, 1);
-    glVertex3d(_x[*it2] / OBJ_SIZE + x, _y[*it2] / OBJ_SIZE + 1, _z[*it2] / OBJ_SIZE + y);
+    glVertex3d(_x[*it2] / OBJ_SIZE + x, _y[*it2] / OBJ_SIZE + 1.2, _z[*it2] / OBJ_SIZE + y);
     glTexCoord2f(1, 0);
-    glVertex3d(_x[*it3] / OBJ_SIZE + x, _y[*it3] / OBJ_SIZE + 1, _z[*it3] / OBJ_SIZE + y);
+    glVertex3d(_x[*it3] / OBJ_SIZE + x, _y[*it3] / OBJ_SIZE + 1.2, _z[*it3] / OBJ_SIZE + y);
     glTexCoord2f(1, 1);
-    glVertex3d(_x[*it4] / OBJ_SIZE + x, _y[*it4] / OBJ_SIZE + 1, _z[*it4] / OBJ_SIZE + y);
+    glVertex3d(_x[*it4] / OBJ_SIZE + x, _y[*it4] / OBJ_SIZE + 1.2, _z[*it4] / OBJ_SIZE + y);
     it2++;
     it3++;
     it4++;
