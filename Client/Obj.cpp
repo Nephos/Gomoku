@@ -55,7 +55,56 @@ Obj::Obj(const std::string &f) {
     v++; 
     getline(file, str);
   }
+  file.close();
   storeVertices();
+  storeMap();
+}
+
+void Obj::storeMap() {
+  std::ifstream file;
+  file.open(filename);
+
+  std::string str;
+
+  while(!file.eof()) {
+    std::getline(file, str);
+    if(str[0] == 'v' && str[1] && str[1] == 't')
+      break;
+  }
+
+  int v = 0;
+
+  while(str[0] == 'v' && str[1] && str[1] == 't') {
+    int i = 0;
+
+    while(true) {
+      while(str[i] == ' ')
+        i++;
+      i += 2;
+      int j = i, k = i;
+      while(str[i] != ' ') {  
+          i++;
+          k = i;
+      }
+      _vtx[v] = atof(str.substr(j, k - j).c_str());
+
+      while(str[i] == ' ' ) {
+        i++;
+      }
+
+      int q = i, w = i;
+      while(str[i] != ' ' ) {
+        i++;
+        w = i;
+      }
+      _vty[v] = atof(str.substr(q, w - q).c_str());
+
+      break;
+    }
+    v++; 
+    getline(file, str);
+  }
+  file.close();
 }
 
 void Obj::storeVertices() {
@@ -87,35 +136,27 @@ void Obj::storeVertices() {
 
     int one = atof(str.substr(j, k - j).c_str());
 
-    i += 1;
-
+    i++;
     j = i;
     k = i;
-
     while(str[i] != ' ') { 
       i++;
       k = i;
     }
-
     int two = atof(str.substr(j, k - j).c_str());
 
-    i+= 1;
-
+    i++;
     j = i;
     k = i;
-
     while(str[i] != ' ') {  
       i++;
       k = i;
     }
-
     int three = atof(str.substr(j, k - j).c_str());
 
-    i+= 1;
-
+    i++;
     j = i;
     k = i;
-
     while(str[i] != ' ') {
       i++;
       k = i;
@@ -130,6 +171,7 @@ void Obj::storeVertices() {
     std::getline(file, str);
     i = 0;
   }
+  file.close();
 }
 
 void Obj::draw(float x, float y, GLuint texture) {
@@ -143,13 +185,13 @@ void Obj::draw(float x, float y, GLuint texture) {
   it3 = _three.begin();
   it4 = _four.begin();
   for (it1 = _one.begin(); it1 != _one.end(); it1++) {
-    glTexCoord2f(0, 0);
+    glTexCoord2f(_vtx[*it1], _vty[*it1]);
     glVertex3d(_x[*it1] + x, _y[*it1], _z[*it1] + y);
-    glTexCoord2f(1, 0);
+    glTexCoord2f(_vtx[*it2], _vty[*it2]); // MEH
     glVertex3d(_x[*it2] + x, _y[*it2], _z[*it2] + y);
-    glTexCoord2f(1, 1);
+    glTexCoord2f(_vtx[*it3], _vty[*it3]);
     glVertex3d(_x[*it3] + x, _y[*it3], _z[*it3] + y);
-    glTexCoord2f(0, 1);
+    glTexCoord2f(_vtx[*it4], _vty[*it4]);
     glVertex3d(_x[*it4] + x, _y[*it4], _z[*it4] + y);
     it2++;
     it3++;

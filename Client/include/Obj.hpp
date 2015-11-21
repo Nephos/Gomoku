@@ -15,12 +15,15 @@ class Obj
 
     void draw(float, float, GLuint);
     void storeVertices();
+    void storeMap();
 
   private:
     std::string filename;
     float _x[MAX];
     float _y[MAX];
     float _z[MAX];
+    float _vtx[MAX];
+    float _vty[MAX];
     std::vector<int> _one;
     std::vector<int> _two;
     std::vector<int> _three;
