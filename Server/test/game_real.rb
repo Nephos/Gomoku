@@ -128,8 +128,9 @@ class TestGameReal < Test::Unit::TestCase
     play_map(map, :black, 0, 2, 200, 200)
     play_map(map, :white, 1, 3, 200, 200)
     play_map(map, :black, 9, 3, 200, 200)
-    # win ahahahha lol
+    # not win (breakable)
     play_map(map, :white, 1, 4, 200, 200)
+    # win not breakable
     body = play_map(map, :black, 9, 4, 200, 200).body.to_s
     assert_equal map.to_a, get_map
     assert_equal "You win.", JSON.parse(body)["message"]
@@ -147,7 +148,16 @@ class TestGameReal < Test::Unit::TestCase
     play_map(map, :black, 0, 2, 200, 200)
     play_map(map, :white, 1, 3, 200, 200)
     play_map(map, :black, 9, 3, 200, 200)
-    body = play_map(map, :white, 3, 2, 200, 200).body.to_s
+    # not win (breakable 1, 2)
+    play_map(map, :white, 1, 4, 200, 200)
+    # bkreakable 1,1
+    play_map(map, :black, 0, 0, 200, 200)
+    # unbreakable 1, 2
+    play_map(map, :white, 3, 2, 200, 200)
+    # random
+    play_map(map, :black, 10, 10, 200, 200)
+    # unbreakable 1, 1
+    body = play_map(map, :white, 3, 3, 200, 200).body.to_s
 
     assert_equal map.to_a, get_map
     assert_equal "You win.", JSON.parse(body)["message"]

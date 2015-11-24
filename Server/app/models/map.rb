@@ -58,13 +58,23 @@ class Map
   end
 
   def update! y, x
-    update_capturable!(y, x)
+    update_capturablex!(y, x)
     #update_free3!(y, x)
   end
 
-      require 'pry'
   private
+  def update_capturablex!(y, x)
+    @i = 0
+    @capture = []
+    update_capturable!(y, x)
+    @capture.each do |cy, cx|
+      @capturable[cy][cx] = true
+    end
+  end
+
   def update_capturable! y, x, rec=true
+    @i += 1
+    binding.pry if @i > 1000
     color = @data[y][x]
     @capturable[y][x] = false
 
@@ -103,8 +113,10 @@ class Map
   end
 
   def update_capturable_case!(y, x, y2, x2)
-    @capturable[y][x] = true
-    @capturable[y2][x2] = true
+    #@capturable[y][x] = true
+    #@capturable[y2][x2] = true
+    @capture << [y, x]
+    @capture << [y2, x2]
   end
 
   public
