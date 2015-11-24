@@ -105,14 +105,15 @@ class GameController < Nephos::Controller
     when 4
       # error for 3x3
     when 5
-      # error for 5 lock
+      return {plain: "failed. locked by 5 breakable\n" + @map_render, status: 401} if plain?
+      return {json: {message: "Invalid position (5 breakable lock)", map: @map_render, points: @map.took_hash}, status: 401}
     else
       # WHAT ?!
     end
-    @game[:map][y][x] = color
-    @game[:map].update!(y, x)
-    @game[:map].take_around!(y, x, color)
-    win = @game[:map].win? color
+    @map[y][x] = color
+    @map.update!(y, x)
+    @map.take_around!(y, x, color)
+    win = @map.win? color
     get_map_render
     if win
       game_terminated!

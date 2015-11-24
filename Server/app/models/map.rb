@@ -15,6 +15,7 @@ class Map
   ]
 
   attr_reader :size, :data, :took, :capturable, :free3
+  attr_accessor :moves
 
   def initialize size=19
     @size = size
@@ -22,6 +23,7 @@ class Map
     @capturable = Array.new(size){Array.new(size) {false}}
     @free3 = Array.new(size){Array.new(size) {false}}
     @took = [0, 0]
+    @moves = []
   end
 
   def took_hash
@@ -46,6 +48,7 @@ class Map
     return 1 if x < 0 or x >= 19
     return 2 if y < 0 or y >= 19
     return 3 if @data[y][x]
+    return 5 if not @moves.empty? and not @moves.include? [x, y]
     return nil
   end
   def valid_xy? x, y
@@ -137,8 +140,11 @@ class Map
     return true if @took[color] >= 10
     fives = fives(color)
     return false if fives.empty?
-    fives.each { |five| return false if is_breakable?(five) }
-    return true # TOOD: check if all fives are breakable
+    #return false if fives.empty?
+    breakables = fives.map{|five| breakable_in(five, color)}
+    @moves = breakables.inject(&:&) || []
+    return true if @moves.empty? # win if cannot break all with one mov
+    return true
   end
 
   private
@@ -164,8 +170,15 @@ class Map
     return fives
   end
 
-  def is_breakable? five
-    return false
+  def breakable_in five, color
+    y,x,t = five
+    breakables = []
+    while @data[y][x] == color
+      breakables << [y, x] if @capturable[y][x]
+      y += t[0]
+      x += t[1]
+    end
+    return breakables
   end
 
   # test a line
@@ -212,5 +225,5 @@ if __FILE__ == $0
   puts m.capturable.stringify_map
   #assert 0, m.capturable.select{|e| e == true}
 
-  binding.pry
+  binding.pry # debug zone it's ok
 end

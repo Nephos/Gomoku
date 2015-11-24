@@ -120,6 +120,7 @@ class TestGameReal < Test::Unit::TestCase
     r = c.get(WAIT, {:headers => co})
     assert_equal status_wait, r.status if status_wait
     r = c.post(PLAY.gsub('X', x.to_s).gsub('Y', y.to_s), {headers: co})
+    puts r.body.to_s
     assert_equal status_end, r.status if status_end
     if opt[:end_msg]
       assert_equal JSON.parse(r.body.to_s)["message"], opt[:end_msg]
