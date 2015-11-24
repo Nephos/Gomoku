@@ -15,7 +15,6 @@ class Map
   ]
 
   attr_reader :size, :data, :took, :capturable, :free3
-  attr_accessor :moves
 
   def initialize size=19
     @size = size
@@ -23,7 +22,6 @@ class Map
     @capturable = Array.new(size){Array.new(size) {false}}
     @free3 = Array.new(size){Array.new(size) {false}}
     @took = [0, 0]
-    @moves = []
   end
 
   def took_hash
@@ -48,47 +46,65 @@ class Map
     return 1 if x < 0 or x >= 19
     return 2 if y < 0 or y >= 19
     return 3 if @data[y][x]
-    return 5 if not @moves.empty? and not @moves.include? [x, y]
+    #return 5 if not @moves.empty? and not @moves.include? [x, y]
     return nil
   end
   def valid_xy? x, y
     return false if y < 0 or y >= 19 or x < 0 or x >= 19
     return true
   end
-
-  def update! y, x
-    color = @data[y][x]
-    update_capturable!(y, x, color)
-    #update_free3!(y, x, color)
+  def border? x, y
+    return (y == 0 or x == 0 or y == 18 or x == 18)
   end
 
+  def update! y, x
+    update_capturable!(y, x)
+    #update_free3!(y, x)
+  end
+
+      require 'pry'
   private
-  def update_capturable! y, x, color
+  def update_capturable! y, x, rec=true
+    color = @data[y][x]
     @capturable[y][x] = false
-    return false if @data[y][x].nil?
-    T_CAPTURE.each do |tuples|
-      #puts "TEST FOR #{tuples} at #{y}#{x}"
-      y2,x2 = y + tuples[0][0], x + tuples[0][1]
-      y3,x3 = y + tuples[1][0], x + tuples[1][1]
-      #puts "2: #{y2}#{x2}, 3:#{y3}#{x3}"
-      next if not valid_xy? x2, y2
-      next if not valid_xy? x3, y3
-      #puts :test
-      a = @data[y2][x2]
-      b = @data[y3][x3]
-      ra = a == color && b == nil
-      rb = b == color && a == nil
-      if ra or rb
-        @capturable[y][x] = true
-        @capturable[y2][x2] = true if ra
-        @capturable[y3][x3] = true if rb
-        #puts :ra if ra
-        #puts :rb if rb
-      #else
-        #puts :miss
-      end
-      ra||rb
+
+    T.each do |tuple|
+      y2, x2 = y+tuple[0], x+tuple[1]
+      #@capturable[y2][x2] = false
+      update_capturable!(y2, x2, false) if @capturable[y2][x2] == true or rec
     end
+
+    return if color.nil? # handled by recursion
+
+    T_CAPTURE.each do |tuples|
+      y2, x2 = y+tuples[0][0], x+tuples[0][1]
+      y22, x22 = y+tuples[0][0]*2, x+tuples[0][1]*2
+      y3, x3 = y+tuples[1][0], x+tuples[1][1]
+      y33, x33 = y+tuples[1][0]*2, x+tuples[1][1]*2
+      next if not valid_xy?(x2, y2)
+      next if not valid_xy?(x3, y3)
+      r2, r3 = @data[y2][x2], @data[y3][x3]
+      r22, r33 = @data[y22][x22], @data[y33][x33]
+      next if r2 == r3
+      next if r2 == nil and r3 != color
+      next if r3 == nil and r2 != color
+      if r2 == color
+        next if not valid_xy?(x22, y22)
+        next if r22 == color
+        next if r22 == r3
+        update_capturable_case!(y, x, y2, x2)
+      elsif r3 == color
+        next if not valid_xy?(x33, y33)
+        next if r33 == color
+        next if r33 == r2
+        update_capturable_case!(y, x, y3, x3)
+      end
+    end
+  end
+
+  def update_capturable_case!(y, x, y2, x2)
+    @capturable[y][x] = true
+    @capturable[y2][x2] = true
   end
 
   public
@@ -140,11 +156,10 @@ class Map
     return true if @took[color] >= 10
     fives = fives(color)
     return false if fives.empty?
-    #return false if fives.empty?
     breakables = fives.map{|five| breakable_in(five, color)}
-    @moves = breakables.inject(&:&) || []
-    return true if @moves.empty? # win if cannot break all with one mov
-    return true
+    moves = breakables.inject(&:&) || []
+    return true if moves.empty? # win if cannot break all with one mov
+    return false
   end
 
   private

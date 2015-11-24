@@ -120,34 +120,38 @@ class TestGameReal < Test::Unit::TestCase
     assert_equal map.to_a, get_map
     play_map(map, :white, 1, 0, 200, 200)
     play_map(map, :black, 9, 0, 200, 200)
-
     play_map(map, :white, 1, 1, 200, 200)
     play_map(map, :black, 9, 1, 200, 200)
-
     play_map(map, :white, 1, 2, 200, 200)
     play_map(map, :black, 9, 2, 200, 200)
-
     play_map(map, :white, 2, 2, 200, 200)
     play_map(map, :black, 0, 2, 200, 200)
-
     play_map(map, :white, 1, 3, 200, 200)
     play_map(map, :black, 9, 3, 200, 200)
-
-    # not win
+    # win ahahahha lol
     play_map(map, :white, 1, 4, 200, 200)
+    body = play_map(map, :black, 9, 4, 200, 200).body.to_s
+    assert_equal map.to_a, get_map
+    assert_equal "You win.", JSON.parse(body)["message"]
 
-    # forbidden -> 5 breakable
-    require 'pry'; binding.pry
-    play(:black, 4, 0, 200, 401)#; map[5][0] = 1
-    # mandatory -> 5 breakable
-    require 'pry'; binding.pry
-    play(:black, 3, 2, 200, 200); map[3][2] = 1
+    new_game
+    map = Map.new
+    assert_equal map.to_a, get_map
+    play_map(map, :white, 1, 0, 200, 200)
+    play_map(map, :black, 9, 0, 200, 200)
+    play_map(map, :white, 1, 1, 200, 200)
+    play_map(map, :black, 9, 1, 200, 200)
+    play_map(map, :white, 1, 2, 200, 200)
+    play_map(map, :black, 9, 2, 200, 200)
+    play_map(map, :white, 2, 2, 200, 200)
+    play_map(map, :black, 0, 2, 200, 200)
+    play_map(map, :white, 1, 3, 200, 200)
+    play_map(map, :black, 9, 3, 200, 200)
+    body = play_map(map, :white, 3, 2, 200, 200).body.to_s
 
     assert_equal map.to_a, get_map
     assert_equal "You win.", JSON.parse(body)["message"]
   end
-
-
 
   private
   def play(color, y, x, status_wait=nil, status_end=nil, opt={})
@@ -174,7 +178,6 @@ class TestGameReal < Test::Unit::TestCase
       map[y][x] = color - 1
       map.update!(y, x)
       map.take_around!(y, x, color - 1)
-      map.moves = []
     end
     r
   end
