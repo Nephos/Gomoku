@@ -91,6 +91,7 @@ class Map
     T_FREE3.each do |tuples|
       @allies = []
       @borders = []
+      @ext_borders = []
       void = 0
       allies = 1
       freeb = 0
@@ -102,7 +103,7 @@ class Map
         id = newid!
         new_ids << id
         points = (@allies + @borders + [y, x])
-        @free3_list[id] = points
+        @free3_list[id] = {allies: points, borders: @ext_borders}
         all_points << points
         points.each do |y2, x2|
           @free3_cpy[y2][x2] << id
@@ -161,6 +162,7 @@ class Map
       elsif f == nil
         @borders << [y2, x2]
         @borders << [y3, x3]
+        @ext_borders << [y3, x3]
         return [void, allies, freeb+2]
       end
 
@@ -175,7 +177,11 @@ class Map
 
   def break_free3! y, x
     @free3_cpy[y][x].each do |id|
-      @free_list.each do |y2, x2|
+      if @free_list[id][:borders].include?([y, x]) and @free_list[id][:borders].size == 2
+        @free_list[id][:borders].delete([y, x])
+        next
+      end
+      @free_list[id].each do |y2, x2|
         @free3_cpy[y2][x2].delete id
       end
       @free_list.delete id
