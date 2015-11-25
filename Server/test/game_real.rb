@@ -167,15 +167,20 @@ class TestGameReal < Test::Unit::TestCase
     new_game
     map = Map.new
     play_map(map, :white, 5, 5, 200, 200)
-    play_map(map, :white, 0, 0, 200, 200)
+    play_map(map, :black, 0, 0, 200, 200)
     play_map(map, :white, 5, 6, 200, 200)
-    play_map(map, :white, 0, 1, 200, 200)
+    play_map(map, :black, 0, 1, 200, 200)
     play_map(map, :white, 5, 7, 200, 200)
-    play_map(map, :white, 0, 2, 200, 200)
+    play_map(map, :black, 0, 2, 200, 200)
     play_map(map, :white, 6, 7, 200, 200)
-    play_map(map, :white, 0, 3, 200, 200)
+    play_map(map, :black, 0, 3, 200, 200)
     # echouer
+    play_map(map, :white, 7, 7, 200, 401)
+    play_map(map, :white, 8, 7, 200, 401)
+    play_map(map, :white, 9, 7, 200, 200)
+    play_map(map, :black, 8, 7, 200, 200)
     play_map(map, :white, 7, 7, 200, 200)
+    #puts map.to_a.map{|e| e.map{|x| x||"."}.join(" ")}.join("\n")
   end
 
   private

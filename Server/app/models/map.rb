@@ -136,7 +136,7 @@ class Map
     # nil
     elsif e == nil
       y3, x3 = y2+tuple[0], x2+tuple[1]
-      f = @data[y3][x3] rescue binding
+      f = @data[y3][x3]
 
       # border
       if not valid_xy? y3, x3
@@ -185,7 +185,6 @@ class Map
   def break_free3! y, x
     # problem == function called twice so the 2nd time it bugs because the id does not exist anymore in the list, but does in the array
     @free3_cpy[y][x].each do |id|
-      binding.pry
       if @free3_list_cpy[id][:borders].include?([y, x]) and @free3_list_cpy[id][:borders].size == 2
         @free3_list_cpy[id][:borders].delete([y, x])
         next
