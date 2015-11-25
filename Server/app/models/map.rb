@@ -18,11 +18,19 @@ class Map
   attr_reader :size, :data, :took, :capturable, :free3
 
   def initialize size=19
+    @id = 0
     @size = size
     @data = Array.new(size){Array.new(size) {nil}}
     @capturable = Array.new(size){Array.new(size) {false}}
-    @free3 = Array.new(size){Array.new(size) {0}}
+    @free3 = Array.new(size){Array.new(size) {[]}}
     @took = [0, 0]
+    @free3_list = {}
+  end
+
+  def newid!
+    id = @id
+    @id += 1
+    id
   end
 
   def took_hash
@@ -68,15 +76,18 @@ class Map
   public # remove
   def make_free3 y, x, color
     @data[y][x] = color
-    update_free3! y, x
+    all_points = update_free3! y, x
     @data[y][x] = nil
-    return @free3_cpy[y][x]
+    return all_points.map{|y2, x2| @free3_cpy[y2][x2] }.flatten.uniq.size
   end
 
   def update_free3! y, x
     color = @data[y][x]
     @free3_cpy = Marshal.load(Marshal.dump(@free3))
-    @free3_cpy[y][x] = 0
+    break_free3!(y, x)
+    @free3_cpy[y][x] = []
+    all_points = []
+
     T_FREE3.each do |tuples|
       @allies = []
       @borders = []
@@ -84,53 +95,91 @@ class Map
       allies = 1
       freeb = 0
       void, allies, freeb = free3_tests(void, allies, freeb, y, x, tuples[0], color, false)
-      if allies < 4 and freeb > 0
+      if freeb > 0
         void, allies, freeb = free3_tests(void, allies, freeb, y, x, tuples[1], color, (void == 1 && allies != 3))
       end
-      if void <= 1 and allies == 3 and freeb > 2
-        # TODO: add an ID to the free3_cpy array
-        @free3_cpy[y][x] += 1
-        @allies.each do |y2, x2, _|
-          @free3_cpy[y2][x2] += 1
+      if void <= 1 and allies == 3 and freeb >= 3
+        id = newid!
+        new_ids << id
+        points = (@allies + @borders + [y, x])
+        @free3_list[id] = points
+        all_points << points
+        points.each do |y2, x2|
+          @free3_cpy[y2][x2] << id
         end
       end
     end
-    return @free3_cpy[y][x]
+    return points.flatten.uniq
   end
 
   def free3_tests(void, allies, freeb, y, x, tuple, color, reset_void)
     y2, x2 = y+tuple[0], x+tuple[1]
-    return [void, allies, freeb] if not valid_xy? y2, x2
+    return [void, allies, freeb] if not valid_xy? y2, x2 # out of range
     e = @data[y2][x2]
+
+    # new ally
     if e == color
       if allies < 4
         @allies << [y2, x2, tuple] # tag ally
         return free3_tests(void, allies+1, freeb, y2, x2, tuple, color, reset_void)
       end
       return [0, 4, 0] # nope nope nope
+
+    # nil
     elsif e == nil
-      @borders << [y2, x2, tuple] # tag border
       y3, x3 = y2+tuple[0], x2+tuple[1]
       f = @data[y3][x3]
-      return [void, allies, freeb+1] if not valid_xy? y3, x3
-      if f == color
+
+      # border
+      if not valid_xy? y3, x3
+        @borders << [y2, x2]
+        return [void, allies, freeb+1]
+
+      # ally 2 cases away
+      elsif f == color
+        # void allowed
         if void == 0
-          @allies << [y3, x3, tuple] # tag ally
+          @allies << [y2, x2]
+          @allies << [y3, x3] # tag ally
           return free3_tests(void+1, allies+1, freeb, y3, x3, tuple, color, reset_void)
+
+        # void allowed by resetting the first
         elsif void == 1 and reset_void == true
           @borders = [@allies.shift] # void becomes border
-          @allies.shift # untag ally
+          @allies.clear # untag allies
+          @allies << [y2, x2] # tag void
+          @allies << [y3, x3] # tag ally
           return free3_tests(void, allies, freeb, y3, x3, tuple, color, false)
+
+        # void disallowed
         else
+          @borders << [y2, x2]
           return [void, allies, freeb+1]
         end
+
+      # . nil nil
       elsif f == nil
-        @borders << [y3, x3, tuple]
+        @borders << [y2, x2]
+        @borders << [y3, x3]
         return [void, allies, freeb+2]
       end
+
+      # enemy 2 cases away
+      @borders << [y2, x2]
       return [void, allies, freeb+1] if e != f
     end
+
+    # enemy
     return [void, allies, freeb]
+  end
+
+  def break_free3! y, x
+    @free3_cpy[y][x].each do |id|
+      @free_list.each do |y2, x2|
+        @free3_cpy[y2][x2].delete id
+      end
+      @free_list.delete id
+    end
   end
 
   def save_free3!
