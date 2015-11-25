@@ -110,9 +110,9 @@ class GameController < Nephos::Controller
       raise "What the fuck"
     end
     @map[y][x] = color
-    @map.save_free3!
     @map.take_around!(y, x, color)
     @map.update!(y, x)
+    @map.save_free3!
     win = @map.win? color
     get_map_render
     if win
