@@ -81,9 +81,16 @@ class Map
     return (all_points.map{|y2, x2| @free3_cpy[y2][x2] }.inject(&:+) ||[]).uniq.size
   end
 
+  def save_free3!
+    @free3 = @free3_cpy
+    @free3_list = @free3_list_cpy
+  end
+
   def update_free3! y, x
+    require "pry"
     color = @data[y][x]
     @free3_cpy = Marshal.load(Marshal.dump(@free3))
+    @free3_list_cpy = Marshal.load(Marshal.dump(@free3_list))
     break_free3!(y, x)
     @free3_cpy[y][x] = []
     all_points = []
@@ -101,8 +108,9 @@ class Map
       end
       if void <= 1 and allies == 3 and freeb >= 3
         id = newid!
-        points = (@allies + @borders + [[y, x]])
-        @free3_list[id] = {allies: points, borders: @ext_borders}
+        @allies << [y, x]
+        points = (@allies + @borders)
+        @free3_list_cpy[id] = {allies: points, borders: @ext_borders}
         all_points << points
         points.each do |y2, x2|
           @free3_cpy[y2][x2] << id
@@ -120,7 +128,7 @@ class Map
     # new ally
     if e == color
       if allies < 4
-        @allies << [y2, x2, tuple] # tag ally
+        @allies << [y2, x2] # tag ally
         return free3_tests(void, allies+1, freeb, y2, x2, tuple, color, reset_void)
       end
       return [0, 4, 0] # nope nope nope
@@ -128,7 +136,7 @@ class Map
     # nil
     elsif e == nil
       y3, x3 = y2+tuple[0], x2+tuple[1]
-      f = @data[y3][x3]
+      f = @data[y3][x3] rescue binding
 
       # border
       if not valid_xy? y3, x3
@@ -151,7 +159,7 @@ class Map
           @allies << [y3, x3] # tag ally
           return free3_tests(void, allies, freeb, y3, x3, tuple, color, false)
 
-        # void disallowed
+        # void not allowed
         else
           @borders << [y2, x2]
           return [void, allies, freeb+1]
@@ -175,20 +183,18 @@ class Map
   end
 
   def break_free3! y, x
+    # problem == function called twice so the 2nd time it bugs because the id does not exist anymore in the list, but does in the array
     @free3_cpy[y][x].each do |id|
-      if @free_list[id][:borders].include?([y, x]) and @free_list[id][:borders].size == 2
-        @free_list[id][:borders].delete([y, x])
+      binding.pry
+      if @free3_list_cpy[id][:borders].include?([y, x]) and @free3_list_cpy[id][:borders].size == 2
+        @free3_list_cpy[id][:borders].delete([y, x])
         next
       end
-      @free_list[id].each do |y2, x2|
+      @free3_list_cpy[id][:allies].each do |y2, x2|
         @free3_cpy[y2][x2].delete id
       end
-      @free_list.delete id
+      @free3_list_cpy.delete id
     end
-  end
-
-  def save_free3!
-    @free3 = @free3_cpy
   end
 
   ### Capturable section (5) ###
