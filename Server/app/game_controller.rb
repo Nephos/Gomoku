@@ -104,11 +104,13 @@ class GameController < Nephos::Controller
       return {plain: "failed. occupied\n" + @map_render, status: 401} if plain?
       return {json: {message: "Invalid position (occupied)", map: @map_render, points: @map.took_hash}, status: 401}
     when 4
-      # error for 3x3
+      return {plain: "failed. double 3 free forbidden\n" + @map_render, status: 401} if plain?
+      return {json: {message: "Invalid position (2x3free)", map: @map_render, points: @map.took_hash}, status: 401}
     else
-      # WHAT ?!
+      raise "What the fuck"
     end
     @map[y][x] = color
+    @map.save_free3!
     @map.take_around!(y, x, color)
     @map.update!(y, x)
     win = @map.win? color

@@ -13,6 +13,7 @@ class Map
     [[-1, 1], [1, -1]],
     [[0, 1], [0, -1]],
   ]
+  T_FREE3 = T_CAPTURE
 
   attr_reader :size, :data, :took, :capturable, :free3
 
@@ -20,7 +21,7 @@ class Map
     @size = size
     @data = Array.new(size){Array.new(size) {nil}}
     @capturable = Array.new(size){Array.new(size) {false}}
-    @free3 = Array.new(size){Array.new(size) {false}}
+    @free3 = Array.new(size){Array.new(size) {0}}
     @took = [0, 0]
   end
 
@@ -46,12 +47,12 @@ class Map
     return 1 if x < 0 or x >= 19
     return 2 if y < 0 or y >= 19
     return 3 if @data[y][x]
+    return 4 if make_free3(y, x, color) >= 2
     #return 5 if not @moves.empty? and not @moves.include? [x, y]
     return nil
   end
   def valid_xy? x, y
-    return false if y < 0 or y >= 19 or x < 0 or x >= 19
-    return true
+    return (y >= 0 or y <= 18 or x >= 0 or x <= 18)
   end
   def border? x, y
     return (y == 0 or x == 0 or y == 18 or x == 18)
@@ -59,11 +60,82 @@ class Map
 
   def update! y, x
     update_capturablex!(y, x)
-    #update_free3!(y, x)
+    update_free3!(y, x)
   end
 
+  ### Free3 section ###
   private
-  def update_capturablex!(y, x)
+  public # remove
+  def make_free3 y, x, color
+    @data[y][x] = color
+    update_free3! y, x
+    @data[y][x] = nil
+    return @free3_cpy[y][x]
+  end
+
+  def update_free3! y, x
+    color = @data[y][x]
+    @free3_cpy = Marshal.load(Marshal.dump(@free3))
+    @free3_cpy[y][x] = 0
+    T_FREE3.each do |tuples|
+      @allies = []
+      void = 0
+      allies = 1
+      freeb = 0
+      void, allies, freeb = free3_tests(void, allies, freeb, y, x, tuples[0], color, false)
+      if allies < 4 and freeb > 0
+        void, allies, freeb = free3_tests(void, allies, freeb, y, x, tuples[1], color, (void == 1 && allies != 3))
+      end
+      if void <= 1 and allies == 3 and freeb > 2
+        @free3_cpy[y][x] += 1
+        @allies.each do |y2, x2, _|
+          @free3_cpy[y2][x2] += 1
+        end
+      end
+    end
+    return @free3_cpy[y][x]
+  end
+
+  def free3_tests(void, allies, freeb, y, x, tuple, color, reset_void)
+    y2, x2 = y+tuple[0], x+tuple[1]
+    return [void, allies, freeb] if not valid_xy? y2, x2
+    e = @data[y2][x2]
+    if e == color
+      if allies < 4
+        @allies << [y2, x2, tuple] # tag ally
+        return free3_tests(void, allies+1, freeb, y2, x2, tuple, color, reset_void)
+      end
+      return [0, 4, 0] # nope nope nope
+    elsif e == nil
+      y3, x3 = y2+tuple[0], x2+tuple[1]
+      f = @data[y3][x3]
+      return [void, allies, freeb+1] if not valid_xy? y3, x3
+      if f == color
+        if void == 0
+          @allies << [y3, x3, tuple] # tag ally
+          return free3_tests(void+1, allies+1, freeb, y3, x3, tuple, color, reset_void)
+        elsif void == 1 and reset_void == true
+          @allies.shift # untag ally
+          return free3_tests(void, allies, freeb, y3, x3, tuple, color, false)
+        else
+          return [void, allies, freeb+1]
+        end
+      elsif f == nil
+        return [void, allies, freeb+2]
+      end
+      return [void, allies, freeb+1] if e != f
+    end
+    return [void, allies, freeb]
+  end
+
+  def save_free3!
+    @free3 = @free3_cpy
+  end
+
+  ### Capturable section (5) ###
+
+  private
+  def update_capturablex! y, x
     @i = 0
     @capture = []
     update_capturable!(y, x)
@@ -74,7 +146,6 @@ class Map
 
   def update_capturable! y, x, rec=true
     @i += 1
-    binding.pry if @i > 1000
     color = @data[y][x]
     @capturable[y][x] = false
 
@@ -119,6 +190,8 @@ class Map
     @capture << [y2, x2]
   end
 
+  ### Take section ###
+
   public
   # try to take every lines around (y, x)
   # use the directions T
@@ -159,6 +232,8 @@ class Map
       return true
     end
   end
+
+  ### Win section ###
 
   public
   # for every "color" or "2"
