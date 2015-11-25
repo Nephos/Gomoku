@@ -60,7 +60,7 @@ class Map
     return nil
   end
   def valid_xy? x, y
-    return (y >= 0 or y <= 18 or x >= 0 or x <= 18)
+    return (y >= 0 and y <= 18 and x >= 0 and x <= 18)
   end
   def border? x, y
     return (y == 0 or x == 0 or y == 18 or x == 18)
@@ -78,7 +78,7 @@ class Map
     @data[y][x] = color
     all_points = update_free3! y, x
     @data[y][x] = nil
-    return all_points.map{|y2, x2| @free3_cpy[y2][x2] }.flatten.uniq.size
+    return (all_points.map{|y2, x2| @free3_cpy[y2][x2] }.inject(&:+) ||[]).uniq.size
   end
 
   def update_free3! y, x
@@ -101,8 +101,7 @@ class Map
       end
       if void <= 1 and allies == 3 and freeb >= 3
         id = newid!
-        new_ids << id
-        points = (@allies + @borders + [y, x])
+        points = (@allies + @borders + [[y, x]])
         @free3_list[id] = {allies: points, borders: @ext_borders}
         all_points << points
         points.each do |y2, x2|
@@ -110,7 +109,7 @@ class Map
         end
       end
     end
-    return points.flatten.uniq
+    return (all_points.map{|e| e||[] }.inject(&:+) ||[] ).uniq
   end
 
   def free3_tests(void, allies, freeb, y, x, tuple, color, reset_void)
@@ -136,7 +135,7 @@ class Map
         @borders << [y2, x2]
         return [void, allies, freeb+1]
 
-      # ally 2 cases away
+      #ally 2 cases away
       elsif f == color
         # void allowed
         if void == 0
