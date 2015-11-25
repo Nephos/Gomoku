@@ -79,6 +79,7 @@ class Map
     @free3_cpy[y][x] = 0
     T_FREE3.each do |tuples|
       @allies = []
+      @borders = []
       void = 0
       allies = 1
       freeb = 0
@@ -87,6 +88,7 @@ class Map
         void, allies, freeb = free3_tests(void, allies, freeb, y, x, tuples[1], color, (void == 1 && allies != 3))
       end
       if void <= 1 and allies == 3 and freeb > 2
+        # TODO: add an ID to the free3_cpy array
         @free3_cpy[y][x] += 1
         @allies.each do |y2, x2, _|
           @free3_cpy[y2][x2] += 1
@@ -107,6 +109,7 @@ class Map
       end
       return [0, 4, 0] # nope nope nope
     elsif e == nil
+      @borders << [y2, x2, tuple] # tag border
       y3, x3 = y2+tuple[0], x2+tuple[1]
       f = @data[y3][x3]
       return [void, allies, freeb+1] if not valid_xy? y3, x3
@@ -115,12 +118,14 @@ class Map
           @allies << [y3, x3, tuple] # tag ally
           return free3_tests(void+1, allies+1, freeb, y3, x3, tuple, color, reset_void)
         elsif void == 1 and reset_void == true
+          @borders = [@allies.shift] # void becomes border
           @allies.shift # untag ally
           return free3_tests(void, allies, freeb, y3, x3, tuple, color, false)
         else
           return [void, allies, freeb+1]
         end
       elsif f == nil
+        @borders << [y3, x3, tuple]
         return [void, allies, freeb+2]
       end
       return [void, allies, freeb+1] if e != f
