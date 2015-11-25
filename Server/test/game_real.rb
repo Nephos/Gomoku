@@ -163,6 +163,21 @@ class TestGameReal < Test::Unit::TestCase
     assert_equal "You win.", JSON.parse(body)["message"]
   end
 
+  def test_free3
+    new_game
+    map = Map.new
+    play_map(map, :white, 5, 5, 200, 200)
+    play_map(map, :white, 0, 0, 200, 200)
+    play_map(map, :white, 5, 6, 200, 200)
+    play_map(map, :white, 0, 1, 200, 200)
+    play_map(map, :white, 5, 7, 200, 200)
+    play_map(map, :white, 0, 2, 200, 200)
+    play_map(map, :white, 6, 7, 200, 200)
+    play_map(map, :white, 0, 3, 200, 200)
+    # echouer
+    play_map(map, :white, 7, 7, 200, 200)
+  end
+
   private
   def play(color, y, x, status_wait=nil, status_end=nil, opt={})
     color = 1 if color == :white
