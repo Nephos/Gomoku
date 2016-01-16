@@ -1,17 +1,13 @@
 #include <sstream>
 #include "Player.hpp"
 
-Player::Player(std::string const &host, std::string const &port, bool r) : _network(host, port), _display(r) {
+Player::Player(std::string const &host, std::string const &port,
+              std::string const &cookie, std::string const &color) : _network(host, port) {
+  _cookie = cookie;
+  _color = color;
   _myTurn = false;
   _host = host + ":" + port;
   initMap();
-}
-
-Player *Player::p = NULL;
-Player *Player::getInstance(bool r, std::string const &host, std::string const &port) {
-  if (p == NULL)
-    p = new Player(host, port, r);
-  return p;
 }
 
 void Player::connect() {
@@ -34,49 +30,14 @@ void Player::resetGame() {
   _cookie.clear();
   _gameOver = false;
   _myTurn = false;
-  _display.setWhiteScore(0);
-  _display.setBlackScore(0);
   initMap();
   _network.reset();
   connect();
-  _display.setMessage("Waiting for other players...");
 }
 
 void Player::play() {
   connect();
-  _display.setMessage("Waiting for other players...");
-  std::string ans;
-  std::string header = " HTTP/1.0\r\nHost: " + _host + "\r\nAccept: */*\r\n";
-  std::pair<int, int> click(-1, -1);
   _gameOver = false;
-  while (click.first != -2) { // Game loop
-    click.first = -1;
-    click.second = -1;
-    ans = _network.getAnswer();
-    parseAnswer(ans);
-    click = _display.drawGame(_map);
-    if (click.first == -3)
-      resetGame();
-    else if (!_myTurn && !_gameOver) {
-      std::string req = "GET /game.txt" + header + _cookie + "\r\n\r\n";
-      _network.sendQuery(req);
-    }
-    else if (!_gameOver && click.first >= 0 && click.second >= 0)
-      sendClick(click, header);
-  }
-}
-
-void Player::sendClick(std::pair<int, int> click, std::string const &header) {
-  std::stringstream ss;
-  ss << "POST /game/play/" << click.first << "/" << click.second << header << _cookie << "\r\n\r\n";
-  std::string req = ss.str();
-  _network.sendQuery(req);
-  _network._io_service.run();
-  _network._io_service.reset();
-  std::string ans = _network.getAnswer();
-  parseAnswer(ans);
-  req = "GET /game/map.txt" + header + _cookie + "\r\n\r\n";
-  _network.sendQuery(req);
 }
 
 /* If returns false, then ask for another user input */
@@ -84,6 +45,7 @@ void Player::sendClick(std::pair<int, int> click, std::string const &header) {
 bool Player::parseAnswer(const std::string &str) {
   if (str.empty())
     return true;
+  std::cout << str << std::endl;
   if (str.find("401 Unauthorized") != std::string::npos)
     return false;
   else if (str.find("403 Forbidden") != std::string::npos) {
@@ -96,23 +58,21 @@ bool Player::parseAnswer(const std::string &str) {
     while (std::getline(ss, tmp)) {
       if (tmp.find("failed.") == 0) {
         _gameOver = true;
-        _display.setMessage("Game over, you lose. Press ESC to quit or SPACE to play again.");
+        _win = false;
         updateMap(ss);
       }
       else if (tmp.find("win.") == 0) {
         _gameOver = true;
-        _display.setMessage("Game over, you win. Press ESC to quit or SPACE to play again.");
+        _win = true;
         updateMap(ss);
       }
       else if (tmp.find("continue.") == 0 ||
         tmp.find("ok.") == 0) {
         if (tmp.find("continue") == 0) {
           if (!_myTurn) {
-            _display.setMessage("It's your turn !");
-            _myTurn = true;            
+            _myTurn = true;
           }
           else {
-            _display.setMessage("It's the enemy's turn !");
             _myTurn = false;
           }
         }
@@ -124,7 +84,7 @@ bool Player::parseAnswer(const std::string &str) {
   return true;
 }
 
-void Player::updateMap(std::istringstream &ss) {
+std::pair<int, int> Player::updateMap(std::istringstream &ss) {
   std::string tmp;
   _map.clear();
   int i = 0;
@@ -139,8 +99,7 @@ void Player::updateMap(std::istringstream &ss) {
   int w, b;
   ss >> w;
   ss >> b;
-  _display.setWhiteScore(w);
-  _display.setBlackScore(b);
+  return std::pair<int, int> (w, b);
 }
 
 void Player::setCookie(const std::string &str) {
@@ -158,8 +117,7 @@ void Player::setCookie(const std::string &str) {
         tmp = tmp.substr(12, n - 12);
         _cookie += tmp + "; ";
         if (tmp.find("color") == 0) {
-          tmp = tmp.substr(6);
-          _display.setColor(tmp);
+          _color = tmp.substr(6);
         }
       }
     }

@@ -3,7 +3,6 @@
 #include <string>
 #include <utility>
 #include <map>
-#include "Display.hpp"
 #include "Network.hpp"
 
 class Player
@@ -12,26 +11,23 @@ class Player
     void play();
     void connect();
 
-    static Player *getInstance(bool, std::string const &host = "127.0.0.1", std::string const &port = "8080");
-
     void initMap();
     bool parseAnswer(std::string const &);
     void setCookie(std::string const &);
     void resetGame();
-    void updateMap(std::istringstream &);
-    void sendClick(std::pair<int, int>, std::string const &);
+    std::pair<int, int> updateMap(std::istringstream &);
 
-  private:
-    Player(std::string const &, std::string const &, bool);
+  protected:
+    Player(std::string const &, std::string const &, std::string const &, std::string const &);
     ~Player() {};
     static Player *p;
 
     std::string _color;
     std::string _host;
     std::string _cookie;
+    bool _win;
     bool _myTurn;
     bool _gameOver;
     Network _network;
-    GomokuDisplay _display;
     std::map<std::pair<int, int>, char> _map;
 };
