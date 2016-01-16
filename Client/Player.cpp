@@ -45,7 +45,6 @@ void Player::play() {
 bool Player::parseAnswer(const std::string &str) {
   if (str.empty())
     return true;
-  std::cout << str << std::endl;
   if (str.find("401 Unauthorized") != std::string::npos)
     return false;
   else if (str.find("403 Forbidden") != std::string::npos) {
