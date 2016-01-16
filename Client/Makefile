@@ -4,6 +4,7 @@ SRC	=	Player.cpp \
 		Display.cpp \
 		Obj.cpp \
 		Human.cpp \
+		Computer.cpp \
 		main.cpp
 
 OBJ	=	$(SRC:.cpp=.o)

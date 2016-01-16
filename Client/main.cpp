@@ -1,6 +1,6 @@
 #include <iostream>
 #include "Exceptions.hpp"
-#include "Player.hpp"
+#include "Computer.hpp"
 #include "Human.hpp"
 
 int main(int ac, char **av) {
@@ -26,8 +26,10 @@ int main(int ac, char **av) {
         rainbows = false;
       if (host.size() == 0 || port.size() == 0)
         Human::getInstance()->play();
-      else
+      else if (ac < 4)
         Human::getInstance(host, port, cookie, color, rainbows)->play();
+      else
+        Computer::getInstance(host, port, cookie, color)->play();
     }
     else
       throw Gomoku::UsageException();

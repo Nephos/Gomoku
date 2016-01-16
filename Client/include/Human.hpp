@@ -11,7 +11,6 @@ class Human : public Player
 {
   public:
     void play();
-    void connect();
 
     static Human *getInstance(std::string const &host = "127.0.0.1", std::string const &port = "8080",
                               std::string const &cookie = "", std::string const &color = "", bool rainbows = true);
