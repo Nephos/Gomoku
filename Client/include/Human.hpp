@@ -17,7 +17,6 @@ class Human : public Player
                               std::string const &cookie = "", std::string const &color = "");
 
     bool parseAnswer(std::string const &);
-    std::string setCookie(std::string const &);
     void resetGame();
     std::pair<int, int> updateMap(std::istringstream &);
     void sendClick(std::pair<int, int>, std::string const &);

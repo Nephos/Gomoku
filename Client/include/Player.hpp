@@ -13,7 +13,7 @@ class Player
 
     void initMap();
     bool parseAnswer(std::string const &);
-    std::string setCookie(std::string const &);
+    void setCookie(std::string const &);
     void resetGame();
     std::pair<int, int> updateMap(std::istringstream &);
 

@@ -45,6 +45,7 @@ void Player::play() {
 bool Player::parseAnswer(const std::string &str) {
   if (str.empty())
     return true;
+  std::cout << str << std::endl;
   if (str.find("401 Unauthorized") != std::string::npos)
     return false;
   else if (str.find("403 Forbidden") != std::string::npos) {
@@ -101,7 +102,7 @@ std::pair<int, int> Player::updateMap(std::istringstream &ss) {
   return std::pair<int, int> (w, b);
 }
 
-std::string Player::setCookie(const std::string &str) {
+void Player::setCookie(const std::string &str) {
   if (_cookie == "") {
     bool cookieSet = false;
     std::istringstream ss(str);
@@ -116,11 +117,9 @@ std::string Player::setCookie(const std::string &str) {
         tmp = tmp.substr(12, n - 12);
         _cookie += tmp + "; ";
         if (tmp.find("color") == 0) {
-          tmp = tmp.substr(6);
-          return tmp;
+          _color = tmp.substr(6);
         }
       }
     }
   }
-  return "";
 }

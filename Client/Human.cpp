@@ -68,19 +68,14 @@ bool Human::parseAnswer(const std::string &str) {
     _display.setMessage("It's your turn !");
   else if (!_myTurn)
     _display.setMessage("It's the enemy's turn !");
+  _display.setColor(_color);
   return true;
 }
 
 std::pair<int, int> Human::updateMap(std::istringstream &ss) {
   std::pair<int, int> score = Player::updateMap(ss);
+  std::cout << score.first << " " << score.second << std::endl;
   _display.setWhiteScore(score.first);
   _display.setBlackScore(score.second);
   return score;
-}
-
-std::string Human::setCookie(const std::string &str) {
-  std::string c;
-  if ((c = Player::setCookie(str)) != "")
-    _display.setColor(c);
-  return "";
 }
