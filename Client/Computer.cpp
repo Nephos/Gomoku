@@ -1,15 +1,13 @@
 #include <sstream>
 #include "Computer.hpp"
 
-Computer::Computer(std::string const &host, std::string const &port,
-              std::string const &cookie, std::string const &color)
-              : Player(host, port, cookie, color) {}
+Computer::Computer(std::string const &host, std::string const &port)
+              : Player(host, port) {}
 
 Computer *Computer::p = NULL;
-Computer *Computer::getInstance(std::string const &host, std::string const &port,
-                            std::string const &cookie, std::string const &color) {
+Computer *Computer::getInstance(std::string const &host, std::string const &port) {
   if (p == NULL)
-    p = new Computer(host, port, cookie, color);
+    p = new Computer(host, port);
   return p;
 }
 

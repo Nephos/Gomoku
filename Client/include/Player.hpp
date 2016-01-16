@@ -18,7 +18,7 @@ class Player
     std::pair<int, int> updateMap(std::istringstream &);
 
   protected:
-    Player(std::string const &, std::string const &, std::string const &, std::string const &);
+    Player(std::string const &, std::string const &);
     ~Player() {};
     static Player *p;
 

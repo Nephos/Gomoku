@@ -12,8 +12,7 @@ class Human : public Player
   public:
     void play();
 
-    static Human *getInstance(std::string const &host = "127.0.0.1", std::string const &port = "8080",
-                              std::string const &cookie = "", std::string const &color = "", bool rainbows = true);
+    static Human *getInstance(std::string const &host = "127.0.0.1", std::string const &port = "8080", bool rainbows = true);
 
     bool parseAnswer(std::string const &);
     void resetGame();
@@ -21,7 +20,7 @@ class Human : public Player
     void sendClick(std::pair<int, int>, std::string const &);
 
   private:
-    Human(std::string const &, std::string const &, std::string const &, std::string const &, bool);
+    Human(std::string const &, std::string const &, bool);
     ~Human() {};
     static Human *p;
 

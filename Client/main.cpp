@@ -6,7 +6,7 @@
 int main(int ac, char **av) {
   try {
     if (ac >= 1) {
-      std::string host, port, cookie, color;
+      std::string host, port;
       bool rainbows, player;
       rainbows = player = true;
       if (ac >= 2) {
@@ -17,19 +17,16 @@ int main(int ac, char **av) {
         port = host.substr(sep + 1);
         host = host.substr(0, sep);
       }
-      if (ac >= 4) {
-        player = false;
-        cookie.assign(av[2]);
-        color.assign(av[3]);
-      }
-      else if (ac >= 3 && std::string(av[2]).compare("--norainbowsplease") == 0)
+      if (ac >= 3 && std::string(av[2]).compare("--norainbowsplease") == 0)
         rainbows = false;
+      else if (ac >= 3 && std::string(av[2]).compare("--ia=true") == 0)
+        player = false;
       if (host.size() == 0 || port.size() == 0)
         Human::getInstance()->play();
-      else if (ac < 4)
-        Human::getInstance(host, port, cookie, color, rainbows)->play();
+      else if (player)
+        Human::getInstance(host, port, rainbows)->play();
       else
-        Computer::getInstance(host, port, cookie, color)->play();
+        Computer::getInstance(host, port)->play();
     }
     else
       throw Gomoku::UsageException();

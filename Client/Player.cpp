@@ -1,10 +1,7 @@
 #include <sstream>
 #include "Player.hpp"
 
-Player::Player(std::string const &host, std::string const &port,
-              std::string const &cookie, std::string const &color) : _network(host, port) {
-  _cookie = cookie;
-  _color = color;
+Player::Player(std::string const &host, std::string const &port) : _network(host, port) {
   _myTurn = false;
   _host = host + ":" + port;
   initMap();

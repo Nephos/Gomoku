@@ -18,7 +18,7 @@ namespace Gomoku {
 
   class UsageException : public GomokuException {
   public:
-    UsageException() : GomokuException("./client [ host:port ] [ --norainbowsplease ] [ cookie ] [ color ]", "Usage: ") {};
+    UsageException() : GomokuException("./client [ host:port ] [ --norainbowsplease | --ia=true ]", "Usage: ") {};
   };
 
   class NetworkException : public GomokuException {
