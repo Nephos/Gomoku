@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Exceptions.hpp"
 #include "Player.hpp"
+#include "Human.hpp"
 
 int main(int ac, char **av) {
   try {
@@ -19,9 +20,9 @@ int main(int ac, char **av) {
         color.assign(av[3]);
       }
       if (host.size() == 0 || port.size() == 0)
-        Player::getInstance()->play();
+        Human::getInstance()->play();
       else
-        Player::getInstance(host, port, cookie, color)->play();
+        Human::getInstance(host, port, cookie, color)->play();
     }
     else
       throw Gomoku::UsageException();
