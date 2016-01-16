@@ -3,6 +3,7 @@ SRC	=	Player.cpp \
 		HttpRequest.cpp \
 		Display.cpp \
 		Obj.cpp \
+		Human.cpp \
 		main.cpp
 
 OBJ	=	$(SRC:.cpp=.o)

@@ -89,17 +89,26 @@ class GameController < Nephos::Controller
       return {json: {message: "Not your turn. It's #{@round}.", points: @map.took_hash}, status: 401}
     end
     x, y = Integer(params[:x]), Integer(params[:y])
-    if x < 0 or x > 18
+    color = @color == "white" ? 0 : 1
+    case @map.valid_place_for? x, y, color
+    when nil
+      # ok
+    when 1
       return {plain: "failed. invalid x\n" + @map_render, status: 401} if plain?
       return {json: {message: "Invalid position (x)", map: @map_render, points: @map.took_hash}, status: 401}
-    elsif y < 0 or y > 18
+    when 2
       return {plain: "failed. invalid y\n" + @map_render, status: 401} if plain?
       return {json: {message: "Invalid position (y)", map: @map_render, points: @map.took_hash}, status: 401}
-    elsif @map[y][x]
+    when 3
       return {plain: "failed. occupied\n" + @map_render, status: 401} if plain?
       return {json: {message: "Invalid position (occupied)", map: @map_render, points: @map.took_hash}, status: 401}
+    when 4
+      # error for 3x3
+    when 5
+      # error for 5 lock
+    else
+      # WHAT ?!
     end
-    color = @color == "white" ? 0 : 1
     @game[:map][y][x] = color
     @game[:map].take_around!(y, x, color)
     win = @game[:map].win? color

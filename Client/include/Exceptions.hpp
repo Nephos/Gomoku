@@ -30,4 +30,4 @@ namespace Gomoku {
   public:
     DisplayException(std::string const &str) : GomokuException(str, "Display error: ") {};
   };
-}
+};

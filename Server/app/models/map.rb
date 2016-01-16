@@ -29,6 +29,13 @@ class Map
   ]
 
   public
+  def valid_place_for? x, y, color
+    return 1 if x < 0 or x >= 19
+    return 2 if y < 0 or y >= 19
+    return 3 if @data[y][x]
+    return nil
+  end
+
   # try to take every lines around (y, x)
   # use the directions T
   def take_around! y, x, color

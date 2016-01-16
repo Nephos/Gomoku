@@ -6,8 +6,6 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 
-#define max_length 4096
-
 class Network
 {
   public:
@@ -32,7 +30,7 @@ class Network
     boost::asio::ip::tcp::resolver _resolver;
     boost::asio::ip::tcp::socket _sock;
     boost::asio::ip::tcp::resolver::iterator _it;
-    char _buff[max_length];
+    char _buff[2048];
     std::vector<std::string> _answers;
     std::string const &_host;
     std::string const &_port;
