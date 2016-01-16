@@ -40,7 +40,7 @@ enum textures {
 
 class GomokuDisplay {
   public:
-    GomokuDisplay(bool);
+    GomokuDisplay(bool r = true);
     ~GomokuDisplay();
 
     std::pair<int, int> drawGame(const std::map<std::pair<int, int>, char> &); // Displays the game board, iterates on it & calls drawToken() then drawUI()
