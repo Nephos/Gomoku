@@ -1,16 +1,20 @@
 #include <sstream>
 #include "Player.hpp"
 
-Player::Player(std::string const &host, std::string const &port) : _network(host, port), _display() {
+Player::Player(std::string const &host, std::string const &port,
+              std::string const &cookie, std::string const &color) : _network(host, port), _display() {
+  _cookie = cookie;
+  _color = color;
   _myTurn = false;
   _host = host + ":" + port;
   initMap();
 }
 
 Player *Player::p = NULL;
-Player *Player::getInstance(std::string const &host, std::string const &port) {
+Player *Player::getInstance(std::string const &host, std::string const &port,
+                            std::string const &cookie, std::string const &color) {
   if (p == NULL)
-    p = new Player(host, port);
+    p = new Player(host, port, cookie, color);
   return p;
 }
 
@@ -109,7 +113,7 @@ bool Player::parseAnswer(const std::string &str) {
         if (tmp.find("continue") == 0) {
           if (!_myTurn) {
             _display.setMessage("It's your turn !");
-            _myTurn = true;            
+            _myTurn = true;
           }
           else {
             _display.setMessage("It's the enemy's turn !");

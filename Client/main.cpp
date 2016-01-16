@@ -5,8 +5,8 @@
 int main(int ac, char **av) {
   try {
     if (ac >= 1) {
-      std::string host, port;
-      if (ac == 2) {
+      std::string host, port, cookie, color;
+      if (ac >= 2) {
         host.assign(av[1]);
         unsigned int sep = host.find(":");
         if (host.find(":") == std::string::npos || sep + 1 == host.length())
@@ -14,10 +14,14 @@ int main(int ac, char **av) {
         port = host.substr(sep + 1);
         host = host.substr(0, sep);
       }
+      if (ac >= 4) {
+        cookie.assign(av[2]);
+        color.assign(av[3]);
+      }
       if (host.size() == 0 || port.size() == 0)
         Player::getInstance()->play();
       else
-        Player::getInstance(host, port)->play();
+        Player::getInstance(host, port, cookie, color)->play();
     }
     else
       throw Gomoku::UsageException();
