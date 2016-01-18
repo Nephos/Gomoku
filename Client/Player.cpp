@@ -8,6 +8,10 @@ Player::Player(std::string const &host, std::string const &port) : _network(host
   initMap();
 }
 
+int Player::getColor() const {
+  return (_color == "white" ? 0 : 1);
+}
+
 void Player::connect() {
   std::string str = "GET /players/connect/ HTTP/1.0\r\nHost: " + _host + "\r\nAccept: */*\r\n\r\n";
   _network.sendQuery(str);

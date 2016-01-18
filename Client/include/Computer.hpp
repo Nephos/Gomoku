@@ -14,6 +14,7 @@ class Computer : public Player
 
     bool parseAnswer(std::string const &);
     void resetGame();
+    int computesMinMax(int deepth_max, int current_color);
 
   private:
     Computer(std::string const &, std::string const &);

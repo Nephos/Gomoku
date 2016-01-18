@@ -16,6 +16,7 @@ class Player
     void setCookie(std::string const &);
     void resetGame();
     void updateMap(std::istringstream &);
+    int getColor() const;
 
   protected:
     Player(std::string const &, std::string const &);
