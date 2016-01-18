@@ -16,7 +16,6 @@ class Human : public Player
 
     bool parseAnswer(std::string const &);
     void resetGame();
-    std::pair<int, int> updateMap(std::istringstream &);
     void sendClick(std::pair<int, int>, std::string const &);
 
   private:

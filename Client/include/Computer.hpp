@@ -14,7 +14,6 @@ class Computer : public Player
 
     bool parseAnswer(std::string const &);
     void resetGame();
-    std::pair<int, int> updateMap(std::istringstream &);
 
   private:
     Computer(std::string const &, std::string const &);

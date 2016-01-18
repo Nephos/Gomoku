@@ -3,6 +3,7 @@
 
 Player::Player(std::string const &host, std::string const &port) : _network(host, port) {
   _myTurn = false;
+  _whiteScore = _blackScore = 0;
   _host = host + ":" + port;
   initMap();
 }
@@ -27,6 +28,8 @@ void Player::resetGame() {
   _cookie.clear();
   _gameOver = false;
   _myTurn = false;
+  _whiteScore = 0;
+  _blackScore = 0;
   initMap();
   _network.reset();
   connect();
@@ -80,7 +83,7 @@ bool Player::parseAnswer(const std::string &str) {
   return true;
 }
 
-std::pair<int, int> Player::updateMap(std::istringstream &ss) {
+void Player::updateMap(std::istringstream &ss) {
   std::string tmp;
   _map.clear();
   int i = 0;
@@ -92,10 +95,8 @@ std::pair<int, int> Player::updateMap(std::istringstream &ss) {
     }
     ++i;
   }
-  int w, b;
-  ss >> w;
-  ss >> b;
-  return std::pair<int, int> (w, b);
+  ss >> _whiteScore;
+  ss >> _blackScore;
 }
 
 void Player::setCookie(const std::string &str) {

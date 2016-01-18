@@ -25,6 +25,8 @@ void Human::play() {
   std::string header = " HTTP/1.0\r\nHost: " + _host + "\r\nAccept: */*\r\n";
   _display.setMessage("Waiting for other players...");
   while (click.first != -2) { // Game loop
+    _display.setWhiteScore(_whiteScore);
+    _display.setBlackScore(_blackScore);
     click.first = -1;
     click.second = -1;
     ans = _network.getAnswer();
@@ -69,11 +71,4 @@ bool Human::parseAnswer(const std::string &str) {
     _display.setMessage("It's the enemy's turn !");
   _display.setColor(_color);
   return true;
-}
-
-std::pair<int, int> Human::updateMap(std::istringstream &ss) {
-  std::pair<int, int> score = Player::updateMap(ss);
-  _display.setWhiteScore(score.first);
-  _display.setBlackScore(score.second);
-  return score;
 }

@@ -15,7 +15,7 @@ class Player
     bool parseAnswer(std::string const &);
     void setCookie(std::string const &);
     void resetGame();
-    std::pair<int, int> updateMap(std::istringstream &);
+    void updateMap(std::istringstream &);
 
   protected:
     Player(std::string const &, std::string const &);
@@ -28,6 +28,8 @@ class Player
     bool _win;
     bool _myTurn;
     bool _gameOver;
+    int _whiteScore;
+    int _blackScore;
     Network _network;
     std::map<std::pair<int, int>, char> _map;
 };

@@ -48,9 +48,3 @@ bool Computer::parseAnswer(const std::string &str) {
 */
   return true;
 }
-
-std::pair<int, int> Computer::updateMap(std::istringstream &ss) {
-  std::pair<int, int> score = Player::updateMap(ss);
-  /* Update les poids ici */
-  return score;
-}
