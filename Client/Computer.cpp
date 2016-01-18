@@ -19,8 +19,7 @@ void Computer::play() {
   Player::play();
   std::string ans;
   std::string header = " HTTP/1.0\r\nHost: " + _host + "\r\nAccept: */*\r\n";
-  _weights.reserve(_map.size());
-  _usables.reserve(_map.size());
+  initializeMinMax();
   while (true/* Something */) { // Game loop
     ans = _network.getAnswer();
     parseAnswer(ans);
@@ -51,13 +50,27 @@ bool Computer::parseAnswer(const std::string &str) {
   return true;
 }
 
+int Computer::initializeMinMax() {
+  _usables.reserve(_map.size());
+  _usables.assign(_map.size(), false);
+  _usables.assign(_map.size() / 2, true);
+  _weights.reserve(_map.size());
+  return 0;
+}
+
+// TODO
 // Add the 'current_color' to the '_stack' and '_stack'
 #define UPDATE ;
+// TODO
+// Calculate weights with the current infos
 #define COMPUTES_HEURISTIC ;
 
 #define SWAP_BEST best = tmp; best_position = tmp_position;
 #define SWAP_BEST_IF(cond) if (cond) { SWAP_BEST }
-#define GO_DEEPER (current_color == getColor() ? computesMinMax(deepth_max-1, (current_color + 1) % 2) : computesMinMax(deepth_max-1, (current_color + 1) % 2));
+
+// TODO
+// get the better values from the deeper trees
+#define GO_DEEPER computesMinMax(deepth_max-1, (current_color + 1) % 2);
 
 #define weights _weights
 
@@ -69,6 +82,11 @@ int Computer::computesMinMax(int deepth_max, int current_color) {
   int tmp, tmp_position;
   int player_color = getColor();
 
+  // evaluate the state and return it
+  if (deepth_max == 0) {
+    return 0;
+  }
+
   for (unsigned int y = 0; y < _map.size(); y++) {
     for (unsigned int x = 0; x < _map.size(); x++) {
       tmp_position = x + y * _map.size();
@@ -78,22 +96,16 @@ int Computer::computesMinMax(int deepth_max, int current_color) {
       UPDATE;
       COMPUTES_HEURISTIC;
 
-      tmp = weights[tmp_position];
-
-      if (deepth_max > 1) {
-        tmp_position = GO_DEEPER;
-      }
+      tmp = GO_DEEPER;
 
       if (player_color == current_color) {
-        SWAP_BEST_IF(tmp >= best);
+        SWAP_BEST_IF(tmp >= best || best == -1);
       }
       else {
-        SWAP_BEST_IF(tmp <= best);
+        SWAP_BEST_IF(tmp <= best || best == -1);
       }
     }
   }
-  if (best_position == -1) {
-    return _map.size() * _map.size() / 2;
-  }
-  return best_position;
+  //TODO: keep best_position
+  return best;
 }
