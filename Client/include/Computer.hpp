@@ -24,8 +24,13 @@ class Computer : public Player
     static Computer *p;
 
     std::vector<int> _weights;
+
     // true / false if tile is usable ... TODO: more data
-    std::vector<bool> _cache;
-    // <color, position <<x, y>>
+    std::vector<bool> _usables;
+
+    // <action, <x, y> >
     std::stack<std::pair<int, std::pair<int, int> > > _stack;
+
+    // <empreinte, <map, weights> >
+    std::map<long long, std::pair<std::vector<int>, std::vector<int> > > _cache;
 };

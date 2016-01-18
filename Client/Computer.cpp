@@ -20,7 +20,7 @@ void Computer::play() {
   std::string ans;
   std::string header = " HTTP/1.0\r\nHost: " + _host + "\r\nAccept: */*\r\n";
   _weights.reserve(_map.size());
-  _cache.reserve(_map.size());
+  _usables.reserve(_map.size());
   while (true/* Something */) { // Game loop
     ans = _network.getAnswer();
     parseAnswer(ans);
@@ -72,7 +72,7 @@ int Computer::computesMinMax(int deepth_max, int current_color) {
   for (unsigned int y = 0; y < _map.size(); y++) {
     for (unsigned int x = 0; x < _map.size(); x++) {
       tmp_position = x + y * _map.size();
-      if (_cache[tmp_position] == false)
+      if (_usables[tmp_position] == false)
         continue;
 
       UPDATE;
