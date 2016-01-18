@@ -5,7 +5,7 @@ Human::Human(std::string const &host, std::string const &port, bool rainbows)
               : Player(host, port), _display(rainbows) {}
 
 Human *Human::p = NULL;
-Human *Human::getInstance(std::string const &host, std::string const &port, bool rainbows) {
+Human *Human::getInstance(bool rainbows, std::string const &host, std::string const &port) {
   if (p == NULL)
     p = new Human(host, port, rainbows);
   return p;
