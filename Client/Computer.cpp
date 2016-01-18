@@ -19,6 +19,8 @@ void Computer::play() {
   Player::play();
   std::string ans;
   std::string header = " HTTP/1.0\r\nHost: " + _host + "\r\nAccept: */*\r\n";
+  _weights.reserve(_map.size());
+  _cache.reserve(_map.size());
   while (true/* Something */) { // Game loop
     ans = _network.getAnswer();
     parseAnswer(ans);
@@ -49,7 +51,7 @@ bool Computer::parseAnswer(const std::string &str) {
   return true;
 }
 
-#define RESET ;
+// Add the 'current_color' to the '_stack' and '_stack'
 #define UPDATE ;
 #define COMPUTES_HEURISTIC ;
 
@@ -57,30 +59,31 @@ bool Computer::parseAnswer(const std::string &str) {
 #define SWAP_BEST_IF(cond) if (cond) { SWAP_BEST }
 #define GO_DEEPER (current_color == getColor() ? computesMinMax(deepth_max-1, (current_color + 1) % 2) : computesMinMax(deepth_max-1, (current_color + 1) % 2));
 
-// TODO : remove
-#define weights g_weights
-int g_weights[10] = {0};
+#define weights _weights
 
 int Computer::computesMinMax(int deepth_max, int current_color) {
   // pour toutes les cases vides qui ne nous font pas perdre
-  // @best is the value of the better place
+  // 'best' is the value of the better place
   int best = 0, best_position = -1;
-  // @tmp is the value of the current place, to compare with @best
+  // 'tmp' is the value of the current place, to compare with 'best'
   int tmp, tmp_position;
   int player_color = getColor();
 
   for (unsigned int y = 0; y < _map.size(); y++) {
     for (unsigned int x = 0; x < _map.size(); x++) {
-      RESET;
+      tmp_position = x + y * _map.size();
+      if (_cache[tmp_position] == false)
+        continue;
+
       UPDATE;
       COMPUTES_HEURISTIC;
+
+      tmp = weights[tmp_position];
 
       if (deepth_max > 1) {
         tmp_position = GO_DEEPER;
       }
 
-      tmp_position = x + y * _map.size();
-      tmp = weights[tmp_position];
       if (player_color == current_color) {
         SWAP_BEST_IF(tmp >= best);
       }
@@ -88,6 +91,9 @@ int Computer::computesMinMax(int deepth_max, int current_color) {
         SWAP_BEST_IF(tmp <= best);
       }
     }
+  }
+  if (best_position == -1) {
+    return _map.size() * _map.size() / 2;
   }
   return best_position;
 }

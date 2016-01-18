@@ -3,6 +3,8 @@
 #include <string>
 #include <utility>
 #include <map>
+#include <vector>
+#include <stack>
 #include "Player.hpp"
 
 class Computer : public Player
@@ -20,4 +22,10 @@ class Computer : public Player
     Computer(std::string const &, std::string const &);
     ~Computer() {};
     static Computer *p;
+
+    std::vector<int> _weights;
+    // true / false if tile is usable ... TODO: more data
+    std::vector<bool> _cache;
+    // <color, position <<x, y>>
+    std::stack<std::pair<int, std::pair<int, int> > > _stack;
 };
