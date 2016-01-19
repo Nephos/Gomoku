@@ -24,6 +24,7 @@ class Player
     static Player *p;
 
     std::string _color;
+    int _colorValue;
     std::string _host;
     std::string _cookie;
     bool _win;

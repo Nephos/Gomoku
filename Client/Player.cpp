@@ -119,6 +119,7 @@ void Player::setCookie(const std::string &str) {
         _cookie += tmp + "; ";
         if (tmp.find("color") == 0) {
           _color = tmp.substr(6);
+          _colorValue = getColor();
         }
       }
     }

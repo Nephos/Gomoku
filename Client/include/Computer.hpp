@@ -9,29 +9,34 @@
 
 class Computer : public Player
 {
-  public:
-    void play();
+public:
+  void play();
 
-    static Computer *getInstance(std::string const &host = "127.0.0.1", std::string const &port = "8080");
+  static Computer *getInstance(std::string const &host = "127.0.0.1", std::string const &port = "8080");
 
-    bool parseAnswer(std::string const &);
-    void resetGame();
-    int initializeMinMax();
-    int computesMinMax(int deepth_max, int current_color);
+  bool parseAnswer(std::string const &);
+  void resetGame();
+  int initializeMinMax();
+  int computesMinMax(int deepth_max, int current_color, bool self_turn);
+  int pushColorAt(int color, int x, int y);
+  int popColorAt(int color, int x, int y);
+  int setUsable(bool, int, int, int, int);
 
-  private:
-    Computer(std::string const &, std::string const &);
-    ~Computer() {};
-    static Computer *p;
+private:
+  Computer(std::string const &, std::string const &);
+  ~Computer() {};
+  static Computer *p;
 
-    std::vector<int> _weights;
+#define line(T) std::vector<T >
+  line(line(int)) _weights;
 
-    // true / false if tile is usable ... TODO: more data
-    std::vector<bool> _usables;
+  // true / false if tile is usable ... TODO: more data
+  line(line(bool)) _usables;
 
-    // <action, <x, y> >
-    std::stack<std::pair<int, std::pair<int, int> > > _stack;
+  // <action, x1, y1, x2, y2 >
+  typedef std::tuple<int, int, int, int, int> action_t;
+  std::stack<std::tuple<int, int, int, int, int> > _stack;
 
-    // <empreinte, <map, weights> >
-    std::map<long long, std::pair<std::vector<int>, std::vector<int> > > _cache;
+  // <empreinte, <map, weights> >
+  std::map<long long, line(line(int)), line(line(int)) > _cache;
 };
