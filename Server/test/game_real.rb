@@ -114,7 +114,27 @@ class TestGameReal < Test::Unit::TestCase
     # continue
   end
 
+  def test_5_breakable_disabled
+    return if ENV["DISABLE_BREAK5"] != "true"
+    new_game
+    map = Map.new
+    assert_equal map.to_a, get_map
+    play_map(map, :white, 1, 0, 200, 200)
+    play_map(map, :black, 9, 0, 200, 200)
+    play_map(map, :white, 1, 1, 200, 200)
+    play_map(map, :black, 9, 1, 200, 200)
+    play_map(map, :white, 1, 2, 200, 200)
+    play_map(map, :black, 9, 2, 200, 200)
+    play_map(map, :white, 2, 2, 200, 200)
+    play_map(map, :black, 0, 2, 200, 200)
+    play_map(map, :white, 1, 3, 200, 200)
+    play_map(map, :black, 9, 3, 200, 200)
+    body = play_map(map, :white, 1, 4, 200, 200).body.to_s
+    assert_equal "You win.", JSON.parse(body)["message"]
+  end
+
   def test_5_breakable
+    return if ENV["DISABLE_BREAK5"] == "true"
     new_game
     map = Map.new
     assert_equal map.to_a, get_map
@@ -164,6 +184,7 @@ class TestGameReal < Test::Unit::TestCase
   end
 
   def test_free3
+    return if ENV["DISABLE_FREE3"] == "true"
     new_game
     map = Map.new
     play_map(map, :white, 5, 5, 200, 200)

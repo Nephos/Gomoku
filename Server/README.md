@@ -19,7 +19,6 @@ Try to put a item at y:x based on your color.
 Return 401 if failed, and wait for a new move.
 Return 200 if succeed, and also say continue or win if you finished the game
 
-# TODO
-
-- Add optional rules
--
+## Optional rules
+- DISABLE_FREE3: disable the forbidden error when creating a double 3 free
+- DISABLE_BREAK5: win when 5 breakable

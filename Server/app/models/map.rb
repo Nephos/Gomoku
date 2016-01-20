@@ -55,6 +55,7 @@ class Map
     return 1 if x < 0 or x >= 19
     return 2 if y < 0 or y >= 19
     return 3 if @data[y][x]
+    return nil if ENV['DISABLE_FREE3'] == "true"
     return 4 if make_free3(y, x, color) >= 2
     #return 5 if not @moves.empty? and not @moves.include? [x, y]
     return nil
@@ -307,6 +308,7 @@ class Map
     return true if @took[color] >= 10
     fives = fives(color)
     return false if fives.empty?
+    return true if ENV["DISABLE_BREAK5"] == "true"
     breakables = fives.map{|five| breakable_in(five, color)}
     moves = breakables.inject(&:&) || []
     return true if moves.empty? # win if cannot break all with one mov
