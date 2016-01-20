@@ -43,9 +43,9 @@ class GomokuDisplay {
     GomokuDisplay(bool r = true);
     ~GomokuDisplay();
 
-    std::pair<int, int> drawGame(char **); // Displays the game board, iterates on it & calls drawToken() then drawUI()
+    std::pair<int, int> drawGame(char[19][19]); // Displays the game board, iterates on it & calls drawToken() then drawUI()
     std::pair<int, int> transformInputs(std::pair<float, float> &);
-    void drawBoard(char**);
+    void drawBoard(char[19][19]);
     void drawTile(int, int, bool, int);
     void drawToken(float, float, bool); // Draws a token
     void drawPony(float, float, bool);

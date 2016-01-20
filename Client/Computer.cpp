@@ -51,12 +51,12 @@ bool Computer::parseAnswer(const std::string &str) {
 }
 
 int Computer::initializeMinMax() {
-  _usables.reserve(_map.size());
-  _weights.reserve(_map.size());
-  for (int y = 0; y < _map.size(); y++) {
-    _usables[y].reserve(_map.size());
-    _weights[y].reserve(_map.size());
-    for (int x = 0; x < _map.size(); x++) {
+  _usables.reserve(19);
+  _weights.reserve(19);
+  for (int y = 0; y < 19; y++) {
+    _usables[y].reserve(19);
+    _weights[y].reserve(19);
+    for (int x = 0; x < 19; x++) {
       _usables[y][x] = false;
       _weights[y][x] = 0;
     }
@@ -76,7 +76,7 @@ int Computer::initializeMinMax() {
 
 #define EVALUATES_MAP 0
 
-#define SWAP_BEST best = tmp; best_position = x + y * _map.size();
+#define SWAP_BEST best = tmp; best_position = x + y * 19;
 #define SWAP_BEST_IF(cond) if (cond) { SWAP_BEST }
 
 // TODO
@@ -101,8 +101,8 @@ int Computer::computesMinMax(int deepth_max, int current_color, bool self_turn) 
     return EVALUATES_MAP;
   }
 
-  for (unsigned int y = 0; y < _map.size(); y++) {
-    for (unsigned int x = 0; x < _map.size(); x++) {
+  for (unsigned int y = 0; y < 19; y++) {
+    for (unsigned int x = 0; x < 19; x++) {
       if (_usables[y][x] == false)
         continue;
 
@@ -126,21 +126,25 @@ int Computer::computesMinMax(int deepth_max, int current_color, bool self_turn) 
 #define OPNT		1
 
 #define ADD_COLOR	2
-#define SET_USABLE	4
-#define SET_NUSABLE	8
+#define REM_COLOR	4
+#define SET_USABLE	8
+#define SET_NUSABLE	16
 
-#define _SET_USABLE_AT(color, x1, y1, x2, y2, v)			\
-  _stack.push(std::make_tuple(color & SET_USABLE, x1, y1, x2, y2))	\
-  setUsable(true, x1, y1, x2, y2);
-#define _SET_NUSABLE_AT(color, x1, y1, x2, y2, v)			\
-  _stack.push(std::make_tuple(color & SET_NUSABLE, x1, y1, x2, y2));	\
-  setUsable(false, p1, p2);
 #define _ADD_COLOR_AT(color, x, y)				\
   _stack.push(std::make_tuple(color & ADD_COLOR, x, y, x, y));	\
-  // TODO							\
-  //_map[y][x] = color;						\
-  _SET_USABLE_AT(color, x, y, x, y, v);
-#define FINISH_PUSH				\
+  _map[y][x] = color;						\
+  _SET_NUSABLE_AT(color, x, y, x, y);
+#define _REM_COLOR_AT(color, x, y)				\
+  _stack.push(std::make_tuple(color & REM_COLOR, x, y, x, y));	\
+  _map[y][x] = 'x';						\
+  _SET_USABLE_AT(color, x, y, x, y);
+#define _SET_USABLE_AT(color, x1, y1, x2, y2)				\
+  _stack.push(std::make_tuple(color & SET_USABLE, x1, y1, x2, y2));	\
+  setUsable(true, x1, y1, x2, y2);
+#define _SET_NUSABLE_AT(color, x1, y1, x2, y2)				\
+  _stack.push(std::make_tuple(color & SET_NUSABLE, x1, y1, x2, y2));	\
+  setUsable(false, x1, y1, x2, y2);
+#define FINISH_PUSH					\
   _stack.push(std::make_tuple(count, -1, -1, -1, -1));
 
 int Computer::setUsable(bool v, int x1, int y1, int x2, int y2) {
@@ -176,7 +180,18 @@ int Computer::popColorAt(int color, int x, int y) {
   while (count--) {
     action_t action = _stack.top();
     _stack.pop();
-    // execute the invert of 'action'
+    if (std::get<0>(action) & ADD_COLOR) {
+      _REM_COLOR_AT(std::get<0>(action), std::get<1>(action), std::get<2>(action));
+    }
+    else if (std::get<0>(action) & REM_COLOR) {
+      _ADD_COLOR_AT(std::get<0>(action), std::get<1>(action), std::get<2>(action));
+    }
+    else if (std::get<0>(action) & SET_USABLE) {
+      _SET_NUSABLE_AT(std::get<0>(action), std::get<1>(action), std::get<2>(action), std::get<3>(action), std::get<4>(action));
+    }
+    else if (std::get<0>(action) & SET_NUSABLE) {
+      _SET_USABLE_AT(std::get<0>(action), std::get<1>(action), std::get<2>(action), std::get<3>(action), std::get<4>(action));
+    }
   }
   return ccount;
 }

@@ -302,7 +302,7 @@ void GomokuDisplay::drawPony(float x, float y, bool black) {
   }
 }
 
-void GomokuDisplay::drawBoard(char **map) {
+void GomokuDisplay::drawBoard(char map[19][19]) {
   int tmpBlack = blackScore;
   int tmpWhite = whiteScore;
   for (int y = 0; y < 20; y++) {
@@ -366,7 +366,7 @@ std::pair<int, int> GomokuDisplay::transformInputs(std::pair<float, float> &clic
   return ret;
 }
 
-std::pair<int, int> GomokuDisplay::drawGame(char **map) {
+std::pair<int, int> GomokuDisplay::drawGame(char map[19][19]) {
   XWindowAttributes gwa;
 
   XGetWindowAttributes(dpy, win, &gwa);
