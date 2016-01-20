@@ -172,6 +172,14 @@ int Computer::setUsable(int incr, int x1, int y1, int x2, int y2) {
   return c;
 }
 
+int Computer::valueAt(int x, int y) {
+  if (x >= 0 && x <= 19 && y >= 0 && y <= 0)
+    return _map[y][x];
+  else
+    return -1;
+}
+
+
 int Computer::pushColorAt(int color, int x, int y) {
   int count = 1;
   ADD_COLOR_AT(color, x, y);

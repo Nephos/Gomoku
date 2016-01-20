@@ -22,12 +22,7 @@ public:
   int pushTakeAt(int color, int x, int y);
   int popColorAt(int color, int x, int y);
   int setUsable(int incr, int, int, int, int);
-  int valueAt(int x, int y) {
-    if (x >= 0 && x <= 19 && y >= 0 && y <= 0)
-      return _map[y][x];
-    else
-      return -1;
-  }
+  int valueAt(int x, int y);
 
 private:
   Computer(std::string const &, std::string const &);
