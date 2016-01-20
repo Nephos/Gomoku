@@ -66,6 +66,7 @@ class GameController < Nephos::Controller
   end
   private
   def game_terminated_msg
+    puts "Game over. #{@win} win !"
     if @win == @color
       return {plain: "win.\n" + @map_render} if plain?
       return {json: {message: "failed", map: @map_render, points: @map.took_hash}}
@@ -103,15 +104,16 @@ class GameController < Nephos::Controller
       return {plain: "failed. occupied\n" + @map_render, status: 401} if plain?
       return {json: {message: "Invalid position (occupied)", map: @map_render, points: @map.took_hash}, status: 401}
     when 4
-      # error for 3x3
-    when 5
-      # error for 5 lock
+      return {plain: "failed. double 3 free forbidden\n" + @map_render, status: 401} if plain?
+      return {json: {message: "Invalid position (2x3free)", map: @map_render, points: @map.took_hash}, status: 401}
     else
-      # WHAT ?!
+      raise "What the fuck"
     end
-    @game[:map][y][x] = color
-    @game[:map].take_around!(y, x, color)
-    win = @game[:map].win? color
+    @map[y][x] = color
+    @map.take_around!(y, x, color)
+    @map.update!(y, x)
+    @map.save_free3!
+    win = @map.win? color
     get_map_render
     if win
       game_terminated!

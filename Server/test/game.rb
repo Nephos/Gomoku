@@ -117,8 +117,6 @@ class TestGame < Test::Unit::TestCase
     r1_4 = c1.get(WAIT, {:headers => h_co1})
     assert_equal 200, r1_4.status
     assert_equal INIT_WAIT_REP3, JSON.parse(r1_4.body.to_s)
-
-    # binding.pry
   end
 
 end
