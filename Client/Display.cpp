@@ -323,14 +323,13 @@ void GomokuDisplay::drawBoard(char map[19][19]) {
           drawTile(x - 9, y - 9, false, 0);
       }
       /* Then, if there is a token on it, we draw the token */
-//      std::pair<int, int> p(y, x);
-      if (x != 19 && y != 19 && map[x][y] == '0') {
+      if (x != 19 && y != 19 && map[y][x] == '0') {
         if (rainbow)
           drawPony(x - 8.5, y - 8.5, false);
         else
           drawToken(x - 8.5, y - 8.5, false);
       }
-      else if (x != 19 && y != 19 && map[x][y] == '1') {
+      else if (x != 19 && y != 19 && map[y][x] == '1') {
         if (rainbow)
           drawPony(x - 8.5, y - 8.5, true);
         else
