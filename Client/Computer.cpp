@@ -122,44 +122,54 @@ int Computer::computesMinMax(int deepth_max, int current_color, bool self_turn) 
   return best;
 }
 
-#define SELF		0
-#define OPNT		1
+// 8 first bits for flags
+#define SELF		(0 << 24 | 0x00ffffff)
+#define OPNT		(1 << 24 | 0x00ffffff)
 
-#define ADD_COLOR	2
-#define REM_COLOR	4
-#define SET_USABLE	8
-#define SET_NUSABLE	16
+#define ADD_COLOR	(2 << 24 | 0x00ffffff)
+#define REM_COLOR	(4 << 24 | 0x00ffffff)
+#define SET_USABLE	(8 << 24 | 0x00ffffff)
+#define SET_NUSABLE	(16 << 24 | 0x00ffffff)
 
-#define _ADD_COLOR_AT(color, x, y)				\
+#define _ADD_COLOR_AT(color, x, y)		\
+  _map[y][x] = color;				\
+  _SET_NUSABLE_AT(color, 100, x, y, x, y);
+#define ADD_COLOR_AT(color, x, y)				\
   _stack.push(std::make_tuple(color & ADD_COLOR, x, y, x, y));	\
-  _map[y][x] = color;						\
-  _SET_NUSABLE_AT(color, x, y, x, y);
-#define _REM_COLOR_AT(color, x, y)				\
+  _ADD_COLOR_AT(color, x, y)
+
+#define _REM_COLOR_AT(color, x, y)		\
+  _map[y][x] = 'x';				\
+  _SET_USABLE_AT(color, 100, x, y, x, y);
+#define REM_COLOR_AT(color, x, y)				\
   _stack.push(std::make_tuple(color & REM_COLOR, x, y, x, y));	\
-  _map[y][x] = 'x';						\
-  _SET_USABLE_AT(color, x, y, x, y);
-#define _SET_USABLE_AT(color, x1, y1, x2, y2)				\
-  _stack.push(std::make_tuple(color & SET_USABLE, x1, y1, x2, y2));	\
-  setUsable(true, x1, y1, x2, y2);
-#define _SET_NUSABLE_AT(color, x1, y1, x2, y2)				\
-  _stack.push(std::make_tuple(color & SET_NUSABLE, x1, y1, x2, y2));	\
-  setUsable(false, x1, y1, x2, y2);
+  _REM_COLOR_AT(color, x, y)
+
+#define _SET_USABLE_AT(color, diff, x1, y1, x2, y2)	\
+  setUsable(diff, x1, y1, x2, y2);
+#define SET_USABLE_AT(color, diff, x1, y1, x2, y2)			\
+  _stack.push(std::make_tuple(color & SET_USABLE + diff, x1, y1, x2, y2)); \
+  _SET_USABLE_AT(color, diff, x1, y1, x2, y2)				\
+
+#define _SET_NUSABLE_AT(color, diff, x1, y1, x2, y2)	\
+  setUsable(-diff, x1, y1, x2, y2);
+#define SET_NUSABLE_AT(color, diff, x1, y1, x2, y2)			\
+  _stack.push(std::make_tuple(color & SET_NUSABLE + diff, x1, y1, x2, y2)); \
+  _SET_NUSABLE_AT(color, diff, x1, y1, x2, y2)
+
 #define FINISH_PUSH					\
   _stack.push(std::make_tuple(count, -1, -1, -1, -1));
 
-int Computer::setUsable(bool v, int x1, int y1, int x2, int y2) {
+int Computer::setUsable(int incr, int x1, int y1, int x2, int y2) {
   const int xm = x1 > x2 ? x1 : x2;
   const int ym = y1 > y2 ? y1 : y2;
   const int xM = x1 >= x2 ? x2 : x1;
   const int yM = y1 >= y2 ? y2 : y1;
   int c = 0;
-  for (int x = xm; x <= x1; x++) {
-    for (int y = ym; x <= y1; y++) {
-      // TODO
-      // if (_map[x][y] != 0) {
-      // 	_usables[x][y] = v;
-      // 	c++;
-      // }
+  for (int x = xm; x <= xM; x++) {
+    for (int y = ym; x <= yM; y++) {
+      _usables[x][y] += incr;
+      c++;
     }
   }
   return c;
@@ -167,30 +177,31 @@ int Computer::setUsable(bool v, int x1, int y1, int x2, int y2) {
 
 int Computer::pushColorAt(int color, int x, int y) {
   int count = 1;
-  _ADD_COLOR_AT(color, x, y);
-  // Here execute some stuff to regognize pattern
+  ADD_COLOR_AT(color, x, y);
+  // TODO: Here execute some stuff to regognize pattern
   FINISH_PUSH;
   return count;
 }
 
 int Computer::popColorAt(int color, int x, int y) {
-  int count = std::get<0>(_stack.top()); // get the last element of the stack which is the number of elements to pop
+  // get the last element of the stack => is the number of elements to pop
+  int count = std::get<0>(_stack.top());
   const int ccount = count;
   _stack.pop();
   while (count--) {
     action_t action = _stack.top();
     _stack.pop();
     if (std::get<0>(action) & ADD_COLOR) {
-      _REM_COLOR_AT(std::get<0>(action), std::get<1>(action), std::get<2>(action));
+      _REM_COLOR_AT(std::get<0>(action) & 0xff000000, std::get<1>(action), std::get<2>(action));
     }
     else if (std::get<0>(action) & REM_COLOR) {
-      _ADD_COLOR_AT(std::get<0>(action), std::get<1>(action), std::get<2>(action));
+      _ADD_COLOR_AT(std::get<0>(action) & 0xff000000, std::get<1>(action), std::get<2>(action));
     }
     else if (std::get<0>(action) & SET_USABLE) {
-      _SET_NUSABLE_AT(std::get<0>(action), std::get<1>(action), std::get<2>(action), std::get<3>(action), std::get<4>(action));
+      _SET_NUSABLE_AT(std::get<0>(action) & 0xff000000, std::get<0>(action) & 0x00ffffff, std::get<1>(action), std::get<2>(action), std::get<3>(action), std::get<4>(action));
     }
     else if (std::get<0>(action) & SET_NUSABLE) {
-      _SET_USABLE_AT(std::get<0>(action), std::get<1>(action), std::get<2>(action), std::get<3>(action), std::get<4>(action));
+      _SET_USABLE_AT(std::get<0>(action) & 0xff000000, std::get<0>(action) & 0x00ffffff, std::get<1>(action), std::get<2>(action), std::get<3>(action), std::get<4>(action));
     }
   }
   return ccount;

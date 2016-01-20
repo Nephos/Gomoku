@@ -20,7 +20,7 @@ public:
   int computesMinMax(int deepth_max, int current_color, bool self_turn);
   int pushColorAt(int color, int x, int y);
   int popColorAt(int color, int x, int y);
-  int setUsable(bool, int, int, int, int);
+  int setUsable(int incr, int, int, int, int);
 
 private:
   Computer(std::string const &, std::string const &);
@@ -31,7 +31,7 @@ private:
   line(line(int)) _weights;
 
   // true / false if tile is usable ... TODO: more data
-  line(line(bool)) _usables;
+  line(line(int)) _usables;
 
   // <action, x1, y1, x2, y2 >
   typedef std::tuple<int, int, int, int, int> action_t;
