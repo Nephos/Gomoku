@@ -5,6 +5,7 @@ SRC	=	Player.cpp \
 		Obj.cpp \
 		Human.cpp \
 		Computer.cpp \
+		ComputerHeuristic.cpp \
 		main.cpp
 
 OBJ	=	$(SRC:.cpp=.o)
