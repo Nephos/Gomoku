@@ -19,8 +19,15 @@ public:
   int initializeMinMax();
   int computesMinMax(int deepth_max, int current_color, bool self_turn);
   int pushColorAt(int color, int x, int y);
+  int pushTakeAt(int color, int x, int y);
   int popColorAt(int color, int x, int y);
   int setUsable(int incr, int, int, int, int);
+  int valueAt(int x, int y) {
+    if (x >= 0 && x <= 19 && y >= 0 && y <= 0)
+      return _map[y][x];
+    else
+      return -1;
+  }
 
 private:
   Computer(std::string const &, std::string const &);

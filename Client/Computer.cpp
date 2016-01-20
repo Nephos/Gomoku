@@ -123,38 +123,35 @@ int Computer::computesMinMax(int deepth_max, int current_color, bool self_turn) 
 }
 
 // 8 first bits for flags
-#define SELF		(0 << 24 | 0x00ffffff)
-#define OPNT		(1 << 24 | 0x00ffffff)
-
-#define ADD_COLOR	(2 << 24 | 0x00ffffff)
-#define REM_COLOR	(4 << 24 | 0x00ffffff)
-#define SET_USABLE	(8 << 24 | 0x00ffffff)
-#define SET_NUSABLE	(16 << 24 | 0x00ffffff)
+#define ADD_COLOR	(1 << 24 | 0x00ffffff)
+#define REM_COLOR	(2 << 24 | 0x00ffffff)
+#define SET_USABLE	(4 << 24 | 0x00ffffff)
+#define SET_NUSABLE	(8 << 24 | 0x00ffffff)
 
 #define _ADD_COLOR_AT(color, x, y)		\
   _map[y][x] = color;				\
   _SET_NUSABLE_AT(color, 100, x, y, x, y);
 #define ADD_COLOR_AT(color, x, y)				\
-  _stack.push(std::make_tuple(color & ADD_COLOR, x, y, x, y));	\
+  _stack.push(std::make_tuple(color | ADD_COLOR, x, y, x, y));	\
   _ADD_COLOR_AT(color, x, y)
 
 #define _REM_COLOR_AT(color, x, y)		\
   _map[y][x] = 'x';				\
   _SET_USABLE_AT(color, 100, x, y, x, y);
 #define REM_COLOR_AT(color, x, y)				\
-  _stack.push(std::make_tuple(color & REM_COLOR, x, y, x, y));	\
+  _stack.push(std::make_tuple(color | REM_COLOR, x, y, x, y));	\
   _REM_COLOR_AT(color, x, y)
 
 #define _SET_USABLE_AT(color, diff, x1, y1, x2, y2)	\
   setUsable(diff, x1, y1, x2, y2);
 #define SET_USABLE_AT(color, diff, x1, y1, x2, y2)			\
-  _stack.push(std::make_tuple(color & SET_USABLE + diff, x1, y1, x2, y2)); \
+  _stack.push(std::make_tuple(color + diff << 8 | SET_USABLE, x1, y1, x2, y2)); \
   _SET_USABLE_AT(color, diff, x1, y1, x2, y2)				\
 
 #define _SET_NUSABLE_AT(color, diff, x1, y1, x2, y2)	\
   setUsable(-diff, x1, y1, x2, y2);
 #define SET_NUSABLE_AT(color, diff, x1, y1, x2, y2)			\
-  _stack.push(std::make_tuple(color & SET_NUSABLE + diff, x1, y1, x2, y2)); \
+  _stack.push(std::make_tuple(color + diff << 8 | SET_NUSABLE, x1, y1, x2, y2)); \
   _SET_NUSABLE_AT(color, diff, x1, y1, x2, y2)
 
 #define FINISH_PUSH					\
@@ -183,6 +180,29 @@ int Computer::pushColorAt(int color, int x, int y) {
   return count;
 }
 
+#define CHECK_VALUES(xdiff, ydiff) \
+  (valueAt(x + xdiff * 1, y + ydiff * 1) == other && \
+   valueAt(x + xdiff * 2, y + ydiff * 2) == other && \
+   valueAt(x + xdiff * 3, y + ydiff * 3) == color )
+#define TAKE_DIRECTION(xdiff, ydiff) \
+    REM_COLOR_AT(other, x + xdiff * 1, y + ydiff * 1); \
+    REM_COLOR_AT(other, x + xdiff * 2, y + ydiff * 2);
+#define CHECK_AND_TAKE_DIRECTION(xdiff, ydiff) \
+  if (CHECK_VALUES(xdiff, ydiff)) { TAKE_DIRECTION(xdiff, ydiff) }
+int Computer::pushTakeAt(int color, int x, int y) {
+  int count = 0;
+  int other = (color + 1) & 1;
+  CHECK_AND_TAKE_DIRECTION(-1, -1);
+  CHECK_AND_TAKE_DIRECTION(-1, 0);
+  CHECK_AND_TAKE_DIRECTION(-1, 1);
+  CHECK_AND_TAKE_DIRECTION(0, -1);
+  CHECK_AND_TAKE_DIRECTION(0, 1);
+  CHECK_AND_TAKE_DIRECTION(1, -1);
+  CHECK_AND_TAKE_DIRECTION(1, 0);
+  CHECK_AND_TAKE_DIRECTION(1, 1);
+  return count;
+}
+
 int Computer::popColorAt(int color, int x, int y) {
   // get the last element of the stack => is the number of elements to pop
   int count = std::get<0>(_stack.top());
@@ -198,10 +218,10 @@ int Computer::popColorAt(int color, int x, int y) {
       _ADD_COLOR_AT(std::get<0>(action) & 0xff000000, std::get<1>(action), std::get<2>(action));
     }
     else if (std::get<0>(action) & SET_USABLE) {
-      _SET_NUSABLE_AT(std::get<0>(action) & 0xff000000, std::get<0>(action) & 0x00ffffff, std::get<1>(action), std::get<2>(action), std::get<3>(action), std::get<4>(action));
+      _SET_NUSABLE_AT(std::get<0>(action) & 0xff000000, std::get<0>(action) & 0x00ffffff >> 8, std::get<1>(action), std::get<2>(action), std::get<3>(action), std::get<4>(action));
     }
     else if (std::get<0>(action) & SET_NUSABLE) {
-      _SET_USABLE_AT(std::get<0>(action) & 0xff000000, std::get<0>(action) & 0x00ffffff, std::get<1>(action), std::get<2>(action), std::get<3>(action), std::get<4>(action));
+      _SET_USABLE_AT(std::get<0>(action) & 0xff000000, std::get<0>(action) & 0x00ffffff >> 8, std::get<1>(action), std::get<2>(action), std::get<3>(action), std::get<4>(action));
     }
   }
   return ccount;
