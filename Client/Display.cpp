@@ -302,7 +302,7 @@ void GomokuDisplay::drawPony(float x, float y, bool black) {
   }
 }
 
-void GomokuDisplay::drawBoard(const std::map<std::pair<int, int>, char> &map) {
+void GomokuDisplay::drawBoard(char **map) {
   int tmpBlack = blackScore;
   int tmpWhite = whiteScore;
   for (int y = 0; y < 20; y++) {
@@ -323,14 +323,14 @@ void GomokuDisplay::drawBoard(const std::map<std::pair<int, int>, char> &map) {
           drawTile(x - 9, y - 9, false, 0);
       }
       /* Then, if there is a token on it, we draw the token */
-      std::pair<int, int> p(y, x);
-      if (x != 19 && y != 19 && map.at(p) == '0') {
+//      std::pair<int, int> p(y, x);
+      if (x != 19 && y != 19 && map[x][y] == '0') {
         if (rainbow)
           drawPony(x - 8.5, y - 8.5, false);
         else
           drawToken(x - 8.5, y - 8.5, false);
       }
-      else if (x != 19 && y != 19 && map.at(p) == '1') {
+      else if (x != 19 && y != 19 && map[x][y] == '1') {
         if (rainbow)
           drawPony(x - 8.5, y - 8.5, true);
         else
@@ -366,7 +366,7 @@ std::pair<int, int> GomokuDisplay::transformInputs(std::pair<float, float> &clic
   return ret;
 }
 
-std::pair<int, int> GomokuDisplay::drawGame(const std::map<std::pair<int, int>, char> &map) {
+std::pair<int, int> GomokuDisplay::drawGame(char **map) {
   XWindowAttributes gwa;
 
   XGetWindowAttributes(dpy, win, &gwa);

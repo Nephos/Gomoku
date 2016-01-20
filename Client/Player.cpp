@@ -18,12 +18,9 @@ void Player::connect() {
 }
 
 void Player::initMap() {
-  _map.clear();
   for (int i = 0; i < 19; i++) {
     for (int j = 0; j < 19; j++) {
-      std::pair<int, int> p(i, j);
-      std::pair<std::pair<int, int>, char> e(p, 'x');
-      _map.insert(e);
+      _map[i][j] = 'x';
     }
   }
 }
@@ -89,13 +86,10 @@ bool Player::parseAnswer(const std::string &str) {
 
 void Player::updateMap(std::istringstream &ss) {
   std::string tmp;
-  _map.clear();
   int i = 0;
   while (i < 19 && std::getline(ss, tmp)) {
     for (int j = 0; j < 19; j++) {
-      std::pair<int, int> c(i, j); // Coordinates
-      std::pair<std::pair<int, int>, char> e(c, tmp.at(j * 2));
-      _map.insert(e);
+        _map[i][j] = tmp.at(j * 2);
     }
     ++i;
   }

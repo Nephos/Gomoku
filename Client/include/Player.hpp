@@ -33,5 +33,5 @@ class Player
     int _whiteScore;
     int _blackScore;
     Network _network;
-    std::map<std::pair<int, int>, char> _map;
+    char _map[19][19];
 };
