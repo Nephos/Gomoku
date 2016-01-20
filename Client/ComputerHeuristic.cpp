@@ -10,7 +10,7 @@ void deconstruct(unsigned char *map, unsigned char *weights_map, int index_origi
   int i = index_origin + (POWER - 1) * -dirx + (POWER - 1) * -diry * WIDTH;
   int last = index_tile + POWER * dirx + POWER * diry * WIDTH;
 
-  for (i; i < last; i += dirx + diry * WIDTH) {
+  for (; i < last; i += dirx + diry * WIDTH) {
     if (i >= 0 && i < 49 && map[i] != map[index_origin]) {
       weights_map[i] -= LINE;
     }
@@ -127,7 +127,7 @@ void display_weights_map(unsigned char *weights_map, unsigned char *map) {
     if (i % 7 == 6) {
       printf("     %3d ", map[j]);
       j++;
-      for (j; j % 7 != 0; j++)
+      for (; j % 7 != 0; j++)
         printf("%3d ", map[j]);
       printf("\n");
     }

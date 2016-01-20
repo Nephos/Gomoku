@@ -64,25 +64,13 @@ int Computer::initializeMinMax() {
   return 0;
 }
 
-// TODO
-// Add the 'current_color' to the '_stack' and '_stack'
-#define UPDATE pushColorAt(current_color, x, y);
-// TODO
-// Remove infos from the stack
-#define RESET popColorAt(current_color, x, y);
-// TODO
 // Calculate weights with the current infos
-#define COMPUTES_HEURISTIC
-
-#define EVALUATES_MAP 0
-
+#define COMPUTES_HEURISTIC 0
+#define REDUCE_TREE_WEIGHT
 #define SWAP_BEST best = tmp; best_position = x + y * 19;
 #define SWAP_BEST_IF(cond) if (cond) { SWAP_BEST }
 
-// TODO
-// get the better values from the deeper trees
-#define GO_DEEPER computesMinMax(deepth_max - 1, (current_color + 1) & 1, !self_turn)
-
+# define MAX_TREE_WEIGHT 10
 /*
  * If on a leaf, calc the heuristic
  * If not, for each interesting usables (x, y) go deeper and keep only the max/min
@@ -93,22 +81,24 @@ int Computer::computesMinMax(int deepth_max, int current_color, bool self_turn) 
   int best = 0, best_position = -1;
   // 'tmp' is the value of the current place, to compare with 'best'
   int tmp, tmp_position;
+  int count = 0;
 
   // if (LOOSE) return -100;
   // if (WIN) return 100;
   // evaluate the state and return it
   if (deepth_max == 0) {
-    return EVALUATES_MAP;
+    return COMPUTES_HEURISTIC;
   }
 
   for (unsigned int y = 0; y < 19; y++) {
     for (unsigned int x = 0; x < 19; x++) {
-      if (_usables[y][x] == false)
+      if (count > MAX_TREE_WEIGHT || _usables[y][x] == false)
         continue;
 
-      UPDATE; // that push on _stack
-      tmp = GO_DEEPER;
-      RESET; // that pop from _stack
+      count++;
+      pushColorAt(current_color, x, y); // that push on _stack
+      tmp = computesMinMax(deepth_max - 1, current_color ^ 1, !self_turn);
+      popColorAt(current_color, x, y); // that pop from _stack
 
       if (self_turn) {
         SWAP_BEST_IF(tmp >= best || best_position == -1);
@@ -123,41 +113,107 @@ int Computer::computesMinMax(int deepth_max, int current_color, bool self_turn) 
 }
 
 // 8 first bits for flags
-#define ADD_COLOR	(1 << 24 | 0x00ffffff)
-#define REM_COLOR	(2 << 24 | 0x00ffffff)
-#define SET_USABLE	(4 << 24 | 0x00ffffff)
-#define SET_NUSABLE	(8 << 24 | 0x00ffffff)
+#define ADD_COLOR	((1 << 24) | 0x00ffffff)
+#define REM_COLOR	((2 << 24) | 0x00ffffff)
+#define SET_USABLE	((4 << 24) | 0x00ffffff)
+#define SET_NUSABLE	((8 << 24) | 0x00ffffff)
 
 #define _ADD_COLOR_AT(color, x, y)		\
-  _map[y][x] = color;				\
-  _SET_NUSABLE_AT(color, 100, x, y, x, y);
+  _map[y][x] = color;
 #define ADD_COLOR_AT(color, x, y)				\
   _stack.push(std::make_tuple(color | ADD_COLOR, x, y, x, y));	\
   _ADD_COLOR_AT(color, x, y)
-
 #define _REM_COLOR_AT(color, x, y)		\
-  _map[y][x] = 'x';				\
-  _SET_USABLE_AT(color, 100, x, y, x, y);
+  _map[y][x] = 'x';
 #define REM_COLOR_AT(color, x, y)				\
   _stack.push(std::make_tuple(color | REM_COLOR, x, y, x, y));	\
   _REM_COLOR_AT(color, x, y)
-
 #define _SET_USABLE_AT(color, diff, x1, y1, x2, y2)	\
   setUsable(diff, x1, y1, x2, y2);
 #define SET_USABLE_AT(color, diff, x1, y1, x2, y2)			\
-  _stack.push(std::make_tuple(color + diff << 8 | SET_USABLE, x1, y1, x2, y2)); \
-  _SET_USABLE_AT(color, diff, x1, y1, x2, y2)				\
-
+  _stack.push(std::make_tuple(color | (diff << 8) | SET_USABLE, x1, y1, x2, y2)); \
+  _SET_USABLE_AT(color, diff, x1, y1, x2, y2)
 #define _SET_NUSABLE_AT(color, diff, x1, y1, x2, y2)	\
   setUsable(-diff, x1, y1, x2, y2);
 #define SET_NUSABLE_AT(color, diff, x1, y1, x2, y2)			\
-  _stack.push(std::make_tuple(color + diff << 8 | SET_NUSABLE, x1, y1, x2, y2)); \
+  _stack.push(std::make_tuple(color | (diff << 8) | SET_NUSABLE, x1, y1, x2, y2)); \
   _SET_NUSABLE_AT(color, diff, x1, y1, x2, y2)
-
 #define FINISH_PUSH					\
   _stack.push(std::make_tuple(count, -1, -1, -1, -1));
 
+#define CHECK_VALUES(xdiff, ydiff)			\
+  (valueAt(x + xdiff * 1, y + ydiff * 1) == other &&	\
+   valueAt(x + xdiff * 2, y + ydiff * 2) == other &&	\
+   valueAt(x + xdiff * 3, y + ydiff * 3) == color )
+#define TAKE_DIRECTION(xdiff, ydiff)					\
+  REM_COLOR_AT(other, x + xdiff * 1, y + ydiff * 1);			\
+  SET_USABLE_AT(color, 100, x + xdiff * 1, y + ydiff * 1, x + xdiff * 1, y + ydiff * 1); \
+  REM_COLOR_AT(other, x + xdiff * 2, y + ydiff * 2);			\
+  SET_USABLE_AT(color, 100, x + xdiff * 2, y + ydiff * 2, x + xdiff * 2, y + ydiff * 2); \
+  count++;
+#define CHECK_AND_TAKE_DIRECTION(xdiff, ydiff)				\
+  if (CHECK_VALUES(xdiff, ydiff)) { TAKE_DIRECTION(xdiff, ydiff) }
+
+int Computer::pushColorAt(int color, int x, int y) {
+  int count = 1;
+  ADD_COLOR_AT(color, x, y);
+  SET_NUSABLE_AT(color, 100, x, y, x, y);
+  SET_USABLE_AT(color, 1, x-1, y-1, x+1, y+1);
+  // take
+  int other = color ^ 1;
+  CHECK_AND_TAKE_DIRECTION(-1, -1);
+  CHECK_AND_TAKE_DIRECTION(-1, 0);
+  CHECK_AND_TAKE_DIRECTION(-1, 1);
+  CHECK_AND_TAKE_DIRECTION(0, -1);
+  CHECK_AND_TAKE_DIRECTION(0, 1);
+  CHECK_AND_TAKE_DIRECTION(1, -1);
+  CHECK_AND_TAKE_DIRECTION(1, 0);
+  CHECK_AND_TAKE_DIRECTION(1, 1);
+  FINISH_PUSH;
+  return count;
+}
+
+int Computer::popColorAt(int color, int x, int y) {
+  // get the last element of the stack => is the number of elements to pop
+  int count = std::get<0>(_stack.top());
+  const int ccount = count;
+  _stack.pop();
+  while (count--) {
+    action_t action = _stack.top();
+    _stack.pop();
+    if (std::get<0>(action) & ADD_COLOR) {
+      _REM_COLOR_AT(std::get<0>(action) & 0xff000000,
+		    std::get<1>(action), std::get<2>(action));
+      _SET_USABLE_AT(color, 100, x, y, x, y);
+    }
+    else if (std::get<0>(action) & REM_COLOR) {
+      _ADD_COLOR_AT(std::get<0>(action) & 0xff000000,
+		    std::get<1>(action), std::get<2>(action));
+      _SET_NUSABLE_AT(color, 100, x, y, x, y);
+    }
+    else if (std::get<0>(action) & SET_USABLE) {
+      _SET_NUSABLE_AT(std::get<0>(action) & 0xff000000,
+		      (std::get<0>(action) & 0x00ffffff >> 8),
+		      std::get<1>(action), std::get<2>(action),
+		      std::get<3>(action), std::get<4>(action));
+    }
+    else if (std::get<0>(action) & SET_NUSABLE) {
+      _SET_USABLE_AT(std::get<0>(action) & 0xff000000,
+		     (std::get<0>(action) & 0x00ffffff) >> 8,
+		     std::get<1>(action), std::get<2>(action),
+		     std::get<3>(action), std::get<4>(action));
+    }
+  }
+  return ccount;
+}
+
+#define INTMAX(i, M) (i > M ? M : i)
+#define INTMIN(i, m) (i < m ? m : i)
 int Computer::setUsable(int incr, int x1, int y1, int x2, int y2) {
+  x1 = INTMIN(INTMAX(x1, 18), 0);
+  y1 = INTMIN(INTMAX(y1, 18), 0);
+  x2 = INTMIN(INTMAX(x2, 18), 0);
+  y2 = INTMIN(INTMAX(y2, 18), 0);
   const int xm = x1 > x2 ? x1 : x2;
   const int ym = y1 > y2 ? y1 : y2;
   const int xM = x1 >= x2 ? x2 : x1;
@@ -173,64 +229,8 @@ int Computer::setUsable(int incr, int x1, int y1, int x2, int y2) {
 }
 
 int Computer::valueAt(int x, int y) {
-  if (x >= 0 && x <= 19 && y >= 0 && y <= 0)
+  if (x >= 0 && x < 19 && y >= 0 && y < 19)
     return _map[y][x];
   else
     return -1;
-}
-
-
-int Computer::pushColorAt(int color, int x, int y) {
-  int count = 1;
-  ADD_COLOR_AT(color, x, y);
-  // TODO: Here execute some stuff to regognize pattern
-  FINISH_PUSH;
-  return count;
-}
-
-#define CHECK_VALUES(xdiff, ydiff) \
-  (valueAt(x + xdiff * 1, y + ydiff * 1) == other && \
-   valueAt(x + xdiff * 2, y + ydiff * 2) == other && \
-   valueAt(x + xdiff * 3, y + ydiff * 3) == color )
-#define TAKE_DIRECTION(xdiff, ydiff) \
-    REM_COLOR_AT(other, x + xdiff * 1, y + ydiff * 1); \
-    REM_COLOR_AT(other, x + xdiff * 2, y + ydiff * 2);
-#define CHECK_AND_TAKE_DIRECTION(xdiff, ydiff) \
-  if (CHECK_VALUES(xdiff, ydiff)) { TAKE_DIRECTION(xdiff, ydiff) }
-int Computer::pushTakeAt(int color, int x, int y) {
-  int count = 0;
-  int other = (color + 1) & 1;
-  CHECK_AND_TAKE_DIRECTION(-1, -1);
-  CHECK_AND_TAKE_DIRECTION(-1, 0);
-  CHECK_AND_TAKE_DIRECTION(-1, 1);
-  CHECK_AND_TAKE_DIRECTION(0, -1);
-  CHECK_AND_TAKE_DIRECTION(0, 1);
-  CHECK_AND_TAKE_DIRECTION(1, -1);
-  CHECK_AND_TAKE_DIRECTION(1, 0);
-  CHECK_AND_TAKE_DIRECTION(1, 1);
-  return count;
-}
-
-int Computer::popColorAt(int color, int x, int y) {
-  // get the last element of the stack => is the number of elements to pop
-  int count = std::get<0>(_stack.top());
-  const int ccount = count;
-  _stack.pop();
-  while (count--) {
-    action_t action = _stack.top();
-    _stack.pop();
-    if (std::get<0>(action) & ADD_COLOR) {
-      _REM_COLOR_AT(std::get<0>(action) & 0xff000000, std::get<1>(action), std::get<2>(action));
-    }
-    else if (std::get<0>(action) & REM_COLOR) {
-      _ADD_COLOR_AT(std::get<0>(action) & 0xff000000, std::get<1>(action), std::get<2>(action));
-    }
-    else if (std::get<0>(action) & SET_USABLE) {
-      _SET_NUSABLE_AT(std::get<0>(action) & 0xff000000, std::get<0>(action) & 0x00ffffff >> 8, std::get<1>(action), std::get<2>(action), std::get<3>(action), std::get<4>(action));
-    }
-    else if (std::get<0>(action) & SET_NUSABLE) {
-      _SET_USABLE_AT(std::get<0>(action) & 0xff000000, std::get<0>(action) & 0x00ffffff >> 8, std::get<1>(action), std::get<2>(action), std::get<3>(action), std::get<4>(action));
-    }
-  }
-  return ccount;
 }
