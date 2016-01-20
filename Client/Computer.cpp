@@ -66,7 +66,6 @@ int Computer::initializeMinMax() {
 
 // Calculate weights with the current infos
 #define COMPUTES_HEURISTIC 0
-#define REDUCE_TREE_WEIGHT
 #define SWAP_BEST best = tmp; best_position = x + y * 19;
 #define SWAP_BEST_IF(cond) if (cond) { SWAP_BEST }
 
@@ -75,13 +74,14 @@ int Computer::initializeMinMax() {
  * If on a leaf, calc the heuristic
  * If not, for each interesting usables (x, y) go deeper and keep only the max/min
  */
-int Computer::computesMinMax(int deepth_max, int current_color, bool self_turn) {
+int Computer::computesMinMax(int deepth_max, int current_color) {
   // pour toutes les cases vides qui ne nous font pas perdre
   // 'best' is the value of the better place
   int best = 0, best_position = -1;
   // 'tmp' is the value of the current place, to compare with 'best'
   int tmp, tmp_position;
   int count = 0;
+  bool is_self_turn = current_color == _colorValue;
 
   // if (LOOSE) return -100;
   // if (WIN) return 100;
@@ -97,10 +97,12 @@ int Computer::computesMinMax(int deepth_max, int current_color, bool self_turn) 
 
       count++;
       pushColorAt(current_color, x, y); // that push on _stack
-      tmp = computesMinMax(deepth_max - 1, current_color ^ 1, !self_turn);
+      _tree_x = x;
+      _tree_y = y;
+      tmp = computesMinMax(deepth_max - 1, current_color ^ 1);
       popColorAt(current_color, x, y); // that pop from _stack
 
-      if (self_turn) {
+      if (is_self_turn) {
         SWAP_BEST_IF(tmp >= best || best_position == -1);
       }
       else {
@@ -110,7 +112,16 @@ int Computer::computesMinMax(int deepth_max, int current_color, bool self_turn) 
   }
   //TODO: keep best_position in an attribute ? _best_position = best_position;
   return best;
-}
+} // after it, re-run pushColorAt(_colorValue, _best_position, ...)
+// after, call this macro to decrement all _weights
+#define NEXT_ROUND_PREPARATION			\
+  for (int y = 0; y < 19; y++) {		\
+    for (int x = 0; x < 19; x++) {		\
+      if (_weights[y][x] > 0) {			\
+	_weights[y][x]--;			\
+      }						\
+    }						\
+  }
 
 // 8 first bits for flags
 #define ADD_COLOR	((1 << 24) | 0x00ffffff)
@@ -147,9 +158,9 @@ int Computer::computesMinMax(int deepth_max, int current_color, bool self_turn) 
    valueAt(x + xdiff * 3, y + ydiff * 3) == color )
 #define TAKE_DIRECTION(xdiff, ydiff)					\
   REM_COLOR_AT(other, x + xdiff * 1, y + ydiff * 1);			\
-  SET_USABLE_AT(color, 100, x + xdiff * 1, y + ydiff * 1, x + xdiff * 1, y + ydiff * 1); \
+  SET_USABLE_AT(color, 1000, x + xdiff * 1, y + ydiff * 1, x + xdiff * 1, y + ydiff * 1); \
   REM_COLOR_AT(other, x + xdiff * 2, y + ydiff * 2);			\
-  SET_USABLE_AT(color, 100, x + xdiff * 2, y + ydiff * 2, x + xdiff * 2, y + ydiff * 2); \
+  SET_USABLE_AT(color, 1000, x + xdiff * 2, y + ydiff * 2, x + xdiff * 2, y + ydiff * 2); \
   count++;
 #define CHECK_AND_TAKE_DIRECTION(xdiff, ydiff)				\
   if (CHECK_VALUES(xdiff, ydiff)) { TAKE_DIRECTION(xdiff, ydiff) }
@@ -157,8 +168,9 @@ int Computer::computesMinMax(int deepth_max, int current_color, bool self_turn) 
 int Computer::pushColorAt(int color, int x, int y) {
   int count = 1;
   ADD_COLOR_AT(color, x, y);
-  SET_NUSABLE_AT(color, 100, x, y, x, y);
-  SET_USABLE_AT(color, 1, x-1, y-1, x+1, y+1);
+  SET_NUSABLE_AT(color, 1000, x, y, x, y);
+  SET_USABLE_AT(color, 10, x-1, y-1, x+1, y+1); // radius 1 = +10
+  SET_USABLE_AT(color, 5, x-2, y-2, x+2, y+2); // radius 2 = +5
   // take
   int other = color ^ 1;
   CHECK_AND_TAKE_DIRECTION(-1, -1);

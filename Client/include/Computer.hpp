@@ -17,7 +17,7 @@ public:
   bool parseAnswer(std::string const &);
   void resetGame();
   int initializeMinMax();
-  int computesMinMax(int deepth_max, int current_color, bool self_turn);
+  int computesMinMax(int deepth_max, int current_color);
   int pushColorAt(int color, int x, int y);
   int pushTakeAt(int color, int x, int y);
   int popColorAt(int color, int x, int y);
@@ -41,4 +41,8 @@ private:
 
   // <empreinte, <map, weights> >
   std::map<long long, line(line(int)), line(line(int)) > _cache;
+
+  // tree search
+  int _best_x, _best_y;
+  int _tree_x, _tree_y;
 };
