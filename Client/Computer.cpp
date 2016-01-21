@@ -64,8 +64,13 @@ int Computer::initializeMinMax() {
   return 0;
 }
 
+unsigned char *getWeightsMap();
+void update_tile(char map[19][19], int n);
+
 // Calculate weights with the current infos
-#define COMPUTES_HEURISTIC 0
+#define COMPUTES_HEURISTIC update_tile(_map, _tree_x + 19 * _tree_y);
+#define HEURISTIC getWeightsMap()[_tree_x + 19 * _tree_y]
+#define REDUCE_TREE_WEIGHT
 #define SWAP_BEST best = tmp; best_position = x + y * 19;
 #define SWAP_BEST_IF(cond) if (cond) { SWAP_BEST }
 
@@ -87,7 +92,8 @@ int Computer::computesMinMax(int deepth_max, int current_color) {
   // if (WIN) return 100;
   // evaluate the state and return it
   if (deepth_max == 0) {
-    return COMPUTES_HEURISTIC;
+    COMPUTES_HEURISTIC;
+    return HEURISTIC;
   }
 
   for (unsigned int y = 0; y < 19; y++) {
