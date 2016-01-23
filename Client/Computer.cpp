@@ -1,3 +1,4 @@
+#include <iostream>
 #include <sstream>
 #include "Computer.hpp"
 
@@ -73,7 +74,6 @@ void update_tile(char map[19][19], int n);
 // Calculate weights with the current infos
 #define COMPUTES_HEURISTIC update_tile(_map, _tree_x + 19 * _tree_y);
 #define HEURISTIC getWeightsMap()[_tree_x + 19 * _tree_y]
-#define REDUCE_TREE_WEIGHT
 
 # define MAX_TREE_WEIGHT 10
 /*
@@ -148,21 +148,25 @@ int Computer::computesMinMax(int deepth_max, int current_color) {
   _map[y][x] = color;
 #define ADD_COLOR_AT(color, x, y)				\
   _stack.push(std::make_tuple(color | ADD_COLOR, x, y, x, y));	\
+  count++;							\
   _ADD_COLOR_AT(color, x, y)
 #define _REM_COLOR_AT(color, x, y)		\
   _map[y][x] = 'x';
 #define REM_COLOR_AT(color, x, y)				\
   _stack.push(std::make_tuple(color | REM_COLOR, x, y, x, y));	\
+  count++;							\
   _REM_COLOR_AT(color, x, y)
 #define _SET_USABLE_AT(color, diff, x1, y1, x2, y2)	\
   setUsable(diff, x1, y1, x2, y2);
 #define SET_USABLE_AT(color, diff, x1, y1, x2, y2)			\
   _stack.push(std::make_tuple(color | (diff << 8) | SET_USABLE, x1, y1, x2, y2)); \
+  count++;								\
   _SET_USABLE_AT(color, diff, x1, y1, x2, y2)
 #define _SET_NUSABLE_AT(color, diff, x1, y1, x2, y2)	\
   setUsable(-diff, x1, y1, x2, y2);
 #define SET_NUSABLE_AT(color, diff, x1, y1, x2, y2)			\
   _stack.push(std::make_tuple(color | (diff << 8) | SET_NUSABLE, x1, y1, x2, y2)); \
+  count++;								\
   _SET_NUSABLE_AT(color, diff, x1, y1, x2, y2)
 #define FINISH_PUSH					\
   _stack.push(std::make_tuple(count, -1, -1, -1, -1));
@@ -175,13 +179,12 @@ int Computer::computesMinMax(int deepth_max, int current_color) {
   REM_COLOR_AT(other, x + xdiff * 1, y + ydiff * 1);			\
   SET_USABLE_AT(color, 1000, x + xdiff * 1, y + ydiff * 1, x + xdiff * 1, y + ydiff * 1); \
   REM_COLOR_AT(other, x + xdiff * 2, y + ydiff * 2);			\
-  SET_USABLE_AT(color, 1000, x + xdiff * 2, y + ydiff * 2, x + xdiff * 2, y + ydiff * 2); \
-  count++;
+  SET_USABLE_AT(color, 1000, x + xdiff * 2, y + ydiff * 2, x + xdiff * 2, y + ydiff * 2);
 #define CHECK_AND_TAKE_DIRECTION(xdiff, ydiff)				\
   if (CHECK_VALUES(xdiff, ydiff)) { TAKE_DIRECTION(xdiff, ydiff) }
 
 int Computer::pushColorAt(int color, int x, int y) {
-  int count = 1;
+  int count = 0;
   ADD_COLOR_AT(color, x, y);
   SET_NUSABLE_AT(color, 1000, x, y, x, y);
   SET_USABLE_AT(color, 10, x-1, y-1, x+1, y+1); // radius 1 = +10
