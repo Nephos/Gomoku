@@ -53,16 +53,19 @@ bool Computer::parseAnswer(const std::string &str) {
   return true;
 }
 
+void calc_initial_weight(char map[19][19]);
+
 int Computer::initializeMinMax() {
-  _usables.reserve(19);
-  _weights.reserve(19);
+  calc_initial_weight(_map);
   for (int y = 0; y < 19; y++) {
-    _usables[y].reserve(19);
-    _weights[y].reserve(19);
+    std::vector<int> tmpi;
+    std::vector<int> tmpb;
     for (int x = 0; x < 19; x++) {
-      _usables[y][x] = false;
-      _weights[y][x] = 0;
+      tmpi.push_back(0);
+      tmpb.push_back(0);
     }
+    _usables.push_back(tmpb);
+    _weights.push_back(tmpi);
   }
   return 0;
 }
@@ -99,7 +102,7 @@ int Computer::computesMinMax(int deepth_max, int current_color) {
 
   for (unsigned int y = 0; y < 19; y++) {
     for (unsigned int x = 0; x < 19; x++) {
-      if (count > MAX_TREE_WEIGHT || _usables[y][x] == false)
+      if (count > MAX_TREE_WEIGHT)// || _usables[y][x] == false)
         continue;
 
       count++;
@@ -247,7 +250,7 @@ int Computer::setUsable(int incr, int x1, int y1, int x2, int y2) {
   const int yM = y1 >= y2 ? y2 : y1;
   int c = 0;
   for (int x = xm; x <= xM; x++) {
-    for (int y = ym; x <= yM; y++) {
+    for (int y = ym; y <= yM; y++) {
       _usables[x][y] += incr;
       c++;
     }
