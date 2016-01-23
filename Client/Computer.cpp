@@ -15,6 +15,7 @@ void Computer::resetGame() {
   // Reset les poids / l'IA ici
 }
 
+#define TREE_DEEPTH 3
 void Computer::play() {
   Player::play();
   std::string ans;
@@ -28,7 +29,7 @@ void Computer::play() {
       _network.sendQuery(req);
     }
     else if (!_gameOver) {
-      computesMinMax(3, _colorValue);
+      computesMinMax(TREE_DEEPTH, _colorValue);
       std::pair<int, int> p(_tree_x, _tree_y);
       sendClick(p, header);
     }
@@ -73,8 +74,6 @@ void update_tile(char map[19][19], int n);
 #define COMPUTES_HEURISTIC update_tile(_map, _tree_x + 19 * _tree_y);
 #define HEURISTIC getWeightsMap()[_tree_x + 19 * _tree_y]
 #define REDUCE_TREE_WEIGHT
-#define SWAP_BEST best = tmp; _tree_x = x; _tree_y = y;
-#define SWAP_BEST_IF(cond) if (cond) { SWAP_BEST }
 
 # define MAX_TREE_WEIGHT 10
 /*
@@ -84,7 +83,7 @@ void update_tile(char map[19][19], int n);
 int Computer::computesMinMax(int deepth_max, int current_color) {
   // pour toutes les cases vides qui ne nous font pas perdre
   // 'best' is the value of the better place
-  int best = 0, best_position = -1;
+  int best = (current_color == _colorValue ? (~0) : ((~0 >> 1) << 1)); // -inf or +inf
   // 'tmp' is the value of the current place, to compare with 'best'
   int tmp, tmp_position;
   int count = 0;
@@ -111,10 +110,18 @@ int Computer::computesMinMax(int deepth_max, int current_color) {
       popColorAt(current_color, x, y); // that pop from _stack
 
       if (is_self_turn) {
-        SWAP_BEST_IF(tmp >= best || best_position == -1);
+        if (tmp >= best) {
+	  best = tmp;
+	  if (deepth_max == TREE_DEEPTH) {
+	    _best_x = x;
+	    _best_y = y;
+	  }
+	}
       }
       else {
-        SWAP_BEST_IF(tmp <= best || best_position == -1);
+        if (tmp <= best) {
+	  best = tmp;
+	}
       }
     }
   }
