@@ -17,6 +17,7 @@ class Player
     void resetGame();
     void updateMap(std::istringstream &);
     int getColor() const;
+    void sendClick(std::pair<int, int>, std::string const &);
 
   protected:
     Player(std::string const &, std::string const &);

@@ -28,7 +28,9 @@ void Computer::play() {
       _network.sendQuery(req);
     }
     else if (!_gameOver) {
-      ;// Play & send move to network
+      computesMinMax(3, _colorValue);
+      std::pair<int, int> p(_tree_x, _tree_y);
+      sendClick(p, header);
     }
   }
 }

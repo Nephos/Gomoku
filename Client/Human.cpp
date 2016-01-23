@@ -43,19 +43,6 @@ void Human::play() {
   }
 }
 
-void Human::sendClick(std::pair<int, int> click, std::string const &header) {
-  std::stringstream ss;
-  ss << "POST /game/play/" << click.first << "/" << click.second << header << _cookie << "\r\n\r\n";
-  std::string req = ss.str();
-  _network.sendQuery(req);
-  _network._io_service.run();
-  _network._io_service.reset();
-  std::string ans = _network.getAnswer();
-  parseAnswer(ans);
-  req = "GET /game/map.txt" + header + _cookie + "\r\n\r\n";
-  _network.sendQuery(req);
-}
-
 /* If returns false, then ask for another user input */
 /* Else, wait for the other client */
 bool Human::parseAnswer(const std::string &str) {

@@ -17,6 +17,19 @@ void Player::connect() {
   _network.sendQuery(str);
 }
 
+void Player::sendClick(std::pair<int, int> click, std::string const &header) {
+  std::stringstream ss;
+  ss << "POST /game/play/" << click.first << "/" << click.second << header << _cookie << "\r\n\r\n";
+  std::string req = ss.str();
+  _network.sendQuery(req);
+  _network._io_service.run();
+  _network._io_service.reset();
+  std::string ans = _network.getAnswer();
+  parseAnswer(ans);
+  req = "GET /game/map.txt" + header + _cookie + "\r\n\r\n";
+  _network.sendQuery(req);
+}
+
 void Player::initMap() {
   for (int i = 0; i < 19; i++) {
     for (int j = 0; j < 19; j++) {
