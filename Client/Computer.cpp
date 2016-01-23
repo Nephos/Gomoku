@@ -71,7 +71,7 @@ void update_tile(char map[19][19], int n);
 #define COMPUTES_HEURISTIC update_tile(_map, _tree_x + 19 * _tree_y);
 #define HEURISTIC getWeightsMap()[_tree_x + 19 * _tree_y]
 #define REDUCE_TREE_WEIGHT
-#define SWAP_BEST best = tmp; best_position = x + y * 19;
+#define SWAP_BEST best = tmp; _tree_x = x; _tree_y = y;
 #define SWAP_BEST_IF(cond) if (cond) { SWAP_BEST }
 
 # define MAX_TREE_WEIGHT 10
