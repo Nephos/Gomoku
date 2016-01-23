@@ -16,7 +16,16 @@ void Computer::resetGame() {
   // Reset les poids / l'IA ici
 }
 
-#define TREE_DEEPTH 3
+#define TREE_DEEPTH 2
+#define NEXT_ROUND_PREPARATION			\
+  for (int y = 0; y < 19; y++) {		\
+    for (int x = 0; x < 19; x++) {		\
+      if (_weights[y][x] > 0) {			\
+	_weights[y][x]--;			\
+      }						\
+    }						\
+  }
+
 void Computer::play() {
   Player::play();
   std::string ans;
@@ -33,6 +42,7 @@ void Computer::play() {
       computesMinMax(TREE_DEEPTH, _colorValue);
       std::pair<int, int> p(_best_x, _best_y);
       sendClick(p, header);
+      NEXT_ROUND_PREPARATION
     }
   }
 }
@@ -43,13 +53,10 @@ bool Computer::parseAnswer(const std::string &str) {
   if (!Player::parseAnswer(str))
     return false;
 /* Different possible answers impacting the game
-  if (_gameOver && _win)
-
-  else if (_gameOver && !_win)
-
-  else if (_myTurn)
-
-  else if (!_myTurn)
+  if (_gameOver && _win){}
+  else if (_gameOver && !_win){}
+  else if (_myTurn){}
+  else if (!_myTurn){}
 */
   return true;
 }
@@ -78,7 +85,7 @@ void update_tile(char map[19][19], int n);
 #define COMPUTES_HEURISTIC update_tile(_map, _tree_x + 19 * _tree_y);
 #define HEURISTIC getWeightsMap()[_tree_x + 19 * _tree_y]
 
-# define MAX_TREE_WEIGHT 10
+# define MAX_TREE_WEIGHT 1
 /*
  * If on a leaf, calc the heuristic
  * If not, for each interesting usables (x, y) go deeper and keep only the max/min
@@ -102,7 +109,7 @@ int Computer::computesMinMax(int deepth_max, int current_color) {
 
   for (unsigned int y = 0; y < 19; y++) {
     for (unsigned int x = 0; x < 19; x++) {
-      if (count > MAX_TREE_WEIGHT)// || _usables[y][x] == false)
+      if (count > MAX_TREE_WEIGHT || _usables[y][x] <= 0)
         continue;
 
       count++;
@@ -128,18 +135,8 @@ int Computer::computesMinMax(int deepth_max, int current_color) {
       }
     }
   }
-  //TODO: keep best_position in an attribute ? _best_position = best_position;
   return best;
 } // after it, re-run pushColorAt(_colorValue, _best_position, ...)
-// after, call this macro to decrement all _weights
-#define NEXT_ROUND_PREPARATION			\
-  for (int y = 0; y < 19; y++) {		\
-    for (int x = 0; x < 19; x++) {		\
-      if (_weights[y][x] > 0) {			\
-	_weights[y][x]--;			\
-      }						\
-    }						\
-  }
 
 // 8 first bits for flags
 #define ADD_COLOR	(1 << 24)
