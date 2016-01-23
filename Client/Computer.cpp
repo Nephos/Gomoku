@@ -83,7 +83,7 @@ void update_tile(char map[19][19], int n);
 int Computer::computesMinMax(int deepth_max, int current_color) {
   // pour toutes les cases vides qui ne nous font pas perdre
   // 'best' is the value of the better place
-  int best = (current_color == _colorValue ? (~0) : ((~0 >> 1) << 1)); // -inf or +inf
+  int best = (current_color == _colorValue ? (~0) : ((~0 << 1) >> 1)); // -inf or +inf
   // 'tmp' is the value of the current place, to compare with 'best'
   int tmp, tmp_position;
   int count = 0;
