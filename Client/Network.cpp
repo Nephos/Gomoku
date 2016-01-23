@@ -5,6 +5,7 @@
 Network::Network(std::string const &host, std::string const &port) : _resolver(_io_service), _sock(_io_service), _host(host), _port(port), _answered(true) {}
 
 void Network::connect() {
+  _answers.reserve(2048);
   boost::asio::ip::tcp::resolver::query query(_host, _port);
   boost::asio::ip::tcp::resolver::iterator iterator = _resolver.resolve(query);
   boost::asio::connect(_sock.lowest_layer(), iterator);
@@ -18,7 +19,7 @@ void Network::handleRead(const boost::system::error_code &err, size_t bread) {
     std::string tmp(_buff);
     _answers.push_back(tmp);
   }
-  memset(_buff, '\0', 2048);
+  memset(_buff, 0, 2048);
 }
 
 void Network::handleWrite(const boost::system::error_code &err) {

@@ -31,7 +31,7 @@ void Computer::play() {
     }
     else if (!_gameOver) {
       computesMinMax(TREE_DEEPTH, _colorValue);
-      std::pair<int, int> p(_tree_x, _tree_y);
+      std::pair<int, int> p(_best_x, _best_y);
       sendClick(p, header);
     }
   }
@@ -142,10 +142,10 @@ int Computer::computesMinMax(int deepth_max, int current_color) {
   }
 
 // 8 first bits for flags
-#define ADD_COLOR	((1 << 24) | 0x00ffffff)
-#define REM_COLOR	((2 << 24) | 0x00ffffff)
-#define SET_USABLE	((4 << 24) | 0x00ffffff)
-#define SET_NUSABLE	((8 << 24) | 0x00ffffff)
+#define ADD_COLOR	(1 << 24)
+#define REM_COLOR	(2 << 24)
+#define SET_USABLE	(4 << 24)
+#define SET_NUSABLE	(8 << 24)
 
 #define _ADD_COLOR_AT(color, x, y)		\
   _map[y][x] = color;
@@ -171,8 +171,6 @@ int Computer::computesMinMax(int deepth_max, int current_color) {
   _stack.push(std::make_tuple(color | (diff << 8) | SET_NUSABLE, x1, y1, x2, y2)); \
   count++;								\
   _SET_NUSABLE_AT(color, diff, x1, y1, x2, y2)
-#define FINISH_PUSH					\
-  _stack.push(std::make_tuple(count, -1, -1, -1, -1));
 
 #define CHECK_VALUES(xdiff, ydiff)			\
   (valueAt(x + xdiff * 1, y + ydiff * 1) == other &&	\
@@ -202,7 +200,7 @@ int Computer::pushColorAt(int color, int x, int y) {
   CHECK_AND_TAKE_DIRECTION(1, -1);
   CHECK_AND_TAKE_DIRECTION(1, 0);
   CHECK_AND_TAKE_DIRECTION(1, 1);
-  FINISH_PUSH;
+  _stack.push(std::make_tuple(count, -1, -1, -1, -1));
   return count;
 }
 
@@ -215,24 +213,24 @@ int Computer::popColorAt(int color, int x, int y) {
     action_t action = _stack.top();
     _stack.pop();
     if (std::get<0>(action) & ADD_COLOR) {
-      _REM_COLOR_AT(std::get<0>(action) & 0xff000000,
+      _REM_COLOR_AT(std::get<0>(action),
 		    std::get<1>(action), std::get<2>(action));
       _SET_USABLE_AT(color, 100, x, y, x, y);
     }
     else if (std::get<0>(action) & REM_COLOR) {
-      _ADD_COLOR_AT(std::get<0>(action) & 0xff000000,
+      _ADD_COLOR_AT(std::get<0>(action),
 		    std::get<1>(action), std::get<2>(action));
       _SET_NUSABLE_AT(color, 100, x, y, x, y);
     }
     else if (std::get<0>(action) & SET_USABLE) {
-      _SET_NUSABLE_AT(std::get<0>(action) & 0xff000000,
-		      (std::get<0>(action) & 0x00ffffff >> 8),
+      _SET_NUSABLE_AT(std::get<0>(action),
+		      (std::get<0>(action) & 0x00ffff00 >> 8),
 		      std::get<1>(action), std::get<2>(action),
 		      std::get<3>(action), std::get<4>(action));
     }
     else if (std::get<0>(action) & SET_NUSABLE) {
-      _SET_USABLE_AT(std::get<0>(action) & 0xff000000,
-		     (std::get<0>(action) & 0x00ffffff) >> 8,
+      _SET_USABLE_AT(std::get<0>(action),
+		     (std::get<0>(action) & 0x00ffff00) >> 8,
 		     std::get<1>(action), std::get<2>(action),
 		     std::get<3>(action), std::get<4>(action));
     }
