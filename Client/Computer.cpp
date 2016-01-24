@@ -3,7 +3,7 @@
 #include "Computer.hpp"
 
 Computer::Computer(std::string const &host, std::string const &port)
-              : Player(host, port) {}
+  : Player(host, port) {}
 
 Computer *Computer::p = NULL;
 Computer *Computer::getInstance(std::string const &host, std::string const &port) {
@@ -24,8 +24,8 @@ void update_tile(char map[19][19], int n);
 #define NEXT_ROUND_PREPARATION			\
   for (int y = 0; y < 19; y++) {		\
     for (int x = 0; x < 19; x++) {		\
-      if (_weights[y][x] > 0) {			\
-	_weights[y][x]--;			\
+      if (_usables[y][x] > 0) {			\
+	_usables[y][x]--;			\
       }						\
     }						\
   }
@@ -65,6 +65,14 @@ void Computer::play() {
       _myTurn = false;
       // sendClick(p, header);
       NEXT_ROUND_PREPARATION;
+#ifdef DEBUG
+      for (int y = 0; y < 19; y++) {
+	for (int x = 0; x < 19; x++) {
+	  if (_usables[y][x])
+	    std::cout << "Usable (" << x << ":" << y << ") = " << _usables[y][x] << std::endl;
+	}
+      }
+#endif // DEBUG
     }
   }
 }
@@ -92,12 +100,12 @@ void Computer::setMoveToXY(int color, int x, int y) {
 bool Computer::parseAnswer(const std::string &str) {
   if (!Player::parseAnswer(str))
     return false;
-/* Different possible answers impacting the game
-  if (_gameOver && _win){}
-  else if (_gameOver && !_win){}
-  else if (_myTurn){}
-  else if (!_myTurn){}
-*/
+  /* Different possible answers impacting the game
+     if (_gameOver && _win){}
+     else if (_gameOver && !_win){}
+     else if (_myTurn){}
+     else if (!_myTurn){}
+  */
   return true;
 }
 
@@ -225,6 +233,9 @@ int Computer::computesMinMax(int deepth_max, int current_color) {
   0
 
 int Computer::pushColorAt(int color, int x, int y) {
+#ifdef DEBUG
+  std::cout << "Push color (" << color << ") at (" << x << ":" << y << ")"  << std::endl;
+#endif //DEBUG
   int count = 0;
   ADD_COLOR_AT(color, x, y);
   SET_NUSABLE_AT(color, 1000, x, y, x, y);
@@ -241,6 +252,9 @@ int Computer::pushColorAt(int color, int x, int y) {
 
 int Computer::popColorAt(int color, int x, int y) {
   // get the last element of the stack => is the number of elements to pop
+#ifdef DEBUG
+  std::cout << "Pop color (" << color << ") at (" << x << ":" << y << ")"  << std::endl;
+#endif //DEBUG
   int count = std::get<0>(_stack.top());
   const int ccount = count;
   _stack.pop();
@@ -276,21 +290,30 @@ int Computer::popColorAt(int color, int x, int y) {
 #define INTMAX(i, M) (i > M ? M : i)
 #define INTMIN(i, m) (i < m ? m : i)
 int Computer::setUsable(int incr, int x1, int y1, int x2, int y2) {
+#ifdef DEBUG
+  std::cout << "1. Set usable ( " << incr << ") pour " << x1 << " <= x <= " << x2 << " ET " << y1 << " <= y <= " << y2 << std::endl;
+#endif //DEBUG
   x1 = INTMIN(INTMAX(x1, 18), 0);
   y1 = INTMIN(INTMAX(y1, 18), 0);
   x2 = INTMIN(INTMAX(x2, 18), 0);
   y2 = INTMIN(INTMAX(y2, 18), 0);
-  const int xm = x1 > x2 ? x1 : x2;
-  const int ym = y1 > y2 ? y1 : y2;
+  const int xm = x1 < x2 ? x1 : x2;
+  const int ym = y1 < y2 ? y1 : y2;
   const int xM = x1 >= x2 ? x2 : x1;
   const int yM = y1 >= y2 ? y2 : y1;
+#ifdef DEBUG
+  std::cout << "2. Set usable ( " << incr << ") pour " << xm << " <= x <= " << xM << " ET " << ym << " <= y <= " << yM << std::endl;
+#endif //DEBUG
   int c = 0;
+  for (int y = ym; y <= yM; y++) {
   for (int x = xm; x <= xM; x++) {
-    for (int y = ym; y <= yM; y++) {
-      _usables[x][y] += incr;
-      c++;
-    }
-  }
+  _usables[y][x] += incr;
+  c++;
+}
+}
+#ifdef DEBUG
+  std::cout << "Case modifiees : " << c << std::endl;
+#endif //DEBUG
   return c;
 }
 
