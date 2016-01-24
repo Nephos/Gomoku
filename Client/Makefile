@@ -8,6 +8,8 @@ SRC	=	Player.cpp \
 		ComputerHeuristic.cpp \
 		main.cpp
 
+# CXX	=	clang++
+
 OBJ	=	$(SRC:.cpp=.o)
 
 NAME=	client
@@ -19,10 +21,10 @@ LDXXFLAGS =	-lboost_system -lGL -lGLU -lX11 -lpthread
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	g++ -o $(NAME) $(LDXXFLAGS) $(OBJ)
+	$(CXX) -o $(NAME) $(LDXXFLAGS) $(OBJ)
 
 debug:
-	g++ $(SRC) $(LDXXFLAGS) $(CXXFLAGS) -g -o $(NAME)
+	$(CXX) $(SRC) $(LDXXFLAGS) $(CXXFLAGS) -g -o $(NAME)
 
 clean:
 	$(RM) $(OBJ)
