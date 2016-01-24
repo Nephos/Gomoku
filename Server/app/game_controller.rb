@@ -113,6 +113,7 @@ class GameController < Nephos::Controller
     @map.take_around!(y, x, color)
     @map.update!(y, x)
     @map.save_free3!
+    @map.new_move x, y
     win = @map.win? color
     get_map_render
     if win
@@ -146,6 +147,7 @@ class GameController < Nephos::Controller
     if plain?
       @map_render = @map.to_a.map{|e| e.map{|x| x||"x"}.join(" ")}.join("\n")
       @map_render += "\n" + @map.took.join(" ")
+      @map_render += "\n" + @map.last_move.join(" ")
     else
       @map_render = @map.to_a
     end

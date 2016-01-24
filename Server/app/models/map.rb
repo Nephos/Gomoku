@@ -15,7 +15,7 @@ class Map
   ]
   T_FREE3 = T_CAPTURE
 
-  attr_reader :size, :data, :took, :capturable, :free3
+  attr_reader :size, :data, :took, :capturable, :free3, :last_move
 
   def initialize size=19
     @id = 0
@@ -25,12 +25,17 @@ class Map
     @free3 = Array.new(size){Array.new(size) {[]}}
     @took = [0, 0]
     @free3_list = {}
+    @last_move = [-1, -1]
   end
 
   def newid!
     id = @id
     @id += 1
     id
+  end
+
+  def new_move x, y
+    @last_move = [x, y]
   end
 
   def took_hash
