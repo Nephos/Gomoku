@@ -93,7 +93,6 @@ class Map
   end
 
   def update_free3! y, x
-    require "pry"
     color = @data[y][x]
     @free3_cpy = Marshal.load(Marshal.dump(@free3))
     @free3_list_cpy = Marshal.load(Marshal.dump(@free3_list))
@@ -142,15 +141,16 @@ class Map
     # nil
     elsif e == nil
       y3, x3 = y2+tuple[0], x2+tuple[1]
-      f = @data[y3][x3]
 
       # border
       if not valid_xy? y3, x3
         @borders << [y2, x2]
         return [void, allies, freeb+1]
+      end
+      f = @data[y3][x3]
 
       #ally 2 cases away
-      elsif f == color
+      if f == color
         # void allowed
         if void == 0
           @allies << [y2, x2]
@@ -222,7 +222,7 @@ class Map
     T.each do |tuple|
       y2, x2 = y+tuple[0], x+tuple[1]
       #@capturable[y2][x2] = false
-      update_capturable!(y2, x2, false) if @capturable[y2][x2] == true or rec
+      update_capturable!(y2, x2, false) if valid_xy?(x2, y2) and (@capturable[y2][x2] == true or rec)
     end
 
     return if color.nil? # handled by recursion
@@ -234,6 +234,8 @@ class Map
       y33, x33 = y+tuples[1][0]*2, x+tuples[1][1]*2
       next if not valid_xy?(x2, y2)
       next if not valid_xy?(x3, y3)
+      next if not valid_xy?(x22, y22)
+      next if not valid_xy?(x33, y33)
       r2, r3 = @data[y2][x2], @data[y3][x3]
       r22, r33 = @data[y22][x22], @data[y33][x33]
       next if r2 == r3
