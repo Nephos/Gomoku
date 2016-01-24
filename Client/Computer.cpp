@@ -204,6 +204,18 @@ int Computer::computesMinMax(int deepth_max, int current_color) {
   SET_USABLE_AT(color, 1000, x + xdiff * 2, y + ydiff * 2, x + xdiff * 2, y + ydiff * 2);
 #define CHECK_AND_TAKE_DIRECTION(xdiff, ydiff)				\
   if (CHECK_VALUES(xdiff, ydiff)) { TAKE_DIRECTION(xdiff, ydiff) }
+#define CHECK_AND_TAKE_ALL_DIRECTION		\
+  CHECK_AND_TAKE_DIRECTION(-1, -1);		\
+  CHECK_AND_TAKE_DIRECTION(-1, 0);		\
+  CHECK_AND_TAKE_DIRECTION(-1, 1);		\
+  CHECK_AND_TAKE_DIRECTION(0, -1);		\
+  CHECK_AND_TAKE_DIRECTION(0, 1);		\
+  CHECK_AND_TAKE_DIRECTION(1, -1);		\
+  CHECK_AND_TAKE_DIRECTION(1, 0);		\
+  CHECK_AND_TAKE_DIRECTION(1, 1);
+
+#define ADD_3FREE				\
+  0
 
 int Computer::pushColorAt(int color, int x, int y) {
   int count = 0;
@@ -211,16 +223,9 @@ int Computer::pushColorAt(int color, int x, int y) {
   SET_NUSABLE_AT(color, 1000, x, y, x, y);
   SET_USABLE_AT(color, 10, x-1, y-1, x+1, y+1); // radius 1 = +10
   SET_USABLE_AT(color, 5, x-2, y-2, x+2, y+2); // radius 2 = +5
-  // take
   int other = color ^ 1;
-  CHECK_AND_TAKE_DIRECTION(-1, -1);
-  CHECK_AND_TAKE_DIRECTION(-1, 0);
-  CHECK_AND_TAKE_DIRECTION(-1, 1);
-  CHECK_AND_TAKE_DIRECTION(0, -1);
-  CHECK_AND_TAKE_DIRECTION(0, 1);
-  CHECK_AND_TAKE_DIRECTION(1, -1);
-  CHECK_AND_TAKE_DIRECTION(1, 0);
-  CHECK_AND_TAKE_DIRECTION(1, 1);
+  CHECK_AND_TAKE_ALL_DIRECTION;
+  ADD_3FREE;
   _stack.push(std::make_tuple(count, -1, -1, -1, -1));
   return count;
 }
