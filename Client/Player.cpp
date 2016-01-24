@@ -14,7 +14,8 @@ int Player::getColor() const {
 
 void Player::connect() {
   std::string str = "GET /players/connect/ HTTP/1.0\r\nHost: " + _host + "\r\nAccept: */*\r\n\r\n";
-  _network.sendQuery(str);
+  std::string ans = _network.sendSyncQuery(str);
+  parseAnswer(ans);
 }
 
 void Player::sendClick(std::pair<int, int> click, std::string const &header) {
@@ -98,6 +99,7 @@ bool Player::parseAnswer(const std::string &str) {
 }
 
 void Player::updateMap(std::istringstream &ss) {
+  std::string test = ss.str();
   std::string tmp;
   int i = 0;
   while (i < 19 && std::getline(ss, tmp)) {

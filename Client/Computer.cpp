@@ -40,7 +40,8 @@ void Computer::play() {
     parseAnswer(ans);
     if (!_myTurn && !_gameOver) {
       std::string req = "GET /game.txt" + header + _cookie + "\r\n\r\n";
-      _network.sendQuery(req);
+      ans = _network.sendSyncQuery(req);
+      parseAnswer(ans);
     }
     else if (!_gameOver) {
       // The opponent moved
@@ -53,8 +54,16 @@ void Computer::play() {
 	setRandomBestPosition();
       }
       setMoveToXY(_colorValue, _best_x, _best_y);
-      std::pair<int, int> p(_best_x, _best_y);
-      sendClick(p, header);
+      std::stringstream ss;
+      ss << "POST /game/play/" << _best_x << "/" << _best_y << header << _cookie << "\r\n\r\n";
+      std::string req = ss.str();
+      ans = _network.sendSyncQuery(req);
+      parseAnswer(ans);
+      req = "GET /game/map.txt" + header + _cookie + "\r\n\r\n";
+      ans = _network.sendSyncQuery(req);
+      parseAnswer(ans);
+      _myTurn = false;
+      // sendClick(p, header);
       NEXT_ROUND_PREPARATION;
     }
   }

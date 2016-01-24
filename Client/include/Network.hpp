@@ -16,6 +16,7 @@ class Network
     void connect();
     void update();
     void sendQuery(const std::string);
+    std::string sendSyncQuery(const std::string &req);
     bool isConnected();
     void reset();
 

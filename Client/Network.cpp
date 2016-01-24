@@ -34,6 +34,19 @@ void Network::reset() {
   _answered = true;
 }
 
+std::string Network::sendSyncQuery(const std::string &req) {
+  connect();
+  const char *str = new char[req.length()];
+  str = req.c_str();
+  boost::asio::write(_sock, boost::asio::buffer(str, req.length()));
+  boost::asio::streambuf buf;
+  buf.prepare(2048);
+  boost::asio::read_until(_sock, buf, "\r\n");
+  std::stringstream ss;
+  ss << &buf;
+  return ss.str();
+}
+
 void Network::sendQuery(const std::string req) {
   _io_service.poll();
   _io_service.reset();
