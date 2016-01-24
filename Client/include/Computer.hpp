@@ -24,7 +24,7 @@ public:
   int setUsable(int incr, int, int, int, int);
   int valueAt(int x, int y);
   void setRandomBestPosition();
-  void setMoveToXY(int x, int y);
+  void setMoveToXY(int color, int x, int y);
 
 private:
   Computer(std::string const &, std::string const &);

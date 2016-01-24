@@ -16,6 +16,10 @@ void Computer::resetGame() {
   // Reset les poids / l'IA ici
 }
 
+void calc_initial_weight(char map[19][19]);
+unsigned char *getWeightsMap();
+void update_tile(char map[19][19], int n);
+
 #define TREE_DEEPTH 2
 #define NEXT_ROUND_PREPARATION			\
   for (int y = 0; y < 19; y++) {		\
@@ -39,16 +43,19 @@ void Computer::play() {
       _network.sendQuery(req);
     }
     else if (!_gameOver) {
-      computesMinMax(TREE_DEEPTH, _colorValue);
+      // The opponent moved
+      setMoveToXY(_colorValue ^ 1, std::get<0>(_lastMove), std::get<1>(_lastMove));
+      update_tile(_map, std::get<0>(_lastMove) + 19 * std::get<1>(_lastMove));
+      // Computes our move
       _best_x = -1;
-
+      computesMinMax(TREE_DEEPTH, _colorValue);
       if (_best_x == -1) {
 	setRandomBestPosition();
       }
-      setMoveToXY(_best_x, _best_y);
+      setMoveToXY(_colorValue, _best_x, _best_y);
       std::pair<int, int> p(_best_x, _best_y);
       sendClick(p, header);
-      NEXT_ROUND_PREPARATION
+      NEXT_ROUND_PREPARATION;
     }
   }
 }
@@ -65,8 +72,8 @@ void Computer::setRandomBestPosition() {
   }
 }
 
-void Computer::setMoveToXY(int x, int y) {
-  int c = pushColorAt(_colorValue, x, y);
+void Computer::setMoveToXY(int color, int x, int y) {
+  int c = pushColorAt(color, x, y);
   while (c--)
     _stack.pop();
 }
@@ -85,8 +92,6 @@ bool Computer::parseAnswer(const std::string &str) {
   return true;
 }
 
-void calc_initial_weight(char map[19][19]);
-
 int Computer::initializeMinMax() {
   calc_initial_weight(_map);
   for (int y = 0; y < 19; y++) {
@@ -101,13 +106,6 @@ int Computer::initializeMinMax() {
   }
   return 0;
 }
-
-unsigned char *getWeightsMap();
-void update_tile(char map[19][19], int n);
-
-// Calculate weights with the current infos
-#define COMPUTES_HEURISTIC update_tile(_map, _tree_x + 19 * _tree_y);
-#define HEURISTIC getWeightsMap()[_tree_x + 19 * _tree_y]
 
 # define MAX_TREE_WEIGHT 1
 /*
@@ -127,8 +125,8 @@ int Computer::computesMinMax(int deepth_max, int current_color) {
   // if (WIN) return 100;
   // evaluate the state and return it
   if (deepth_max == 0) {
-    COMPUTES_HEURISTIC;
-    return HEURISTIC;
+    update_tile(_map, _tree_x + 19 * _tree_y); // computes heuristic
+    return getWeightsMap()[_tree_x + 19 * _tree_y]; // TODO
   }
 
   for (unsigned int y = 0; y < 19; y++) {
@@ -225,7 +223,9 @@ int Computer::pushColorAt(int color, int x, int y) {
   SET_USABLE_AT(color, 5, x-2, y-2, x+2, y+2); // radius 2 = +5
   int other = color ^ 1;
   CHECK_AND_TAKE_ALL_DIRECTION;
-  ADD_3FREE;
+  if (color == _colorValue) {
+    ADD_3FREE;
+  }
   _stack.push(std::make_tuple(count, -1, -1, -1, -1));
   return count;
 }
