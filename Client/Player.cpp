@@ -108,6 +108,9 @@ void Player::updateMap(std::istringstream &ss) {
   }
   ss >> _whiteScore;
   ss >> _blackScore;
+  std::getline(ss, tmp);
+  ss >> std::get<0>(_lastMove);
+  ss >> std::get<1>(_lastMove);
 }
 
 void Player::setCookie(const std::string &str) {
