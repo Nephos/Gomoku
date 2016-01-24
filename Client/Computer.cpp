@@ -40,11 +40,35 @@ void Computer::play() {
     }
     else if (!_gameOver) {
       computesMinMax(TREE_DEEPTH, _colorValue);
+      _best_x = -1;
+
+      if (_best_x == -1) {
+	setRandomBestPosition();
+      }
+      setMoveToXY(_best_x, _best_y);
       std::pair<int, int> p(_best_x, _best_y);
       sendClick(p, header);
       NEXT_ROUND_PREPARATION
     }
   }
+}
+
+void Computer::setRandomBestPosition() {
+  for (int y = 0; y < 19; y++) {
+    for (int x = 0; x < 19; x++) {
+      if (_map[y][x] == 'x') {
+	_best_x = x;
+	_best_y = y;
+	return;
+      }
+    }
+  }
+}
+
+void Computer::setMoveToXY(int x, int y) {
+  int c = pushColorAt(_colorValue, x, y);
+  while (c--)
+    _stack.pop();
 }
 
 /* If returns false, then ask for another user input */
