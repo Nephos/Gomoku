@@ -306,11 +306,11 @@ int Computer::setUsable(int incr, int x1, int y1, int x2, int y2) {
 #endif //DEBUG
   int c = 0;
   for (int y = ym; y <= yM; y++) {
-  for (int x = xm; x <= xM; x++) {
-  _usables[y][x] += incr;
-  c++;
-}
-}
+    for (int x = xm; x <= xM; x++) {
+      _usables[y][x] += incr;
+      c++;
+    }
+  }
 #ifdef DEBUG
   std::cout << "Case modifiees : " << c << std::endl;
 #endif //DEBUG
