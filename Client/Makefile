@@ -23,8 +23,8 @@ all: $(NAME)
 $(NAME): $(OBJ)
 	$(CXX) -o $(NAME) $(LDXXFLAGS) $(OBJ)
 
-debug:
-	$(CXX) $(SRC) $(LDXXFLAGS) $(CXXFLAGS) -g -o $(NAME)
+debug:	CXXFLAGS += -D DEBUG -g
+debug: $(NAME)
 
 clean:
 	$(RM) $(OBJ)
