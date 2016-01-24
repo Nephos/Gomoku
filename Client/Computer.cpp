@@ -273,13 +273,13 @@ int Computer::popColorAt(int color, int x, int y) {
     }
     else if (std::get<0>(action) & SET_USABLE) {
       _SET_NUSABLE_AT(std::get<0>(action),
-		      (std::get<0>(action) & 0x00ffff00 >> 8),
+		      ((std::get<0>(action) & 0x00ffff00) >> 8),
 		      std::get<1>(action), std::get<2>(action),
 		      std::get<3>(action), std::get<4>(action));
     }
     else if (std::get<0>(action) & SET_NUSABLE) {
       _SET_USABLE_AT(std::get<0>(action),
-		     (std::get<0>(action) & 0x00ffff00) >> 8,
+		     ((std::get<0>(action) & 0x00ffff00) >> 8),
 		     std::get<1>(action), std::get<2>(action),
 		     std::get<3>(action), std::get<4>(action));
     }
