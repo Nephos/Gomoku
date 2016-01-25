@@ -22,30 +22,8 @@ int Computer::computeHeuristic() {
     {0, -1}, // North... I think ?
     {1, -1}, // North East
     {1, 0}, // East I guess
-    // {1, 1}, // South East
-    // {0, 1}, // South
-    // {-1, 1}, // South West
-    // {-1, 0} // West
   };
-  for (int i = 0; i < 19; i++) {
-    for (int j = 0; j < 19; j++) {
-      std::cout << _usables[i][j] + 0 << " ";
-    }
-    std::cout << std::endl;
-  }
-  std::cout << std::endl;
-  for (int i = 0; i < 19; i++) {
-    for (int j = 0; j < 19; j++) {
-      if (_map[i][j] == 120)
-        std::cout << "x ";
-      else if (_map[i][j] == '0')
-        std::cout << "0 ";
-      else
-        std::cout << "1 ";
-    }
-    std::cout << std::endl;
-  }
-  std::cout << std::endl;
+  bool used[4][19][19] = {false}; // To remember whether the tile was already checked in this direction
   int res = 0;
   for (int i = -2; i < 3; i++) {
     for (int j = -2; j < 3; j++) {
@@ -57,40 +35,51 @@ int Computer::computeHeuristic() {
       if (_map[newy][newx] == 'x')
         continue;
       for (int dir = 0; dir < 4; dir++) {
+        if (used[dir][newy][newx] == true)
+          continue;
+        used[dir][newy][newx] = true;
         // Dir in one way and then in the other
         // Looking for lines here...
         int line = 1;
         int free = 0;
-//        std::cout << "Looking at " << newx + dirs[dir].first << " " << newy + dirs[dir].second << std::endl;
-        for (int n = 1; n < 6; n++) {
+
+        for (int n = 1; n < 5; n++) {
           int tmpx = newx + dirs[dir].first * n;
           int tmpy = newy + dirs[dir].second * n;
           if (tmpx < 0 || tmpx > 18
             || tmpy < 0 || tmpy > 18)
             break; // Out of bounds
+
+          if (used[dir][tmpy][tmpx] == true)
+            continue;
           if (_map[tmpy][tmpx] != _map[newy][newx]) {
             if (_map[tmpy][tmpx] == 'x')
               free++;
-//            std::cout << tmpx << " " << tmpy << " ==> ";
             break; // End of pattern
           }
+          used[dir][tmpy][tmpx] = true;
           line++;
         }
         // In the other way
-        for (int n = 0; n < 5; n++) {
+        for (int n = 1; n < 5; n++) {
           int tmpx = newx + -dirs[dir].first * n;
           int tmpy = newy + -dirs[dir].second * n;
           if (tmpx < 0 || tmpx > 18
             || tmpy < 0 || tmpy > 18)
             break; // Out of bounds
+
+          if (used[dir][tmpy][tmpx] == true)
+              continue;
           if (_map[tmpy][tmpx] != _map[newy][newx]) {
             if (_map[tmpy][tmpx] == 'x')
               free++;
-//            std::cout << tmpx << " " << tmpy << std::endl;
             break; // End of pattern
           }
+          used[dir][tmpy][tmpx] = true;
           line++;
         }
+        if (line < 2)
+          continue;
         if (_map[newy][newx] == _colorValue) {
           if (line == 5)
             res += 100;
@@ -111,11 +100,15 @@ int Computer::computeHeuristic() {
           else if (line == 4)
             res -= 2 * (10 * free);
         }
-//        std::cout << "Found a line of " << line << " which is free " << free << " times." << std::endl;
+        // std::cout << "Found a line of " << line << " which is free " << free << " times. (";
+        // if (_map[newy][newx] == _colorValue)
+        //   std::cout << "mine)";
+        // else
+        //   std::cout << "not mine)";
+        // std::cout << " in " << newy << " " << newx << std::endl;
       }
     }
   }
-
   return res;
 }
 
