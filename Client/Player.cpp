@@ -62,8 +62,11 @@ void Player::play() {
 bool Player::parseAnswer(const std::string &str) {
   if (str.empty())
     return true;
-  if (str.find("401 Unauthorized") != std::string::npos)
-    return false;
+  if (str.find("401 Unauthorized") != std::string::npos) {
+      _moveFailed = true;
+      _myTurn = true;
+      return false;
+    }
   else if (str.find("403 Forbidden") != std::string::npos) {
     connect();
     return false;
@@ -72,12 +75,7 @@ bool Player::parseAnswer(const std::string &str) {
     std::istringstream ss(str);
     std::string tmp;
     while (std::getline(ss, tmp)) {
-      if (tmp.find("failed. ") == 0) {
-        _moveFailed = true;
-	_myTurn = true;
-        updateMap(ss);
-      }
-      else if (tmp.find("failed.") == 0) {
+      if (tmp.find("failed.") == 0) { // failed + code 200 = loose !!
 	std::cout << "Game over :(" << std::endl;
 	exit(0);
         _gameOver = true;
@@ -91,7 +89,6 @@ bool Player::parseAnswer(const std::string &str) {
       }
       else if (tmp.find("continue.") == 0 || tmp.find("ok.") == 0) {
         if (tmp.find("continue") == 0) {
-	  _moveFailed = false;
 	  _myTurn = !_myTurn;
         }
         updateMap(ss);

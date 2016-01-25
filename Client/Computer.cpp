@@ -137,6 +137,7 @@ void Computer::play() {
     else if (!_gameOver) {
       if (_moveFailed == true) {
 	setRandomBestPosition();
+	_moveFailed = false;
       }
       else if (std::get<0>(_lastMove) == -1) {
 	_best_x = 9;
