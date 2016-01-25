@@ -135,20 +135,23 @@ void Computer::play() {
       parseAnswer(ans);
     }
     else if (!_gameOver) {
-      if (std::get<0>(_lastMove) != -1) {
-	setMoveToXY(_colorValue ^ 1, std::get<0>(_lastMove), std::get<1>(_lastMove));
+      if (_moveFailed == true) {
+	setRandomBestPosition();
+      }
+      else if (std::get<0>(_lastMove) == -1) {
+	_best_x = 9;
+	_best_y = 9;
+      }
+      else {
 	_best_x = -1;
+	// The opponent moved
+	setMoveToXY(_colorValue ^ 1, std::get<0>(_lastMove), std::get<1>(_lastMove));
+	// We move
 	computesMinMax(TREE_DEEPTH, _colorValue);
+	// No response
 	if (_best_x == -1) {
 	  setRandomBestPosition();
 	}
-//	addEnemyWeight(std::get<0>(_lastMove), std::get<1>(_lastMove));
-      }
-      // The opponent moved
-      else {
-	// Computes our move
-	_best_x = 9;
-	_best_y = 9;
       }
       setMoveToXY(_colorValue, _best_x, _best_y);
       std::stringstream ss;

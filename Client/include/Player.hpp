@@ -31,6 +31,7 @@ protected:
   std::string _cookie;
   bool _win;
   bool _myTurn;
+  bool _moveFailed;
   bool _gameOver;
   int _whiteScore;
   int _blackScore;

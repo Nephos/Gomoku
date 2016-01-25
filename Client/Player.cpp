@@ -1,3 +1,4 @@
+#include <iostream>
 #include <sstream>
 #include "Player.hpp"
 
@@ -43,6 +44,7 @@ void Player::resetGame() {
   _cookie.clear();
   _gameOver = false;
   _myTurn = false;
+  _moveFailed = false;
   _whiteScore = 0;
   _blackScore = 0;
   initMap();
@@ -70,7 +72,14 @@ bool Player::parseAnswer(const std::string &str) {
     std::istringstream ss(str);
     std::string tmp;
     while (std::getline(ss, tmp)) {
-      if (tmp.find("failed.") == 0) {
+      if (tmp.find("failed. ") == 0) {
+        _moveFailed = true;
+	_myTurn = true;
+        updateMap(ss);
+      }
+      else if (tmp.find("failed.") == 0) {
+	std::cout << "Game over :(" << std::endl;
+	exit(0);
         _gameOver = true;
         _win = false;
         updateMap(ss);
@@ -80,15 +89,10 @@ bool Player::parseAnswer(const std::string &str) {
         _win = true;
         updateMap(ss);
       }
-      else if (tmp.find("continue.") == 0 ||
-        tmp.find("ok.") == 0) {
+      else if (tmp.find("continue.") == 0 || tmp.find("ok.") == 0) {
         if (tmp.find("continue") == 0) {
-          if (!_myTurn) {
-            _myTurn = true;
-          }
-          else {
-            _myTurn = false;
-          }
+	  _moveFailed = false;
+	  _myTurn = !_myTurn;
         }
         updateMap(ss);
       }
