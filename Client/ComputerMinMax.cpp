@@ -17,6 +17,64 @@ int Computer::initializeMinMax() {
   return 0;
 }
 
+int Computer::checkVictory() {
+  // Checking in each direction from the tile we put
+  static std::pair<int, int> dirs[] = {
+    {-1, -1}, // North West
+    {0, -1}, // North... I think ?
+    {1, -1}, // North East
+    {1, 0}, // East I guess
+  };
+
+  for (int dir = 0; dir < 4; dir++) {
+    // Dir in one way and then in the other
+    // Looking for lines here...
+    int line = 1;
+    int free = 0;
+
+    for (int n = 1; n < 5; n++) {
+      int tmpx = _tree_x + dirs[dir].first * n;
+      int tmpy = _tree_y + dirs[dir].second * n;
+      if (tmpx < 0 || tmpx > 18
+        || tmpy < 0 || tmpy > 18)
+        break; // Out of bounds
+
+      if (_map[tmpy][tmpx] != _map[_tree_y][_tree_x]) {
+        if (_map[tmpy][tmpx] == 'x')
+          free++;
+        break; // End of pattern
+      }
+      line++;
+    }
+    // In the other way
+    for (int n = 1; n < 5; n++) {
+      int tmpx = _tree_x + -dirs[dir].first * n;
+      int tmpy = _tree_y + -dirs[dir].second * n;
+      if (tmpx < 0 || tmpx > 18
+        || tmpy < 0 || tmpy > 18)
+        break; // Out of bounds
+
+      if (_map[tmpy][tmpx] != _map[_tree_y][_tree_x]) {
+        if (_map[tmpy][tmpx] == 'x')
+          free++;
+        break; // End of pattern
+      }
+      line++;
+    }
+    if (line < 2)
+      continue;
+    if (_map[_tree_y][_tree_x] == _colorValue + '0') {
+      if (line == 5)
+        return 100;
+    }
+    else {
+      if (line == 5)
+        return -100;
+    }
+  }
+  return 0;
+}
+
 /*
  * If on a leaf, calc the heuristic
  * If not, for each interesting usables (x, y) go deeper and keep only the max/min
@@ -46,6 +104,17 @@ int Computer::computesMinMax(int deepth_max, int current_color) {
       pushColorAt(current_color, x, y); // that push on _stack
       _tree_x = x;
       _tree_y = y;
+      int victory = checkVictory();
+      if (victory != 0) {
+        // std::cout << victory << std::endl;
+        // for (int i = 0; i < 19; i++) {
+        //   for (int j = 0; j < 19; j++) {
+        //     std::cout << _map[i][j] << " ";
+        //   }
+        //   std::cout << std::endl;
+        // }
+        return victory;
+      }
       tmp = computesMinMax(deepth_max - 1, current_color ^ 1);
       popColorAt(current_color, x, y); // that pop from _stack
 

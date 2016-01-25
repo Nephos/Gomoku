@@ -29,6 +29,7 @@ public:
   void setRandomBestPosition();
   void setMoveToXY(int color, int x, int y);
   int computeHeuristic();
+  int checkVictory();
 
 private:
   Computer(std::string const &, std::string const &);
