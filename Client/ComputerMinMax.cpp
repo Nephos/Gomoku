@@ -155,12 +155,10 @@ int Computer::popColorAt(int color, int x, int y) {
     if (std::get<0>(action) & ADD_COLOR) {
       _REM_COLOR_AT(std::get<0>(action),
 		    std::get<1>(action), std::get<2>(action));
-      _SET_USABLE_AT(color, 100, x, y, x, y);
     }
     else if (std::get<0>(action) & REM_COLOR) {
       _ADD_COLOR_AT(std::get<0>(action),
 		    std::get<1>(action), std::get<2>(action));
-      _SET_NUSABLE_AT(color, 100, x, y, x, y);
     }
     else if (std::get<0>(action) & SET_USABLE) {
       _SET_NUSABLE_AT(std::get<0>(action),
@@ -190,8 +188,8 @@ int Computer::setUsable(int incr, int x1, int y1, int x2, int y2) {
   y2 = INTMIN(INTMAX(y2, 18), 0);
   const int xm = x1 < x2 ? x1 : x2;
   const int ym = y1 < y2 ? y1 : y2;
-  const int xM = x1 >= x2 ? x2 : x1;
-  const int yM = y1 >= y2 ? y2 : y1;
+  const int xM = x1 <= x2 ? x2 : x1;
+  const int yM = y1 <= y2 ? y2 : y1;
 #ifdef DEBUG
   std::cout << "2. Set usable ( " << incr << ") pour " << xm << " <= x <= " << xM << " ET " << ym << " <= y <= " << yM << std::endl;
 #endif //DEBUG
