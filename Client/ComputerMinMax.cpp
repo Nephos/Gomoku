@@ -4,7 +4,6 @@
 int Computer::initializeMinMax() {
   std::get<0>(_lastMove) = -1;
   std::get<1>(_lastMove) = -1;
-  calc_initial_weight(_map);
   for (int y = 0; y < 19; y++) {
     std::vector<int> tmpi;
     std::vector<int> tmpb;
@@ -35,8 +34,7 @@ int Computer::computesMinMax(int deepth_max, int current_color) {
   // if (WIN) return 100;
   // evaluate the state and return it
   if (deepth_max == 0) {
-    update_tile(_map, _tree_x + 19 * _tree_y); // computes heuristic
-    return getWeightsMap()[_tree_x + 19 * _tree_y]; // TODO
+    return computeHeuristic();
   }
 
   for (unsigned int y = 0; y < 19; y++) {
@@ -77,7 +75,7 @@ int Computer::computesMinMax(int deepth_max, int current_color) {
 #define SET_NUSABLE	(8 << 24)
 
 #define _ADD_COLOR_AT(color, x, y)		\
-  _map[y][x] = color;
+  _map[y][x] = color + '0';
 #define ADD_COLOR_AT(color, x, y)				\
   _stack.push(std::make_tuple(color | ADD_COLOR, x, y, x, y));	\
   count++;							\

@@ -16,6 +16,109 @@ void Computer::resetGame() {
   // Reset les poids / l'IA ici
 }
 
+int Computer::computeHeuristic() {
+  static std::pair<int, int> dirs[] = {
+    {-1, -1}, // North West
+    {0, -1}, // North... I think ?
+    {1, -1}, // North East
+    {1, 0}, // East I guess
+    // {1, 1}, // South East
+    // {0, 1}, // South
+    // {-1, 1}, // South West
+    // {-1, 0} // West
+  };
+  for (int i = 0; i < 19; i++) {
+    for (int j = 0; j < 19; j++) {
+      std::cout << _usables[i][j] + 0 << " ";
+    }
+    std::cout << std::endl;
+  }
+  std::cout << std::endl;
+  for (int i = 0; i < 19; i++) {
+    for (int j = 0; j < 19; j++) {
+      if (_map[i][j] == 120)
+        std::cout << "x ";
+      else if (_map[i][j] == '0')
+        std::cout << "0 ";
+      else
+        std::cout << "1 ";
+    }
+    std::cout << std::endl;
+  }
+  std::cout << std::endl;
+  int res = 0;
+  for (int i = -2; i < 3; i++) {
+    for (int j = -2; j < 3; j++) {
+      int newx = _tree_x + j;
+      int newy = _tree_y + i;
+      if (newx < 0 || newx > 18
+        || newy < 0 || newy > 18)
+        continue;
+      if (_map[newy][newx] == 'x')
+        continue;
+      for (int dir = 0; dir < 4; dir++) {
+        // Dir in one way and then in the other
+        // Looking for lines here...
+        int line = 1;
+        int free = 0;
+//        std::cout << "Looking at " << newx + dirs[dir].first << " " << newy + dirs[dir].second << std::endl;
+        for (int n = 1; n < 6; n++) {
+          int tmpx = newx + dirs[dir].first * n;
+          int tmpy = newy + dirs[dir].second * n;
+          if (tmpx < 0 || tmpx > 18
+            || tmpy < 0 || tmpy > 18)
+            break; // Out of bounds
+          if (_map[tmpy][tmpx] != _map[newy][newx]) {
+            if (_map[tmpy][tmpx] == 'x')
+              free++;
+//            std::cout << tmpx << " " << tmpy << " ==> ";
+            break; // End of pattern
+          }
+          line++;
+        }
+        // In the other way
+        for (int n = 0; n < 5; n++) {
+          int tmpx = newx + -dirs[dir].first * n;
+          int tmpy = newy + -dirs[dir].second * n;
+          if (tmpx < 0 || tmpx > 18
+            || tmpy < 0 || tmpy > 18)
+            break; // Out of bounds
+          if (_map[tmpy][tmpx] != _map[newy][newx]) {
+            if (_map[tmpy][tmpx] == 'x')
+              free++;
+//            std::cout << tmpx << " " << tmpy << std::endl;
+            break; // End of pattern
+          }
+          line++;
+        }
+        if (_map[newy][newx] == _colorValue) {
+          if (line == 5)
+            res += 100;
+          if (free == 0) // Not interesting...
+            continue;
+          if (line == 3)
+            res += 1 * (10 * free);
+          else if (line == 4)
+            res += 2 * (10 * free);
+        }
+        else {
+          if (line == 5)
+            res -= 100;
+          if (free == 0)
+            continue;
+          if (line == 3)
+            res -= 1 * (10 * free);
+          else if (line == 4)
+            res -= 2 * (10 * free);
+        }
+//        std::cout << "Found a line of " << line << " which is free " << free << " times." << std::endl;
+      }
+    }
+  }
+
+  return res;
+}
+
 #define NEXT_ROUND_PREPARATION			\
   for (int y = 0; y < 19; y++) {		\
     for (int x = 0; x < 19; x++) {		\
@@ -41,12 +144,12 @@ void Computer::play() {
     else if (!_gameOver) {
       if (std::get<0>(_lastMove) != -1) {
 	setMoveToXY(_colorValue ^ 1, std::get<0>(_lastMove), std::get<1>(_lastMove));
-	update_tile(_map, std::get<0>(_lastMove) + 19 * std::get<1>(_lastMove));
 	_best_x = -1;
 	computesMinMax(TREE_DEEPTH, _colorValue);
 	if (_best_x == -1) {
 	  setRandomBestPosition();
 	}
+//	addEnemyWeight(std::get<0>(_lastMove), std::get<1>(_lastMove));
       }
       // The opponent moved
       else {

@@ -7,11 +7,8 @@
 #include <stack>
 #include "Player.hpp"
 
-void calc_initial_weight(char map[19][19]);
-unsigned char *getWeightsMap();
-void update_tile(char map[19][19], int n);
 #define TREE_WEIGHT 5
-#define TREE_DEEPTH 2
+#define TREE_DEEPTH 5
 
 class Computer : public Player
 {
@@ -31,6 +28,7 @@ public:
   int valueAt(int x, int y);
   void setRandomBestPosition();
   void setMoveToXY(int color, int x, int y);
+  int computeHeuristic();
 
 private:
   Computer(std::string const &, std::string const &);

@@ -6,7 +6,6 @@ SRC	=	Player.cpp \
 		Human.cpp \
 		Computer.cpp \
 		ComputerMinMax.cpp \
-		ComputerHeuristic.cpp \
 		main.cpp
 
 # CXX	=	clang++
