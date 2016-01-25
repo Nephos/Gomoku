@@ -23,6 +23,15 @@ int Computer::computeHeuristic() {
     {1, -1}, // North East
     {1, 0}, // East I guess
   };
+
+  std::cout << std::endl;
+  for (int i = 0; i < 19; i++) {
+    for (int j = 0; j < 19; j++) {
+      std::cout << _map[i][j] << " ";
+    }
+    std::cout << std::endl;
+  }
+
   bool used[4][19][19] = {false}; // To remember whether the tile was already checked in this direction
   int res = 0;
   for (int i = -2; i < 3; i++) {
@@ -100,12 +109,12 @@ int Computer::computeHeuristic() {
           else if (line == 4)
             res -= 2 * (10 * free);
         }
-        // std::cout << "Found a line of " << line << " which is free " << free << " times. (";
-        // if (_map[newy][newx] == _colorValue)
-        //   std::cout << "mine)";
-        // else
-        //   std::cout << "not mine)";
-        // std::cout << " in " << newy << " " << newx << std::endl;
+        std::cout << "Found a line of " << line << " which is free " << free << " times. (";
+        if (_map[newy][newx] == _colorValue)
+          std::cout << "mine)";
+        else
+          std::cout << "not mine)";
+        std::cout << " in " << newy << " " << newx << std::endl;
       }
     }
   }
@@ -163,7 +172,6 @@ void Computer::play() {
       ans = _network.sendSyncQuery(req);
       parseAnswer(ans);
       _myTurn = false;
-      // sendClick(p, header);
       NEXT_ROUND_PREPARATION;
 #ifdef DEBUG
       for (int y = 0; y < 19; y++) {
