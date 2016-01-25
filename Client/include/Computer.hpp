@@ -45,6 +45,7 @@ private:
   std::map<long long, line(line(int)), line(line(int)) > _cache;
 
   // tree search
+  int _roundNb;
   int _best_x, _best_y;
   int _tree_x, _tree_y;
 };

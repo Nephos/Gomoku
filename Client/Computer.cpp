@@ -20,6 +20,7 @@ void calc_initial_weight(char map[19][19]);
 unsigned char *getWeightsMap();
 void update_tile(char map[19][19], int n);
 
+#define TREE_WEIGHT 5
 #define TREE_DEEPTH 2
 #define NEXT_ROUND_PREPARATION			\
   for (int y = 0; y < 19; y++) {		\
@@ -45,8 +46,10 @@ void Computer::play() {
     }
     else if (!_gameOver) {
       // The opponent moved
-      setMoveToXY(_colorValue ^ 1, std::get<0>(_lastMove), std::get<1>(_lastMove));
-      update_tile(_map, std::get<0>(_lastMove) + 19 * std::get<1>(_lastMove));
+      if (_roundNb > 0) {
+	setMoveToXY(_colorValue ^ 1, std::get<0>(_lastMove), std::get<1>(_lastMove));
+	update_tile(_map, std::get<0>(_lastMove) + 19 * std::get<1>(_lastMove));
+      }
       // Computes our move
       _best_x = -1;
       computesMinMax(TREE_DEEPTH, _colorValue);
@@ -63,6 +66,7 @@ void Computer::play() {
       ans = _network.sendSyncQuery(req);
       parseAnswer(ans);
       _myTurn = false;
+      _roundNb++;
       // sendClick(p, header);
       NEXT_ROUND_PREPARATION;
 #ifdef DEBUG
@@ -110,6 +114,7 @@ bool Computer::parseAnswer(const std::string &str) {
 }
 
 int Computer::initializeMinMax() {
+  _roundNb = 0;
   calc_initial_weight(_map);
   for (int y = 0; y < 19; y++) {
     std::vector<int> tmpi;
@@ -124,7 +129,6 @@ int Computer::initializeMinMax() {
   return 0;
 }
 
-# define MAX_TREE_WEIGHT 1
 /*
  * If on a leaf, calc the heuristic
  * If not, for each interesting usables (x, y) go deeper and keep only the max/min
@@ -148,7 +152,7 @@ int Computer::computesMinMax(int deepth_max, int current_color) {
 
   for (unsigned int y = 0; y < 19; y++) {
     for (unsigned int x = 0; x < 19; x++) {
-      if (count > MAX_TREE_WEIGHT || _usables[y][x] <= 0)
+      if (count > TREE_WEIGHT || _usables[y][x] <= 0)
         continue;
 
       count++;
