@@ -7,6 +7,12 @@
 #include <stack>
 #include "Player.hpp"
 
+void calc_initial_weight(char map[19][19]);
+unsigned char *getWeightsMap();
+void update_tile(char map[19][19], int n);
+#define TREE_WEIGHT 5
+#define TREE_DEEPTH 2
+
 class Computer : public Player
 {
 public:
@@ -45,7 +51,6 @@ private:
   std::map<long long, line(line(int)), line(line(int)) > _cache;
 
   // tree search
-  int _roundNb;
   int _best_x, _best_y;
   int _tree_x, _tree_y;
 };
