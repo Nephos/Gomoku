@@ -65,11 +65,11 @@ int Computer::checkVictory() {
       continue;
     if (_map[_tree_y][_tree_x] == _colorValue + '0') {
       if (line == 5)
-        return 100;
+        return 1000;
     }
     else {
       if (line == 5)
-        return -100;
+        return -1000;
     }
   }
   return 0;
@@ -106,13 +106,11 @@ int Computer::computesMinMax(int deepth_max, int current_color) {
       _tree_y = y;
       int victory = checkVictory();
       if (victory != 0) {
-        // std::cout << victory << std::endl;
-        // for (int i = 0; i < 19; i++) {
-        //   for (int j = 0; j < 19; j++) {
-        //     std::cout << _map[i][j] << " ";
-        //   }
-        //   std::cout << std::endl;
-        // }
+        if (deepth_max == TREE_DEEPTH) {
+    	    _best_x = x;
+    	    _best_y = y;
+    	  }
+        popColorAt(current_color, x, y);
         return victory;
       }
       tmp = computesMinMax(deepth_max - 1, current_color ^ 1);
@@ -199,8 +197,8 @@ int Computer::pushColorAt(int color, int x, int y) {
   int count = 0;
   ADD_COLOR_AT(color, x, y);
   SET_NUSABLE_AT(color, 1000, x, y, x, y);
-  SET_USABLE_AT(color, 10, x-1, y-1, x+1, y+1); // radius 1 = +10
-  SET_USABLE_AT(color, 5, x-2, y-2, x+2, y+2); // radius 2 = +5
+  SET_USABLE_AT(color, 5, x-1, y-1, x+1, y+1); // radius 1 = +10
+  // SET_USABLE_AT(color, 5, x-2, y-2, x+2, y+2); // radius 2 = +5
   int other = color ^ 1;
   CHECK_AND_TAKE_ALL_DIRECTION;
   if (color == _colorValue) {

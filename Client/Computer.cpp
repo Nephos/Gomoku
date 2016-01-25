@@ -89,28 +89,32 @@ int Computer::computeHeuristic() {
         }
         if (line < 2)
           continue;
-        if (_map[newy][newx] == _colorValue) {
+        if (_map[newy][newx] == _colorValue + '0') {
           if (line == 5)
-            res += 100;
+            res += 1000;
           if (free == 0) // Not interesting...
             continue;
-          if (line == 3)
-            res += 1 * (10 * free);
+          if (line == 2)
+            res += 5 * free;
+          else if (line == 3)
+            res += 20 * free;
           else if (line == 4)
-            res += 2 * (10 * free);
+            res += 50 * free;
         }
         else {
           if (line == 5)
-            res -= 100;
+            res -= 1000;
           if (free == 0)
             continue;
-          if (line == 3)
-            res -= 1 * (10 * free);
+          if (line == 2)
+            res -= 5 * free;
+          else if (line == 3)
+            res -= 20 * free;
           else if (line == 4)
-            res -= 2 * (10 * free);
+            res -= 50 * free;
         }
         std::cout << "Found a line of " << line << " which is free " << free << " times. (";
-        if (_map[newy][newx] == _colorValue)
+        if (_map[newy][newx] == _colorValue + '0')
           std::cout << "mine)";
         else
           std::cout << "not mine)";
@@ -118,6 +122,7 @@ int Computer::computeHeuristic() {
       }
     }
   }
+  std::cout << res << std::endl << std::endl;
   return res;
 }
 
