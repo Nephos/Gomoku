@@ -126,15 +126,15 @@ void Computer::play() {
   std::string ans;
   std::string header = " HTTP/1.0\r\nHost: " + _host + "\r\nAccept: */*\r\n";
   initializeMinMax();
-  while (true/* Something */) { // Game loop
+  while (!_gameOver) { // Game loop
     ans = _network.getAnswer();
     parseAnswer(ans);
-    if (!_myTurn && !_gameOver) {
+    if (!_myTurn) {
       std::string req = "GET /game.txt" + header + _cookie + "\r\n\r\n";
       ans = _network.sendSyncQuery(req);
       parseAnswer(ans);
     }
-    else if (!_gameOver) {
+    else {
       if (_moveFailed == true) {
 	setRandomBestPosition();
 	_moveFailed = false;

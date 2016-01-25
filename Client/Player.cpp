@@ -77,7 +77,6 @@ bool Player::parseAnswer(const std::string &str) {
     while (std::getline(ss, tmp)) {
       if (tmp.find("failed.") == 0) { // failed + code 200 = loose !!
 	std::cout << "Game over :(" << std::endl;
-	exit(0);
         _gameOver = true;
         _win = false;
         updateMap(ss);
