@@ -65,6 +65,7 @@ class Map
     #return 5 if not @moves.empty? and not @moves.include? [x, y]
     return nil
   end
+
   def valid_xy? x, y
     return (y >= 0 and y <= 18 and x >= 0 and x <= 18)
   end
@@ -78,8 +79,6 @@ class Map
   end
 
   ### Free3 section ###
-  private
-  public # remove
   def make_free3 y, x, color
     @data[y][x] = color
     all_points = update_free3! y, x
@@ -223,6 +222,7 @@ class Map
       y2, x2 = y+tuple[0], x+tuple[1]
       #@capturable[y2][x2] = false
       update_capturable!(y2, x2, false) if valid_xy?(x2, y2) and (@capturable[y2][x2] == true or rec)
+
     end
 
     return if color.nil? # handled by recursion
@@ -316,13 +316,13 @@ class Map
     fives = fives(color)
     return false if fives.empty?
     return true if ENV["DISABLE_BREAK5"] == "true"
-    breakables = fives.map{|five| breakable_in(five, color)}
-    moves = breakables.inject(&:&) || []
-    return true if moves.empty? # win if cannot break all with one mov
+    # breakables = fives.map{|five| breakable_in(five, color)}
+    return false if fives.map{|b| breakable_capturable?(b) }.inject(&:&)
+    # moves = breakables.inject(&:&) || []
+    # return true if moves.empty? # win if cannot break all with one mov
     return false
   end
 
-  private
   def fives color
     # for each line and each cell
     fives = []
@@ -345,16 +345,23 @@ class Map
     return fives
   end
 
-  def breakable_in five, color
-    y,x,t = five
-    breakables = []
-    while @data[y][x] == color
-      breakables << [y, x] if @capturable[y][x]
-      y += t[0]
-      x += t[1]
-    end
-    return breakables
+  def breakable_capturable? five
+    y, x, tuple = five
+    i=-1
+    pts = 5.times.map{ i=i+1; [y+tuple[0]*i, x+tuple[1]*i] }
+    pts.map{|y, x| self.capturable[y][x]}.include? true
   end
+
+  # def breakable_in five, color
+  #   y,x,t = five
+  #   breakables = []
+  #   while @data[y][x] == color
+  #     breakables << [y, x] if @capturable[y][x]
+  #     y += t[0]
+  #     x += t[1]
+  #   end
+  #   return breakables
+  # end
 
   # test a line
   def win_direction? tuple, y, x, color, distance=0

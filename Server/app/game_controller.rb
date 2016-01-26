@@ -1,4 +1,5 @@
 require 'digest'
+require 'pry'
 
 class GameController < Nephos::Controller
 
@@ -32,7 +33,7 @@ class GameController < Nephos::Controller
                      # lock the game while there is no 2 players connected
                      players_mutex: {"white" => Mutex.new, "black" => Mutex.new},
                      players_took: {"white" => 0, "black" => 0},
-      }
+                    }
     end
     @@free_game[:players][color] = code # add the player
     if @@free_game[:players].size == 2
@@ -91,7 +92,9 @@ class GameController < Nephos::Controller
     end
     x, y = Integer(params[:x]), Integer(params[:y])
     color = @color == "white" ? 0 : 1
-    case @map.valid_place_for? x, y, color
+    tmp = @map.valid_place_for? x, y, color
+    puts "Error: #{tmp}"
+    case tmp
     when nil
       # ok
     when 1
