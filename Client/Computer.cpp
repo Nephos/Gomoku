@@ -113,16 +113,16 @@ int Computer::computeHeuristic() {
           else if (line == 4)
             res -= 50 * free;
         }
-        std::cout << "Found a line of " << line << " which is free " << free << " times. (";
-        if (_map[newy][newx] == _colorValue + '0')
-          std::cout << "mine)";
-        else
-          std::cout << "not mine)";
-        std::cout << " in " << newy << " " << newx << std::endl;
+        // std::cout << "Found a line of " << line << " which is free " << free << " times. (";
+        // if (_map[newy][newx] == _colorValue + '0')
+        //   std::cout << "mine)";
+        // else
+        //   std::cout << "not mine)";
+        // std::cout << " in " << newy << " " << newx << std::endl;
       }
     }
   }
-  std::cout << res << std::endl << std::endl;
+  // std::cout << res << std::endl << std::endl;
   return res;
 }
 
