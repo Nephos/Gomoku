@@ -8,7 +8,7 @@
 #include "Player.hpp"
 
 #define TREE_WEIGHT 128
-#define TREE_DEEPTH 2
+#define TREE_DEPTH 2
 
 #define ABMIN 0b10000000000000000000000000000000
 #define ABMAX 0b01111111111111111111111111111111
@@ -23,7 +23,7 @@ public:
   bool parseAnswer(std::string const &);
   void resetGame();
   int initializeMinMax();
-  int computesMinMax(int deepth_max, int current_color, int, int);
+  int computesMinMax(int depth_max, int current_color, int, int);
   int pushColorAt(int color, int x, int y);
   int pushTakeAt(int color, int x, int y);
   int popColorAt(int color, int x, int y);
