@@ -150,6 +150,7 @@ int Computer::computesMinMax(int deepth_max, int current_color, int a, int b) {
 #define REM_COLOR	(2 << 24)
 #define SET_USABLE	(4 << 24)
 #define SET_NUSABLE	(8 << 24)
+#define ADD_TAKEN	(16 << 24)
 
 #define _ADD_COLOR_AT(color, x, y)		\
   _map[y][x] = color + '0';
@@ -175,11 +176,19 @@ int Computer::computesMinMax(int deepth_max, int current_color, int a, int b) {
   _stack.push(std::make_tuple(color | (diff << 8) | SET_NUSABLE, x1, y1, x2, y2)); \
   count++;								\
   _SET_NUSABLE_AT(color, diff, x1, y1, x2, y2)
+#define _ADD_TAKEN_DIFF(color, diff)		\
+  _taken_diff[color] += diff;
+#define ADD_TAKEN_DIFF(color, diff)					\
+  _stack.push(std::make_tuple(color | (diff << 8) | ADD_TAKEN, -1, -1, -1, -1)); \
+  count++;								\
+  _ADD_TAKEN_DIFF(color, diff)
+#define _REM_TAKEN_DIFF(color, diff)		\
+  _taken_diff[color] -= diff;
 
 #define CHECK_VALUES(xdiff, ydiff)			\
   (valueAt(x + xdiff * 1, y + ydiff * 1) == other &&	\
    valueAt(x + xdiff * 2, y + ydiff * 2) == other &&	\
-   valueAt(x + xdiff * 3, y + ydiff * 3) == color )
+   valueAt(x + xdiff * 3, y + ydiff * 3) == color + '0')
 #define TAKE_DIRECTION(xdiff, ydiff)					\
   REM_COLOR_AT(other, x + xdiff * 1, y + ydiff * 1);			\
   SET_USABLE_AT(color, 1000, x + xdiff * 1, y + ydiff * 1, x + xdiff * 1, y + ydiff * 1); \
@@ -209,8 +218,13 @@ int Computer::pushColorAt(int color, int x, int y) {
   SET_NUSABLE_AT(color, 1000, x, y, x, y);
   SET_USABLE_AT(color, 5, x-1, y-1, x+1, y+1); // radius 1 = +10
   // SET_USABLE_AT(color, 5, x-2, y-2, x+2, y+2); // radius 2 = +5
-  int other = color ^ 1;
+  int other = color ^ 1 + '0';
+  int const count_save = count;
   CHECK_AND_TAKE_ALL_DIRECTION;
+  int const count_diff = count - count_save;
+  if (count_diff > 0) {
+    ADD_TAKEN_DIFF(color, count_diff);
+  }
   if (color == _colorValue) {
     ADD_3FREE;
   }
@@ -230,7 +244,7 @@ int Computer::popColorAt(int color, int x, int y) {
     action_t action = _stack.top();
     _stack.pop();
     if (std::get<0>(action) & ADD_COLOR) {
-      _REM_COLOR_AT(std::get<0>(action),
+      _REM_COLOR_AT(std::get<0>(action) & 1,
 		    std::get<1>(action), std::get<2>(action));
     }
     else if (std::get<0>(action) & REM_COLOR) {
@@ -238,16 +252,20 @@ int Computer::popColorAt(int color, int x, int y) {
 		    std::get<1>(action), std::get<2>(action));
     }
     else if (std::get<0>(action) & SET_USABLE) {
-      _SET_NUSABLE_AT(std::get<0>(action),
+      _SET_NUSABLE_AT(std::get<0>(action) & 1,
 		      ((std::get<0>(action) & 0x00ffff00) >> 8),
 		      std::get<1>(action), std::get<2>(action),
 		      std::get<3>(action), std::get<4>(action));
     }
     else if (std::get<0>(action) & SET_NUSABLE) {
-      _SET_USABLE_AT(std::get<0>(action),
+      _SET_USABLE_AT(std::get<0>(action) & 1,
 		     ((std::get<0>(action) & 0x00ffff00) >> 8),
 		     std::get<1>(action), std::get<2>(action),
 		     std::get<3>(action), std::get<4>(action));
+    }
+    else if (std::get<0>(action) & ADD_TAKEN) {
+      _REM_TAKEN_DIFF(std::get<0>(action) & 1,
+		      ((std::get<0>(action) & 0x00ffff00) >> 8));
     }
   }
   return ccount;

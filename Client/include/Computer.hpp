@@ -7,8 +7,8 @@
 #include <stack>
 #include "Player.hpp"
 
-#define TREE_WEIGHT 16
-#define TREE_DEEPTH 3
+#define TREE_WEIGHT 32
+#define TREE_DEEPTH 2
 
 #define ABMIN 0b10000000000000000000000000000000
 #define ABMAX 0b01111111111111111111111111111111
@@ -55,4 +55,6 @@ private:
   // tree search
   int _best_x, _best_y;
   int _tree_x, _tree_y;
+
+  int _taken_diff[2];
 };
