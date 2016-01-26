@@ -148,6 +148,7 @@ int Computer::computeHeuristic() {
     }						\
   }
 
+#include <ctime>
 void Computer::play() {
   Player::play();
   std::string ans;
@@ -175,7 +176,9 @@ void Computer::play() {
 	// The opponent moved
 	setMoveToXY(_colorValue ^ 1, std::get<0>(_lastMove), std::get<1>(_lastMove));
 	// We move
+	clock_t tStart = clock();
 	computesMinMax(TREE_DEEPTH, _colorValue, ABMIN, ABMAX);
+	printf("Time taken: %.6fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
 	// No response
 	if (_best_x == -1) {
 	  setRandomBestPosition();

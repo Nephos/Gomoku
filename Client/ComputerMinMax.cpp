@@ -4,6 +4,8 @@
 int Computer::initializeMinMax() {
   std::get<0>(_lastMove) = -1;
   std::get<1>(_lastMove) = -1;
+  _taken_diff[0] = 0;
+  _taken_diff[1] = 0;
   for (int y = 0; y < 19; y++) {
     std::vector<int> tmpi;
     std::vector<int> tmpb;
@@ -222,7 +224,7 @@ int Computer::pushColorAt(int color, int x, int y) {
   SET_NUSABLE_AT(color, 1000, x, y, x, y);
   SET_USABLE_AT(color, 5, x-1, y-1, x+1, y+1); // radius 1 = +10
   // SET_USABLE_AT(color, 5, x-2, y-2, x+2, y+2); // radius 2 = +5
-  int other = color ^ 1 + '0';
+  int other = (color ^ 1) + '0';
   int const count_save = count;
   CHECK_AND_TAKE_ALL_DIRECTION;
   int const count_diff = count - count_save;
