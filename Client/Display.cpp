@@ -1,8 +1,9 @@
 #include "Display.hpp"
 #include "Exceptions.hpp"
 
-GomokuDisplay::GomokuDisplay(bool r) {
+GomokuDisplay::GomokuDisplay(bool r, bool rot) {
   rainbow = r;
+  rotate = rot;
 
   Window root;
   GLint att[] = { GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None };
@@ -366,6 +367,8 @@ std::pair<int, int> GomokuDisplay::transformInputs(std::pair<float, float> &clic
 }
 
 std::pair<int, int> GomokuDisplay::drawGame(char map[19][19]) {
+  if (rotate)
+    pitch++;
   XWindowAttributes gwa;
 
   XGetWindowAttributes(dpy, win, &gwa);

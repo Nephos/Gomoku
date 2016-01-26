@@ -1,13 +1,13 @@
 #include <sstream>
 #include "Human.hpp"
 
-Human::Human(std::string const &host, std::string const &port, bool rainbows)
-              : Player(host, port), _display(rainbows) {}
+Human::Human(std::string const &host, std::string const &port, bool rainbows, bool rotate)
+              : Player(host, port), _display(rainbows, rotate) {}
 
 Human *Human::p = NULL;
-Human *Human::getInstance(bool rainbows, std::string const &host, std::string const &port) {
+Human *Human::getInstance(bool rainbows, bool rotate, std::string const &host, std::string const &port) {
   if (p == NULL)
-    p = new Human(host, port, rainbows);
+    p = new Human(host, port, rainbows, rotate);
   return p;
 }
 
