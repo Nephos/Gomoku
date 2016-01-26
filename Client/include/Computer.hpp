@@ -23,7 +23,7 @@ public:
   bool parseAnswer(std::string const &);
   void resetGame();
   int initializeMinMax();
-  int computesMinMax(int deepth_max, int current_color, int, int);
+  int computesMinMax(int depth_max, int current_color, int, int);
   int pushColorAt(int color, int x, int y);
   int pushTakeAt(int color, int x, int y);
   int popColorAt(int color, int x, int y);
