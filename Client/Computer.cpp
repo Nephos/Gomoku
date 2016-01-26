@@ -162,7 +162,7 @@ void Computer::play() {
 	// The opponent moved
 	setMoveToXY(_colorValue ^ 1, std::get<0>(_lastMove), std::get<1>(_lastMove));
 	// We move
-	computesMinMax(TREE_DEEPTH, _colorValue);
+	computesMinMax(TREE_DEEPTH, _colorValue, ABMIN, ABMAX);
 	// No response
 	if (_best_x == -1) {
 	  setRandomBestPosition();

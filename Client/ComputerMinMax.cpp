@@ -79,17 +79,15 @@ int Computer::checkVictory() {
  * If on a leaf, calc the heuristic
  * If not, for each interesting usables (x, y) go deeper and keep only the max/min
  */
-int Computer::computesMinMax(int deepth_max, int current_color) {
+int Computer::computesMinMax(int deepth_max, int current_color, int a, int b) {
   // pour toutes les cases vides qui ne nous font pas perdre
-  // 'best' is the value of the better place
-  int best = (current_color == _colorValue ? (~0) : ((~0 << 1) >> 1)); // -inf or +inf
   // 'tmp' is the value of the current place, to compare with 'best'
-  int tmp, tmp_position;
+  int tmp;
   int count = 0;
   bool is_self_turn = current_color == _colorValue;
+  // 'best' is the value of the better place
+  int best = (is_self_turn ? (ABMIN) : (ABMAX)); // -inf or +inf
 
-  // if (LOOSE) return -100;
-  // if (WIN) return 100;
   // evaluate the state and return it
   if (deepth_max == 0) {
     return computeHeuristic();
@@ -97,8 +95,8 @@ int Computer::computesMinMax(int deepth_max, int current_color) {
 
   for (unsigned int y = 0; y < 19; y++) {
     for (unsigned int x = 0; x < 19; x++) {
-      if (count > TREE_WEIGHT || _usables[y][x] <= 0)
-        continue;
+      if (_usables[y][x] <= 0)
+	continue;
 
       count++;
       pushColorAt(current_color, x, y); // that push on _stack
@@ -106,33 +104,41 @@ int Computer::computesMinMax(int deepth_max, int current_color) {
       _tree_y = y;
       int victory = checkVictory();
       if (victory != 0) {
-        if (deepth_max == TREE_DEEPTH) {
+        if (deepth_max == TREE_DEEPTH) { // it should not happend
     	    _best_x = x;
     	    _best_y = y;
     	  }
         popColorAt(current_color, x, y);
         return victory;
       }
-      // std::cout << "MinMax ... " << max_deepth << std::endl;
-      tmp = computesMinMax(deepth_max - 1, current_color ^ 1);
-      // std::cout << "MinMax = " << tmp << std::endl;
+      if (count > TREE_WEIGHT) {
+	popColorAt(current_color, x, y);
+        continue;
+      }
+      tmp = computesMinMax(deepth_max - 1, current_color ^ 1, a, b);
       popColorAt(current_color, x, y); // that pop from _stack
 
-      // std::cout << "Found " << tmp << " at " << x << ":" << y << ":" << deepth_max << std::endl;
-
-      if (is_self_turn) {
-        if (tmp >= best || _best_x == -1) {
+      if (!is_self_turn) {
+        if (tmp < best) {
+	  best = tmp;
+	}
+	if (a >= best)
+	  return best;
+	if (best < b)
+	  b = best;
+      }
+      else {
+        if (tmp > best) {
 	  best = tmp;
 	  if (deepth_max == TREE_DEEPTH) {
 	    _best_x = x;
 	    _best_y = y;
 	  }
 	}
-      }
-      else {
-        if (tmp <= best || _best_x == -1) {
-	  best = tmp;
-	}
+	if (best >= b)
+	  return best;
+	if (best > a)
+	  a = best;
       }
     }
   }
