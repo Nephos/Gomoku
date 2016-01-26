@@ -155,7 +155,7 @@ int Computer::computesMinMax(int depth_max, int current_color, int a, int b) {
 #define ADD_TAKEN	(16 << 24)
 
 #define _ADD_COLOR_AT(color, x, y)		\
-  _map[y][x] = color + '0';
+  _map[y][x] = (color % '0') + '0';
 #define ADD_COLOR_AT(color, x, y)				\
   _stack.push(std::make_tuple(color | ADD_COLOR, x, y, x, y));	\
   count++;							\
@@ -182,18 +182,18 @@ int Computer::computesMinMax(int depth_max, int current_color, int a, int b) {
   _taken_diff[color] += diff;
 #define ADD_TAKEN_DIFF(color, diff)					\
   _stack.push(std::make_tuple(color | (diff << 8) | ADD_TAKEN, -1, -1, -1, -1)); \
-  if (color == _colorValue) \
-    _tokensTaken++; \
-  else \
-    _tokensTaken--; \
+  if (color == _colorValue)						\
+    _tokensTaken++;							\
+  else									\
+    _tokensTaken--;							\
   count++;								\
   _ADD_TAKEN_DIFF(color, diff)
 #define _REM_TAKEN_DIFF(color, diff)		\
   _taken_diff[color] -= diff;
 
-#define CHECK_VALUES(xdiff, ydiff)			\
-  (valueAt(x + xdiff * 1, y + ydiff * 1) == other &&	\
-   valueAt(x + xdiff * 2, y + ydiff * 2) == other &&	\
+#define CHECK_VALUES(xdiff, ydiff)				\
+  (valueAt(x + xdiff * 1, y + ydiff * 1) == other + '0' &&	\
+   valueAt(x + xdiff * 2, y + ydiff * 2) == other + '0' &&	\
    valueAt(x + xdiff * 3, y + ydiff * 3) == color + '0')
 #define TAKE_DIRECTION(xdiff, ydiff)					\
   REM_COLOR_AT(other, x + xdiff * 1, y + ydiff * 1);			\
@@ -217,14 +217,14 @@ int Computer::computesMinMax(int depth_max, int current_color, int a, int b) {
 
 int Computer::pushColorAt(int color, int x, int y) {
 #ifdef DEBUG
-  std::cout << "Push color (" << color << ") at (" << x << ":" << y << ")"  << std::endl;
+  std::cout << "Push color (" << (int)color << ") at (" << x << ":" << y << ")"  << std::endl;
 #endif //DEBUG
   int count = 0;
   ADD_COLOR_AT(color, x, y);
   SET_NUSABLE_AT(color, 1000, x, y, x, y);
   SET_USABLE_AT(color, 5, x-1, y-1, x+1, y+1); // radius 1 = +10
   // SET_USABLE_AT(color, 5, x-2, y-2, x+2, y+2); // radius 2 = +5
-  int other = (color ^ 1) + '0';
+  int other = (color ^ 1);
   int const count_save = count;
   CHECK_AND_TAKE_ALL_DIRECTION;
   int const count_diff = count - count_save;
@@ -241,7 +241,7 @@ int Computer::pushColorAt(int color, int x, int y) {
 int Computer::popColorAt(int color, int x, int y) {
   // get the last element of the stack => is the number of elements to pop
 #ifdef DEBUG
-  std::cout << "Pop color (" << color << ") at (" << x << ":" << y << ")"  << std::endl;
+  std::cout << "Pop color (" << (int)color << ") at (" << x << ":" << y << ")"  << std::endl;
 #endif //DEBUG
   int count = std::get<0>(_stack.top());
   const int ccount = count;
@@ -254,7 +254,7 @@ int Computer::popColorAt(int color, int x, int y) {
 		    std::get<1>(action), std::get<2>(action));
     }
     else if (std::get<0>(action) & REM_COLOR) {
-      _ADD_COLOR_AT(std::get<0>(action),
+      _ADD_COLOR_AT(std::get<0>(action) & 1,
 		    std::get<1>(action), std::get<2>(action));
     }
     else if (std::get<0>(action) & SET_USABLE) {
