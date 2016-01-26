@@ -184,15 +184,15 @@ int Computer::computeHeuristic() {
   // Finally, we take into account the tokens taken during the simulation.
   if (_colorValue == '0') {
     if (_tokensTaken < 0) // I'm getting wrecked
-      res += _tokensTaken * (30 + 5 * _blackScore);
+      res += _blackScore == 4 ? _tokensTaken * 1000 : _tokensTaken * (30 + 5 * _blackScore);
     else
-      res += _tokensTaken * (30 + 5 * _whiteScore);
+      res += _whiteScore == 4 ? _tokensTaken * 1000 : _tokensTaken * (30 + 5 * _whiteScore);
   }
   else if (_colorValue == '1') {
     if (_tokensTaken < 0)
-      res += _tokensTaken * (30 + 5 * _whiteScore);
+      res += _whiteScore == 4 ? _tokensTaken * 1000 : _tokensTaken * (30 + 5 * _whiteScore);
     else
-      res += _tokensTaken * (30 + 5 * _blackScore);
+      res += _blackScore == 4 ? _tokensTaken * 1000 : _tokensTaken * (30 + 5 * _blackScore);
   }
 
   return res;
@@ -272,6 +272,8 @@ void Computer::setRandomBestPosition() {
   if (xplayed != _best_x1 || yplayed != _best_y1) {
     _best_x = _best_x1;
     _best_y = _best_y1;
+    xplayed = _best_x1;
+    yplayed = _best_y1;
     return;
   }
   for (int y = 0; y < 19; y++) {
