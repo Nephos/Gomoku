@@ -123,6 +123,19 @@ int Computer::computeHeuristic() {
     }
   }
   // std::cout << res << std::endl << std::endl;
+  // Finally, we take into account the tokens taken during the simulation.
+  if (_colorValue == '0') {
+    if (_tokensTaken < 0) // I'm getting wrecked
+      res += _tokensTaken * (30 + 5 * _blackScore);
+    else
+      res += _tokensTaken * (30 + 5 * _whiteScore);
+  }
+  else if (_colorValue == '1') {
+    if (_tokensTaken < 0)
+      res += _tokensTaken * (30 + 5 * _whiteScore);
+    else
+      res += _tokensTaken * (30 + 5 * _blackScore);
+  }
   return res;
 }
 

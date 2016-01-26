@@ -180,6 +180,10 @@ int Computer::computesMinMax(int deepth_max, int current_color, int a, int b) {
   _taken_diff[color] += diff;
 #define ADD_TAKEN_DIFF(color, diff)					\
   _stack.push(std::make_tuple(color | (diff << 8) | ADD_TAKEN, -1, -1, -1, -1)); \
+  if (color == _colorValue) \
+    _tokensTaken++; \
+  else \
+    _tokensTaken--; \
   count++;								\
   _ADD_TAKEN_DIFF(color, diff)
 #define _REM_TAKEN_DIFF(color, diff)		\

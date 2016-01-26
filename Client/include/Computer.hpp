@@ -7,7 +7,7 @@
 #include <stack>
 #include "Player.hpp"
 
-#define TREE_WEIGHT 32
+#define TREE_WEIGHT 128
 #define TREE_DEEPTH 2
 
 #define ABMIN 0b10000000000000000000000000000000
@@ -38,6 +38,7 @@ private:
   Computer(std::string const &, std::string const &);
   ~Computer() {};
   static Computer *p;
+  int _tokensTaken;
 
 #define line(T) std::vector<T >
   line(line(int)) _weights;
