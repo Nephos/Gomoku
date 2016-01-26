@@ -98,7 +98,7 @@ int Computer::computesMinMax(int depth_max, int current_color, int a, int b) {
   for (unsigned int y = 0; y < 19; y++) {
     for (unsigned int x = 0; x < 19; x++) {
       if (_usables[y][x] <= 0)
-	continue;
+	      continue;
 
       count++;
       pushColorAt(current_color, x, y); // that push on _stack
@@ -133,6 +133,8 @@ int Computer::computesMinMax(int depth_max, int current_color, int a, int b) {
         if (tmp > best) {
 	  best = tmp;
 	  if (depth_max == TREE_DEPTH) {
+      _best_x1 = _best_x;
+      _best_y1 = _best_y;
 	    _best_x = x;
 	    _best_y = y;
 	  }

@@ -195,15 +195,6 @@ int Computer::computeHeuristic() {
       res += _tokensTaken * (30 + 5 * _blackScore);
   }
 
-  std::cout << res << std::endl;
-  for (int a = 0; a < 19; a++) {
-    for (int b = 0; b < 19; b++) {
-      std::cout << _map[a][b] << " ";
-    }
-    std::cout << std::endl;
-  }
-  std::cout << std::endl;
-
   return res;
 }
 
@@ -276,12 +267,28 @@ void Computer::play() {
 }
 
 void Computer::setRandomBestPosition() {
+  static int xplayed = -1;
+  static int yplayed = -1;
+  if (xplayed != _best_x1 || yplayed != _best_y1) {
+    _best_x = _best_x1;
+    _best_y = _best_y1;
+    return;
+  }
+  for (int y = 0; y < 19; y++) {
+    for (int x = 0; x < 19; x++) {
+      if (_map[y][x] == 'x' && _usables[y][x] > 0) {
+        _best_x = x;
+        _best_y = y;
+        return;
+      }
+    }
+  }
   for (int y = 0; y < 19; y++) {
     for (int x = 0; x < 19; x++) {
       if (_map[y][x] == 'x') {
-	_best_x = x;
-	_best_y = y;
-	return;
+      	_best_x = x;
+      	_best_y = y;
+      	return;
       }
     }
   }

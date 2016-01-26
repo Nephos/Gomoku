@@ -55,6 +55,7 @@ private:
 
   // tree search
   int _best_x, _best_y;
+  int _best_x1, _best_y1;
   int _tree_x, _tree_y;
 
   int _taken_diff[2];
