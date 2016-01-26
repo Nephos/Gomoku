@@ -24,13 +24,13 @@ int Computer::computeHeuristic() {
     {1, 0}, // East I guess
   };
 
-  std::cout << std::endl;
-  for (int i = 0; i < 19; i++) {
-    for (int j = 0; j < 19; j++) {
-      std::cout << _map[i][j] << " ";
-    }
-    std::cout << std::endl;
-  }
+  // std::cout << std::endl;
+  // for (int i = 0; i < 19; i++) {
+  //   for (int j = 0; j < 19; j++) {
+  //     std::cout << _map[i][j] << " ";
+  //   }
+  //   std::cout << std::endl;
+  // }
 
   bool used[4][19][19] = {false}; // To remember whether the tile was already checked in this direction
   int res = 0;

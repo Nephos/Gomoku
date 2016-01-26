@@ -7,8 +7,8 @@
 #include <stack>
 #include "Player.hpp"
 
-#define TREE_WEIGHT 10
-#define TREE_DEEPTH 1
+#define TREE_WEIGHT 16
+#define TREE_DEEPTH 2
 
 class Computer : public Player
 {

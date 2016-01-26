@@ -113,11 +113,15 @@ int Computer::computesMinMax(int deepth_max, int current_color) {
         popColorAt(current_color, x, y);
         return victory;
       }
+      // std::cout << "MinMax ... " << max_deepth << std::endl;
       tmp = computesMinMax(deepth_max - 1, current_color ^ 1);
+      // std::cout << "MinMax = " << tmp << std::endl;
       popColorAt(current_color, x, y); // that pop from _stack
 
+      // std::cout << "Found " << tmp << " at " << x << ":" << y << ":" << deepth_max << std::endl;
+
       if (is_self_turn) {
-        if (tmp >= best) {
+        if (tmp >= best || _best_x == -1) {
 	  best = tmp;
 	  if (deepth_max == TREE_DEEPTH) {
 	    _best_x = x;
@@ -126,7 +130,7 @@ int Computer::computesMinMax(int deepth_max, int current_color) {
 	}
       }
       else {
-        if (tmp <= best) {
+        if (tmp <= best || _best_x == -1) {
 	  best = tmp;
 	}
       }
