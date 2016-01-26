@@ -168,14 +168,16 @@ int Computer::computeHeuristic() {
             r = r / 1.5;
           res -= r;
         }
-        // std::cout << "Found a " << (empty ? "potential " : "") << "line of " << line << " which is free " << free << " times. (";
-        // if (_map[newy][newx] == _colorValue)
-        //   std::cout << "mine)";
-        // else
-        //   std::cout << "not mine)";
-        // std::cout << " in " << newy << " " << newx << std::endl;
-        // if (empty)
-        //   _map[newy][newx] = 'x';
+        // if (empty) {
+        //   std::cout << "Found a " << (empty ? "potential " : "") << "line of " << line << " which is free " << free << " times. (";
+        //   if (_map[newy][newx] == _colorValue)
+        //     std::cout << "mine)";
+        //   else
+        //     std::cout << "not mine)";
+        //   std::cout << " in " << newy << " " << newx << std::endl;
+        // }
+        if (empty)
+          _map[newy][newx] = 'x';
       }
     }
   }
