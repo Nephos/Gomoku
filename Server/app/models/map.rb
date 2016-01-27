@@ -28,10 +28,14 @@ class Map
     @last_move = [-1, -1]
   end
 
-  def newid!
+  def newid! color
     id = @id
-    @id += 1
-    id
+    diff = 0
+    if (color == 0 && id % 2 == 1) || (color == 1 && id % 2 == 0)
+      diff += 1
+    end
+    @id += diff + 1
+    id + diff
   end
 
   def new_move x, y
@@ -44,7 +48,7 @@ class Map
 
   # we can use map like an array
   def method_missing m, *a
-    @data.send(m, *a)
+   @data.send(m, *a)
   end
 
   def to_a
@@ -83,14 +87,16 @@ class Map
     @data[y][x] = color
     all_points = update_free3! y, x
     @data[y][x] = nil
-    return (all_points.map{|y2, x2| @free3_cpy[y2][x2] }.inject(&:+) ||[]).uniq.size
+    n = (all_points.map{|y2, x2| @free3_cpy[y2][x2] }.inject(&:+) || []).uniq.select{|id| id % 2 == color }.size
+    # binding.pry if n > 1
+    return n
   end
 
   def save_free3!
     @free3 = @free3_cpy
     @free3_list = @free3_list_cpy
-  end
 
+  end
   def update_free3! y, x
     color = @data[y][x]
     @free3_cpy = Marshal.load(Marshal.dump(@free3))
@@ -111,7 +117,7 @@ class Map
         void, allies, freeb = free3_tests(void, allies, freeb, y, x, tuples[1], color, (void == 1 && allies != 3))
       end
       if void <= 1 and allies == 3 and freeb >= 3
-        id = newid!
+        id = newid!(color)
         @allies << [y, x]
         points = (@allies + @borders)
         @free3_list_cpy[id] = {allies: points, borders: @ext_borders}
