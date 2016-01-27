@@ -11,5 +11,12 @@ resource "/game" do
   resource "/options" do
     get "/break5/:set", to: "GameController#break5"
     get "/free3/:set", to: "GameController#free3"
+    get "/:b/:f", to: "GameController#options"
   end
+end
+
+resource "/options" do
+  get "/break5/:set", to: "GameController#break5"
+  get "/free3/:set", to: "GameController#free3"
+  get "/:b/:f", to: "GameController#options"
 end

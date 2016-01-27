@@ -45,6 +45,14 @@ class GameController < Nephos::Controller
     return @game_id
   end
 
+  def options
+    return auth_err unless auth?
+    ENV["DISABLE_BREAK5"] = params[:b] == "false" ? "true" : "false"
+    ENV["DISABLE_FREE3"] = params[:f] == "false" ? "true" : "false"
+    return {plain: "break5=#{params[:b]}, free3=#{params[:f]}"} if plain?
+    return {json: {break5: params[:b], free3: params[:f]} }
+  end
+
   def break5
     return auth_err unless auth?
     ENV["DISABLE_BREAK5"] = params[:set]
