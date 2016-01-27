@@ -7,8 +7,8 @@
 #include <stack>
 #include "Player.hpp"
 
-#define TREE_WEIGHT 1000
-#define TREE_DEPTH 2
+#define TREE_WEIGHT 128
+#define TREE_DEPTH 4
 
 #define ABMIN 0b10000000000000000000000000000000
 #define ABMAX 0b01111111111111111111111111111111
