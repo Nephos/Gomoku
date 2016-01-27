@@ -5,6 +5,9 @@ GomokuDisplay::GomokuDisplay(bool r, bool rot) {
   rainbow = r;
   rotate = rot;
 
+  _free = _break = true;
+  _rulesChanged = false;
+
   Window root;
   GLint att[] = { GLX_RGBA, GLX_DEPTH_SIZE, 24, GLX_DOUBLEBUFFER, None };
   XVisualInfo *vi;
@@ -377,6 +380,7 @@ std::pair<int, int> GomokuDisplay::drawGame(char map[19][19]) {
   loop++;
 
   /* Getting ready to draw */
+  drawUI();
   if (color.compare("black") == 0)
     glClearColor(0.0, 0.0, 0.0, 0.0);
   else
@@ -395,6 +399,7 @@ std::pair<int, int> GomokuDisplay::drawGame(char map[19][19]) {
   drawUI();
 
   glXSwapBuffers(dpy, win);
+  drawUI();
   std::pair<float, float> p = handleInputs();
   if (p.first >= 0)
     return transformInputs(p);
@@ -459,6 +464,14 @@ std::pair<float, float> GomokuDisplay::handleInputs() {
           break;
         case KEY_DOWN:
           yaw -= CAMERA_SPEED;
+          break;
+        case 41:
+          _free = !_free;
+          _rulesChanged = true;
+          break;
+        case 42:
+          _break = !_break;
+          _rulesChanged = true;
           break;
       }
     }

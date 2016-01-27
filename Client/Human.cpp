@@ -32,6 +32,12 @@ void Human::play() {
     ans = _network.getAnswer();
     parseAnswer(ans);
     click = _display.drawGame(_map);
+    if (_display.getRulesChanged()) {
+      std::string req = "GET /game/options/break5/" + (_display.getBreak() ? std::string("true") : std::string("false")) + header + _cookie + "\r\n\r\n";
+      _network.sendQuery(req);
+      req = "GET /game/options/free3/" + (_display.getBreak() ? std::string("true") : std::string("false")) + header + _cookie + "\r\n\r\n";
+      _network.sendQuery(req);
+    }
     if (click.first == -3)
       resetGame();
     else if (!_myTurn && !_gameOver) {
