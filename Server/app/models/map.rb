@@ -317,7 +317,7 @@ class Map
     return false if fives.empty?
     return true if ENV["DISABLE_BREAK5"] == "true"
     # breakables = fives.map{|five| breakable_in(five, color)}
-    return false if fives.map{|b| breakable_capturable?(b) }.inject(&:&)
+    return true if fives.map{|b| breakable_capturable?(b) }.inject(&:&) == false
     # moves = breakables.inject(&:&) || []
     # return true if moves.empty? # win if cannot break all with one mov
     return false
@@ -349,7 +349,7 @@ class Map
     y, x, tuple = five
     i=-1
     pts = 5.times.map{ i=i+1; [y+tuple[0]*i, x+tuple[1]*i] }
-    pts.map{|y, x| self.capturable[y][x]}.include? true
+    pts.map{|y2, x2| self.capturable[y2][x2]}.include? true
   end
 
   # def breakable_in five, color
