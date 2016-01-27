@@ -16,7 +16,7 @@ NAME	=	client
 
 CXXFLAGS +=	-Wextra -Wall -std=c++11 -I./include
 
-LDXXFLAGS =	-lboost_system -lGL -lGLU -lX11 -lpthread
+LDXXFLAGS =	-lboost_system -lGL -lGLU -lX11 -lpthread `imlib2-config --libs`
 
 all: $(NAME)
 

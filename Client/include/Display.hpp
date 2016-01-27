@@ -6,6 +6,7 @@
 #include <GL/gl.h>
 #include <GL/glx.h>
 #include <GL/glu.h>
+#include <Imlib2.h>
 #include <map>
 #include <vector>
 #include "Obj.hpp"
@@ -60,6 +61,10 @@ class GomokuDisplay {
     void setBlackScore(int);
     void setWhiteScore(int);
 
+    bool getRulesChanged() { bool tmp = _rulesChanged; _rulesChanged = false; return tmp; };
+    bool getFree() const { return _free; };
+    bool getBreak() const { return _break; };
+
   private:
     Display *dpy;
     Window win;
@@ -77,4 +82,8 @@ class GomokuDisplay {
     std::vector<GLuint> _texturesP2;
     std::vector<Obj> _modelsP1;
     std::vector<Obj> _modelsP2;
+
+    bool _rulesChanged;
+    bool _free;
+    bool _break;
 };
