@@ -12,9 +12,9 @@ SRC	=	Player.cpp \
 
 OBJ	=	$(SRC:.cpp=.o)
 
-NAME=	client
+NAME	=	client
 
-CXXFLAGS += -Wextra -Wall -std=c++11 -I./include
+CXXFLAGS +=	-Wextra -Wall -std=c++11 -I./include
 
 LDXXFLAGS =	-lboost_system -lGL -lGLU -lX11 -lpthread `imlib2-config --libs`
 
@@ -23,7 +23,10 @@ all: $(NAME)
 $(NAME): $(OBJ)
 	$(CXX) -o $(NAME) $(LDXXFLAGS) $(OBJ)
 
-debug:	CXXFLAGS += -D DEBUG -g
+opti: CXXFLAGS += -O3
+opti: $(NAME)
+
+debug: CXXFLAGS += -D DEBUG -g
 debug: $(NAME)
 
 clean:
