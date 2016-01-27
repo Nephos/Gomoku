@@ -213,9 +213,12 @@ void Computer::play() {
   std::string ans;
   std::string header = " HTTP/1.0\r\nHost: " + _host + "\r\nAccept: */*\r\n";
   initializeMinMax();
+  printf("|  MinMax  | Arbitre  |  Total   | duration (s)\n");
+  printf("|----------|----------|----------|\n");
   while (!_gameOver) { // Game loop
     ans = _network.getAnswer();
     parseAnswer(ans);
+    clock_t tStart1 = clock();
     if (!_myTurn) {
       std::string req = "GET /game.txt" + header + _cookie + "\r\n\r\n";
       ans = _network.sendSyncQuery(req);
@@ -235,20 +238,22 @@ void Computer::play() {
 	// The opponent moved
 	setMoveToXY(_colorValue ^ 1, std::get<0>(_lastMove), std::get<1>(_lastMove));
 	// We move
-	clock_t tStart = clock();
 	computesMinMax(TREE_DEPTH, _colorValue, ABMIN, ABMAX);
-	printf("Time taken: %.6fs\n", (double)(clock() - tStart)/CLOCKS_PER_SEC);
 	// No response
 	if (_best_x == -1) {
 	  setRandomBestPosition();
 	}
       }
+      clock_t tEnd1 = clock();
       setMoveToXY(_colorValue, _best_x, _best_y);
       std::stringstream ss;
       ss << "POST /game/play/" << _best_x << "/" << _best_y << header << _cookie << "\r\n\r\n";
       std::string req = ss.str();
+      clock_t tStart2 = clock();
       ans = _network.sendSyncQuery(req);
       parseAnswer(ans);
+      clock_t tEnd2 = clock();
+      printf("| %.6f | %.6f | %.6f | \n", (double)(tEnd1 - tStart1)/CLOCKS_PER_SEC, (double)(tEnd2 - tStart2)/CLOCKS_PER_SEC, (double)(tEnd2 - tStart1)/CLOCKS_PER_SEC);
       req = "GET /game/map.txt" + header + _cookie + "\r\n\r\n";
       ans = _network.sendSyncQuery(req);
       parseAnswer(ans);
